@@ -1,5 +1,7 @@
 package dev.thalysom.pessoas.domain;
 
+import dev.thalysom.util.DocumentoUtils;
+
 public class PessoaJuridica extends Pessoa{
     @Override
     public void validarDocumento(String documento) {
@@ -15,6 +17,6 @@ public class PessoaJuridica extends Pessoa{
     }
     @Override
     public void mostrarDados() {
-        System.out.println("Pessoa Jurídica: " + getNome() + " CNPJ: " + getDocumento());
+        System.out.println("Pessoa Jurídica: " + getNome() + " CNPJ: " + DocumentoUtils.formatarCNPJ(getDocumento()));
     }
 }

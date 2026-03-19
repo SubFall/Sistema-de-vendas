@@ -1,5 +1,7 @@
 package dev.thalysom.pessoas.domain;
 
+import dev.thalysom.util.DocumentoUtils;
+
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -49,7 +51,7 @@ public class PessoaFisica extends Pessoa {
         System.out.println("Nome:              " + getNome());
         System.out.println("Ano de Nascimento: " + getAnoNascimento());
         System.out.println("Idade:             " +getIdade());
-        System.out.println("CPF:               " + getDocumento());
+        System.out.println("CPF:               " + DocumentoUtils.formatarCPF(getDocumento()));
         System.out.println();
     }
 }
