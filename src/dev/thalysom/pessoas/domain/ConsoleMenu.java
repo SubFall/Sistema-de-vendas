@@ -6,8 +6,8 @@ import java.time.LocalDate;
 import java.util.Scanner;
 
 public class ConsoleMenu {
-    private Scanner scanner = new Scanner(System.in);
-    private CadastroPessoa cadastroPessoa = new CadastroPessoa();
+    public Scanner scanner = new Scanner(System.in);
+    public CadastroPessoa cadastroPessoa = new CadastroPessoa();
 
     public void iniciar() {
         int opcao;
