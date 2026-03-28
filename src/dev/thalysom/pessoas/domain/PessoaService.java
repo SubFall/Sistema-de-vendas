@@ -22,7 +22,7 @@ public class PessoaService {
                 System.out.print("Digite seu nome:");
                 pessoaFisica.setNome(scanner.nextLine());
 
-                System.out.print("Digite a data de nascimento (AAAA-MM-DD): ");
+                System.out.print("Digite a data de nascimento (DD/MM/YYYY): ");
                 LocalDate data = ConsoleUtils.lerData(scanner);
                 pessoaFisica.setAnoNascimento(data);
 
