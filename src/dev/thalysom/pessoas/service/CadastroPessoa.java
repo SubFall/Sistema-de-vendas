@@ -1,7 +1,10 @@
-package dev.thalysom.pessoas.domain;
+package dev.thalysom.pessoas.service;
+
+import dev.thalysom.pessoas.domain.Pessoa;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class CadastroPessoa {
     private List<Pessoa> pessoas = new ArrayList<>();
@@ -47,5 +50,16 @@ public class CadastroPessoa {
             pessoa.mostrarDados();
         }
 
+    }
+
+    public List<Pessoa> buscar(Predicate<Pessoa> filtro ) {
+        List<Pessoa> resultado = new ArrayList<>();
+
+        for (Pessoa p : pessoas) {
+            if (filtro.test(p)) {
+                resultado.add(p);
+            }
+        }
+        return resultado;
     }
 }

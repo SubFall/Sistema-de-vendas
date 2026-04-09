@@ -1,5 +1,7 @@
-package dev.thalysom.pessoas.domain;
+package dev.thalysom.pessoas.service;
 
+import dev.thalysom.pessoas.domain.PessoaFisica;
+import dev.thalysom.pessoas.domain.PessoaJuridica;
 import dev.thalysom.util.ConsoleUtils;
 
 import java.time.LocalDate;
