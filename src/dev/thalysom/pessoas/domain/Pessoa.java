@@ -1,8 +1,11 @@
 package dev.thalysom.pessoas.domain;
 
+import java.util.List;
+
 public abstract class Pessoa {
     private String nome;
     private String documento;
+    private Endereco enderecos;
 
 
     public void setNome(String nome) {
@@ -16,7 +19,13 @@ public abstract class Pessoa {
         return this.nome;
     }
 
+    public Endereco getEnderecos() {
+        return enderecos;
+    }
 
+    public void setEnderecos(Endereco enderecos) {
+        this.enderecos = enderecos;
+    }
 
     public void setDocumento(String documento) {
         validarDocumento(documento);

@@ -52,6 +52,15 @@ public class PessoaFisica extends Pessoa {
         System.out.println("Ano de Nascimento: " + getAnoNascimento());
         System.out.println("Idade:             " +getIdade());
         System.out.println("CPF:               " + DocumentoUtils.formatarCPF(getDocumento()));
+        if (!getEnderecos().getCep().equals("")) {
+            System.out.println();
+            System.out.println("******Endereço******");
+            System.out.println("CEP:               " + getEnderecos().getCep());
+            System.out.println("Logradouro:        " + getEnderecos().getLogradouro());
+            System.out.println("Cidade:            " + getEnderecos().getCidade());
+            System.out.println("UF:                " + getEnderecos().getUf());
+            System.out.println("Nº:                " + getEnderecos().getNumero());
+        }
         System.out.println();
     }
 }

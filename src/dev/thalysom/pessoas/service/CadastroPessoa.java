@@ -1,5 +1,6 @@
 package dev.thalysom.pessoas.service;
 
+import dev.thalysom.pessoas.domain.Endereco;
 import dev.thalysom.pessoas.domain.Pessoa;
 
 import java.util.ArrayList;
@@ -61,5 +62,9 @@ public class CadastroPessoa {
             }
         }
         return resultado;
+    }
+
+    public void adicionarEndereco(Pessoa pessoa, Endereco endereco) {
+        pessoa.setEnderecos(endereco);
     }
 }

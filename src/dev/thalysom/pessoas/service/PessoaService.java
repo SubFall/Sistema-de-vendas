@@ -1,5 +1,6 @@
 package dev.thalysom.pessoas.service;
 
+import dev.thalysom.pessoas.domain.Endereco;
 import dev.thalysom.pessoas.domain.PessoaFisica;
 import dev.thalysom.pessoas.domain.PessoaJuridica;
 import dev.thalysom.util.ConsoleUtils;
@@ -10,6 +11,8 @@ import java.util.Scanner;
 public class PessoaService {
 
     public void cadastrarPessoa(Scanner scanner, CadastroPessoa cadastroPessoa) {
+        Endereco endereco = new Endereco();
+
         System.out.println("1 - Pessoa Física");
         System.out.println("2 - Pessoa Jurídica");
 
@@ -37,6 +40,20 @@ public class PessoaService {
                     System.out.println(e.getMessage());
                 }
 
+                System.out.println("*****Deseja Adicionar o Cep ?*****");
+                System.out.println("1 - Sim");
+                System.out.println("2 - Não");
+
+                op = scanner.nextInt();
+                scanner.nextLine();
+
+
+                if (op == 1) {
+                    endereco = cadastrarEndereco(endereco, scanner);
+
+                }
+                cadastroPessoa.adicionarEndereco(pessoaFisica, endereco);
+
                 break;
             case 2:
                 PessoaJuridica pessoaJuridica = new PessoaJuridica();
@@ -52,7 +69,18 @@ public class PessoaService {
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
+                System.out.println("*****Deseja Adicionar o Cep ?*****");
+                System.out.println("1 - Sim");
+                System.out.println("2 - Não");
 
+                op = scanner.nextInt();
+                scanner.nextLine();
+
+                if (op == 1) {
+                    endereco = cadastrarEndereco(endereco, scanner);
+
+                }
+                cadastroPessoa.adicionarEndereco(pessoaJuridica, endereco);
                 break;
         }
 
@@ -75,5 +103,34 @@ public class PessoaService {
                 System.out.print("Digite seu CNPJ:");
                 cadastroPessoa.remover(scanner.nextLine());
         }
+    }
+
+    public Endereco cadastrarEndereco(Endereco endereco, Scanner scanner) {
+        System.out.println("Digite o CEP:");
+        System.out.print("R:");
+
+        endereco.setCep(scanner.nextLine());
+
+        System.out.println("Digite o Logradouro:");
+        System.out.print("R:");
+
+        endereco.setLogradouro(scanner.nextLine());
+
+        System.out.println("Digite a Cidade:");
+        System.out.print("R:");
+
+        endereco.setCidade(scanner.nextLine());
+
+        System.out.println("Digite a UF:");
+        System.out.print("R:");
+
+        endereco.setUf(scanner.nextLine());
+
+        System.out.println("Digite o Número:");
+        System.out.print("R:");
+
+        endereco.setNumero(scanner.nextLine());
+
+        return endereco;
     }
 }
