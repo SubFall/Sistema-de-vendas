@@ -1,6 +1,6 @@
 package dev.thalysom.pessoas.domain;
 
-import dev.thalysom.util.DocumentoUtils;
+import dev.thalysom.pessoas.util.DocumentoUtils;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -28,13 +28,15 @@ public class PessoaFisica extends Pessoa {
         return this.anoNascimento;
     }
 
-    public int getIdade() { return Period.between(this.anoNascimento, LocalDate.now()).getYears(); }
+    public int getIdade() {
+        return Period.between(this.anoNascimento, LocalDate.now()).getYears();
+    }
 
     @Override
     public void validarDocumento(String documento) {
         documento = documento.replaceAll("\\D", "");
 
-        if (documento.length() != 11 || documento.isBlank()) {
+        if (documento.length() != 11) {
             throw new IllegalArgumentException("CPF deve conter 11 caracteres");
         }
 
@@ -50,17 +52,17 @@ public class PessoaFisica extends Pessoa {
         System.out.println();
         System.out.println("Nome:              " + getNome());
         System.out.println("Ano de Nascimento: " + getAnoNascimento());
-        System.out.println("Idade:             " +getIdade());
+        System.out.println("Idade:             " + getIdade());
         System.out.println("CPF:               " + DocumentoUtils.formatarCPF(getDocumento()));
-        if (!getEnderecos().getCep().equals("")) {
-            System.out.println();
-            System.out.println("******Endereço******");
-            System.out.println("CEP:               " + getEnderecos().getCep());
-            System.out.println("Logradouro:        " + getEnderecos().getLogradouro());
-            System.out.println("Cidade:            " + getEnderecos().getCidade());
-            System.out.println("UF:                " + getEnderecos().getUf());
-            System.out.println("Nº:                " + getEnderecos().getNumero());
-        }
-        System.out.println();
+//        if (!getEnderecos().getCep().equals("")) {
+//            System.out.println();
+//            System.out.println("******Endereço******");
+//            System.out.println("CEP:               " + getEnderecos().getCep());
+//            System.out.println("Logradouro:        " + getEnderecos().getLogradouro());
+//            System.out.println("Cidade:            " + getEnderecos().getCidade());
+//            System.out.println("UF:                " + getEnderecos().getUf());
+//            System.out.println("Nº:                " + getEnderecos().getNumero());
+//        }
+//        System.out.println();
     }
 }

@@ -10,7 +10,6 @@ public class Endereco {
     private String cep;
 
     public Endereco() {
-        this("", "", "", "S/N", "");
     }
 
     public Endereco(String logradouro, String cidade, String uf, String numero, String cep) {

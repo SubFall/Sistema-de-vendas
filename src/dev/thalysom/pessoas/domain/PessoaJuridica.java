@@ -1,6 +1,6 @@
 package dev.thalysom.pessoas.domain;
 
-import dev.thalysom.util.DocumentoUtils;
+import dev.thalysom.pessoas.util.DocumentoUtils;
 
 public class PessoaJuridica extends Pessoa{
     @Override

@@ -1,4 +1,4 @@
-package dev.thalysom.util;
+package dev.thalysom.pessoas.util;
 
 public class DocumentoUtils {
     public static String formatarCPF(String cpf) {
