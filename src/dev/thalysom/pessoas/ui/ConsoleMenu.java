@@ -23,8 +23,8 @@ public class ConsoleMenu {
 
         do {
             System.out.println("\n===== MENU =====");
-            System.out.println("1 - Cadastrar Pessoa Física");
-            System.out.println("2 - Cadastrar Pessoa Jurídica");
+            System.out.println("1 - Cadastrar Pessoa");
+            System.out.println("2 - Remover Pessoa");
             System.out.println("3 - Listar");
             System.out.println("0 - Sair");
 
@@ -34,10 +34,23 @@ public class ConsoleMenu {
 
             switch (opcao) {
                 case 1:
-                    cadastrarPessoaFisica();
+                    do {
+                        System.out.println("1 - Cadastrar Pessoa Física");
+                        System.out.println("2 - Cadastrar Pessoa Jurídica");
+
+                        System.out.print("Escolha: ");
+                        opcao = scanner.nextInt();
+                        scanner.nextLine();
+                    }while (opcao != 1 && opcao != 2);
+
+                    if (opcao == 1) {
+                        cadastrarPessoaFisica();
+                    } else {
+                        cadastrarPessoaJuridica();
+                    }
                     break;
                 case 2:
-                    cadastrarPessoaJuridica();
+                    removerPessoa();
                     break;
                 case 3:
                     service.listar().forEach(Pessoa::mostrarDados);
@@ -77,7 +90,7 @@ public class ConsoleMenu {
         }
 
         service.cadastrar(p);
-        System.out.println("Pessoa cadastrada com sucesso!");;
+        System.out.println("Pessoa cadastrada com sucesso!");
     }
 
     private void cadastrarPessoaJuridica() {
@@ -104,6 +117,17 @@ public class ConsoleMenu {
         System.out.println("Pessoa cadastrada com sucesso!");
     }
 
+    private void removerPessoa() {
+        System.out.print("Digite o Documento: ");
+        String documento = scanner.nextLine();
+
+        try {
+            service.remover(documento);
+            System.out.println("Pessoa removida com sucesso!");
+        } catch (IllegalArgumentException e){
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
     //    public void iniciar() {
 //        int opcao;
 //        do {

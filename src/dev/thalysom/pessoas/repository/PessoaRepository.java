@@ -27,8 +27,8 @@ public class PessoaRepository {
         pessoas.put(doc, pessoa);
     }
 
-    public void remover(Pessoa pessoa) {
-        String doc = normalizar(pessoa.getDocumento());
+    public void remover(String documento) {
+        String doc = normalizar(documento);
 
         if (pessoas.remove(doc) == null) {
             throw new IllegalArgumentException("Pessoa não encontrada");

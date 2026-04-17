@@ -17,8 +17,8 @@ public class PessoaService {
         repository.salvar(pessoa);
     }
 
-    public void remover(Pessoa pessoa) {
-        repository.remover(pessoa);
+    public void remover(String documento) {
+        repository.remover(documento);
     }
 
     public List<Pessoa> listar() {
