@@ -3,6 +3,7 @@ package dev.thalysom.pessoas.util;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ConsoleUtils {
@@ -17,12 +18,15 @@ public class ConsoleUtils {
                 LocalDate data = LocalDate.parse(text, formatter);
 
                 if (data.isAfter(LocalDate.now())) {
-                    System.out.println("Data não pode estar no futuro.");
+                    throw new IllegalArgumentException("Data não pode estar no futuro.");
                 }
 
                 return data;
             }catch (DateTimeParseException e) {
                 System.out.println("Data inválida. Use dd/MM/yyyy:");
+
+            } catch (IllegalArgumentException e) {
+                System.out.println("Erro: " + e.getMessage());
             }
         }while (true);
     }
