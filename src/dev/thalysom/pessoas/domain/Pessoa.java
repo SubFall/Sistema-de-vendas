@@ -1,11 +1,12 @@
 package dev.thalysom.pessoas.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Pessoa {
     private String nome;
     private String documento;
-    private Endereco enderecos;
+    private List<Endereco> enderecos = new ArrayList<>();
 
 
     public void setNome(String nome) {
@@ -19,12 +20,12 @@ public abstract class Pessoa {
         return this.nome;
     }
 
-    public Endereco getEnderecos() {
-        return enderecos;
+    public void adicionarEndereco(Endereco endereco) {
+        this.enderecos.add(endereco);
     }
 
-    public void setEnderecos(Endereco enderecos) {
-        this.enderecos = enderecos;
+    public List<Endereco> getEnderecos() {
+        return enderecos;
     }
 
     public void setDocumento(String documento) {

@@ -1,7 +1,5 @@
 package dev.thalysom.pessoas.domain;
 
-import java.security.PublicKey;
-
 public class Endereco {
     private String logradouro;
     private String cidade;
@@ -22,13 +20,7 @@ public class Endereco {
 
     @Override
     public String toString() {
-        return "Endereco{" +
-                "logradouro='" + logradouro + '\'' +
-                ", cidade='" + cidade + '\'' +
-                ", uf='" + uf + '\'' +
-                ", numero='" + numero + '\'' +
-                ", cep='" + cep + '\'' +
-                '}';
+        return logradouro + ", " + numero + " - " + cidade + "/" + uf + " CEP: " + cep;
     }
 
     public void setLogradouro(String logradouro) {
@@ -48,7 +40,12 @@ public class Endereco {
     }
 
     public void setCep(String cep) {
-        this.cep = cep;
+        String c = cep.replaceAll("\\D", "");
+
+        if (c.length() != 8) {
+            throw new IllegalArgumentException("Cep Inválido!");
+        }
+        this.cep = c;
     }
 
     public String getLogradouro() {

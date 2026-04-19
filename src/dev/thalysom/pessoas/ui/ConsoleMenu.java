@@ -1,5 +1,6 @@
 package dev.thalysom.pessoas.ui;
 
+import dev.thalysom.pessoas.domain.Endereco;
 import dev.thalysom.pessoas.domain.Pessoa;
 import dev.thalysom.pessoas.domain.PessoaFisica;
 import dev.thalysom.pessoas.domain.PessoaJuridica;
@@ -82,6 +83,17 @@ public class ConsoleMenu {
                 LocalDate data = ConsoleUtils.lerData(scanner);
                 p.setAnoNascimento(data);
 
+                System.out.println("Deseja cadastrar o Endereço :");
+                System.out.println("1 - SIM");
+                System.out.println("2 -  NÃO");
+
+                int op = scanner.nextInt();
+                scanner.nextLine();
+
+                if (op == 1) {
+                    p.adicionarEndereco(cadastrarEndereco());
+                }
+
                 documentoValido = true;
 
             } catch (IllegalArgumentException e) {
@@ -106,6 +118,17 @@ public class ConsoleMenu {
                 System.out.print("CNPJ: ");
                 p.setDocumento(scanner.nextLine());
 
+                System.out.println("Deseja cadastrar o Endereço :");
+                System.out.println("1 - SIM");
+                System.out.println("2 -  NÃO");
+
+                int op = scanner.nextInt();
+                scanner.nextLine();
+
+                if (op == 1) {
+                    p.adicionarEndereco(cadastrarEndereco());
+                }
+
                 documentoValido = true;
 
             } catch (IllegalArgumentException e) {
@@ -127,6 +150,27 @@ public class ConsoleMenu {
         } catch (IllegalArgumentException e){
             System.out.println("Erro: " + e.getMessage());
         }
+    }
+
+    private Endereco cadastrarEndereco() {
+        Endereco endereco = new Endereco();
+
+        System.out.print("Logradouro: ");
+        endereco.setLogradouro(scanner.nextLine());
+
+        System.out.print("Nº: ");
+        endereco.setNumero(scanner.nextLine());
+
+        System.out.print("Cidade: ");
+        endereco.setCidade(scanner.nextLine());
+
+        System.out.print("UF: ");
+        endereco.setUf(scanner.nextLine());
+
+        System.out.print("CEP: ");
+        endereco.setCep(scanner.nextLine());
+
+        return endereco;
     }
     //    public void iniciar() {
 //        int opcao;
