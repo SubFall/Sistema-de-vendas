@@ -6,7 +6,7 @@ import service.PessoaService;
 import ui.ConsoleMenu;
 
 public class Principal {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         PessoaRepository repository = new PessoaRepository();
         PessoaService service = new PessoaService(repository);
 
