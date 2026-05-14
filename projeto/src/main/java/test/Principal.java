@@ -37,8 +37,10 @@ public class Principal {
 //        service.inserirPessoa(hetosoft);
 //        service.inserirPessoa(thalysom);
 
-        Pessoa pessoa = service.buscarPorDocumento("01123456000181");
+        Pessoa pessoa = service.buscarPorDocumento("01123456000180");
         System.out.println(pessoa);
+
+        System.out.println(service.buscarTodos());
 
     }
 }
