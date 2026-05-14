@@ -30,6 +30,10 @@ public class PessoaService {
         }
         return pessoa;
     }
+
+    public List<Pessoa> buscarTodos() {
+        return pessoaRepository.buscarTodos();
+    }
 //
 //    public void remover(String documento) {
 //        repository.remover(documento);

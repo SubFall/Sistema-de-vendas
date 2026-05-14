@@ -4,7 +4,6 @@ import domain.documento.Documento;
 import domain.endereco.Endereco;
 
 public class Pessoa {
-    private int id;
     private String nome;
     private final Documento documento;
     private Endereco endereco;
@@ -74,8 +73,7 @@ public class Pessoa {
     @Override
     public String toString() {
         return "Pessoa{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
+                "nome='" + nome + '\'' +
                 ", documento=" + documento +
                 ", enderecos=" + endereco +
                 '}';
