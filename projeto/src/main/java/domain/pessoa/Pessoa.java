@@ -1,13 +1,12 @@
 package domain.pessoa;
 
-import domain.documento.CPF;
 import domain.documento.Documento;
 import domain.endereco.Endereco;
 
 public class Pessoa {
     private int id;
     private String nome;
-    private Documento documento;
+    private final Documento documento;
     private Endereco endereco;
 
     private Pessoa(String nome, Documento documento) {

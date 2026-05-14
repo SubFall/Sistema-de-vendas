@@ -7,20 +7,20 @@ import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
 import repository.PessoaRepository;
 //import repository.PessoaRepository;
-//import service.PessoaService;
+import service.PessoaService;
 //import ui.ConsoleMenu;
 
 public class Principal {
     static void main(String[] args) {
 //        PessoaRepository repository = new PessoaRepository();
-//        PessoaService service = new PessoaService(repository);
+        PessoaService service = new PessoaService();
 //
 //        ConsoleMenu menu = new ConsoleMenu(service);
 //        menu.iniciar();
-        Pessoa thalysom = Pessoa.builder().nome("thalysom").documento(new CPF("06032055183"))
+        Pessoa thalysom = Pessoa.builder().nome("thalysom").documento(new CPF("06032055184"))
                 //.endereco(new Endereco("teste","teste","teste", "teste", "teste"))
                 .build();
-        System.out.println(thalysom);
+//        System.out.println(thalysom);
 
         Endereco build = Endereco.builder()
                 .logradouro("Rua girassol")
@@ -32,9 +32,13 @@ public class Principal {
 
         thalysom.setEndereco(build);
 
-        Pessoa hetosoft = Pessoa.builder().nome("hetosoft").documento(new CNPJ("00123456000180")).build();
+        Pessoa hetosoft = Pessoa.builder().nome("hetosoft 2").documento(new CNPJ("01123456000180")).build();
 
-        PessoaRepository pessoaRepository = new PessoaRepository();
-        pessoaRepository.inserirPessoa(hetosoft);
+//        service.inserirPessoa(hetosoft);
+//        service.inserirPessoa(thalysom);
+
+        Pessoa pessoa = service.buscarPorDocumento("01123456000181");
+        System.out.println(pessoa);
+
     }
 }

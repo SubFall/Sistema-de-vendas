@@ -1,32 +1,41 @@
-//package service;
+package service;
+
+import domain.pessoa.Pessoa;
+import repository.PessoaRepository;
+
+import java.util.List;
+
+public class PessoaService {
+    PessoaRepository pessoaRepository = new PessoaRepository();
+
+//    private PessoaRepository repository;
 //
-//import domain.pessoa.Pessoa;
-//import repository.PessoaRepository;
+//    public PessoaService(PessoaRepository repository) {
+//        this.repository = repository;
+//    }
 //
-//import java.util.List;
+    public void inserirPessoa(Pessoa pessoa) {
+
+        String documento = pessoa.getDocumento().getValor();
+        if (pessoaRepository.existeDocumento(documento)) {
+            throw new IllegalArgumentException("Documento " + pessoa.getDocumento().getValor() + " já cadastrado");
+        }
+        pessoaRepository.inserirPessoa(pessoa);
+    }
+
+    public Pessoa buscarPorDocumento(String documento) {
+        Pessoa pessoa = pessoaRepository.buscarPorDocumento(documento);
+        if (pessoa == null) {
+            throw new IllegalArgumentException("Documento não existe");
+        }
+        return pessoa;
+    }
 //
-//public class PessoaService {
+//    public void remover(String documento) {
+//        repository.remover(documento);
+//    }
 //
-////    private PessoaRepository repository;
-////
-////    public PessoaService(PessoaRepository repository) {
-////        this.repository = repository;
-////    }
-////
-////    public void cadastrar(Pessoa pessoa) {
-////        repository.salvar(pessoa);
-////    }
-////
-////    public void remover(String documento) {
-////        repository.remover(documento);
-////    }
-////
-////    public List<Pessoa> listar() {
-////        return repository.listar();
-////    }
-//
-////    public void teste() {
-////        PessoaRepository.test();
-////    }
-//
-//}
+//    public List<Pessoa> listar() {
+//        return repository.listar();
+//    }
+}
