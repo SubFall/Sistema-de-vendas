@@ -5,11 +5,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionFactory {
-    public static Connection getConnection() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/eclipse_net";
-        String username = "app_user";
-        String password = "app123";
+    private static final String URL = "jdbc:mysql://localhost:3306/eclipse_net";
+    private static final String USERNAME = "app_user";
+    private static final String PASSWORD = "app123";
 
-        return DriverManager.getConnection(url, username, password);
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 }

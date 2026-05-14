@@ -3,7 +3,7 @@ CREATE TABLE `eclipse_net`.`pessoa`
     `id_pessoa` INT         NOT NULL AUTO_INCREMENT,
     `descricao` VARCHAR(60) NOT NULL,
     `documento` VARCHAR(14) NOT NULL,
-    `tipo`      INT         NOT NULL,
+    `tipo`      TINYINT(1)  NOT NULL,
     PRIMARY KEY (`id_pessoa`),
     UNIQUE INDEX `id_pessoa_UNIQUE` (`id_pessoa` ASC) VISIBLE,
     UNIQUE INDEX `documento_UNIQUE` (`documento` ASC) VISIBLE
