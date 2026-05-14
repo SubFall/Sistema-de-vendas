@@ -34,12 +34,5 @@ public class PessoaService {
     public List<Pessoa> buscarTodos() {
         return pessoaRepository.buscarTodos();
     }
-//
-//    public void remover(String documento) {
-//        repository.remover(documento);
-//    }
-//
-//    public List<Pessoa> listar() {
-//        return repository.listar();
-//    }
+
 }
