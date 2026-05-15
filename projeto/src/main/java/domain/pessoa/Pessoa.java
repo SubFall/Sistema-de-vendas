@@ -4,17 +4,19 @@ import domain.documento.Documento;
 import domain.endereco.Endereco;
 
 public class Pessoa {
+    private int id;
     private String nome;
     private final Documento documento;
     private Endereco endereco;
 
-    private Pessoa(String nome, Documento documento) {
+    private Pessoa(int id, String nome, Documento documento) {
+        this.id = id;
         this.documento = documento;
         setNome(nome);
     }
 
-    private Pessoa(String nome, Documento documento, Endereco endereco) {
-        this(nome, documento);
+    private Pessoa(int id, String nome, Documento documento, Endereco endereco) {
+        this(id, nome, documento);
         this.endereco = endereco;
     }
 
@@ -23,10 +25,15 @@ public class Pessoa {
     }
 
     public static final class PessoaBuilder {
+        private int id;
         private String nome;
         private Documento documento;
         private Endereco endereco;
 
+        public PessoaBuilder id(int id) {
+            this.id = id;
+            return this;
+        }
         public PessoaBuilder nome(String nome) {
             this.nome = nome;
             return this;
@@ -43,7 +50,7 @@ public class Pessoa {
         }
 
         public Pessoa build() {
-            return new Pessoa(nome, documento, endereco);
+            return new Pessoa(id, nome, documento, endereco);
         }
     }
 
@@ -73,7 +80,8 @@ public class Pessoa {
     @Override
     public String toString() {
         return "Pessoa{" +
-                "nome='" + nome + '\'' +
+                "id= '" + id + '\'' +
+                " nome='" + nome + '\'' +
                 ", documento=" + documento +
                 ", enderecos=" + endereco +
                 '}';

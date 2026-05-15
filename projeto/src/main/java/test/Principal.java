@@ -8,6 +8,8 @@ import domain.pessoa.Pessoa;
 import repository.PessoaRepository;
 //import repository.PessoaRepository;
 import service.PessoaService;
+
+import java.util.List;
 //import ui.ConsoleMenu;
 
 public class Principal {
@@ -37,10 +39,11 @@ public class Principal {
 //        service.inserirPessoa(hetosoft);
 //        service.inserirPessoa(thalysom);
 
-        Pessoa pessoa = service.buscarPorDocumento("01123456000180");
-        System.out.println(pessoa);
+//        Pessoa pessoa = service.buscarPorDocumento("01123456000180");
+        List<Pessoa> pessoas = service.buscarPorNome("");
+        System.out.println(pessoas);
 
-        System.out.println(service.buscarTodos());
+//        System.out.println(service.buscarTodos());
 
     }
 }

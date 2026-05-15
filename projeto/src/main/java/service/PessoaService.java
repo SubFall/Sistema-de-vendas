@@ -31,6 +31,10 @@ public class PessoaService {
         return pessoa;
     }
 
+    public List<Pessoa> buscarPorNome(String nome) {
+        return pessoaRepository.buscarPorNome(nome);
+    }
+
     public List<Pessoa> buscarTodos() {
         return pessoaRepository.buscarTodos();
     }

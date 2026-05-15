@@ -51,7 +51,7 @@ public class PessoaRepository {
     }
 
     public Pessoa buscarPorDocumento(String documentoBusca) {
-        String sql = "SELECT descricao, documento, tipo FROM pessoa WHERE documento = ?;";
+        String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa WHERE documento = ?;";
 
         try(Connection conn = ConnectionFactory.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -69,8 +69,29 @@ public class PessoaRepository {
         return null;
     }
 
+    public List<Pessoa> buscarPorNome(String nome) {
+        String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa WHERE descricao LIKE ?;";
+        List<Pessoa> pessoaList = new ArrayList<>();
+
+        try(Connection conn = ConnectionFactory.getConnection();
+           PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%"+nome+"%");
+
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    pessoaList.add(mapearPessoa(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return pessoaList;
+    }
+
+
     public List<Pessoa> buscarTodos() {
-        String sql = "SELECT descricao, documento, tipo FROM pessoa;";
+        String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa;";
         List<Pessoa> pessoasList = new ArrayList<>();
 
         try(Connection conn = ConnectionFactory.getConnection();
@@ -98,6 +119,7 @@ public class PessoaRepository {
         }
 
         return Pessoa.builder()
+                .id(rs.getInt("id_pessoa"))
                 .nome(rs.getString("descricao"))
                 .documento(documento)
                 .build();
