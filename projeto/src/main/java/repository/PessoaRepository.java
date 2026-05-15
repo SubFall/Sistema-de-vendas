@@ -33,6 +33,19 @@ public class PessoaRepository {
         }
     }
 
+    public int deletarPessoa(int id) {
+        String sql = "DELETE FROM pessoa WHERE (id_pessoa = ?);";
+
+        try(Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean existeDocumento(String documento) {
         String sql = "SELECT 1 FROM pessoa WHERE documento = ? LIMIT 1;";
 

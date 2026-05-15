@@ -44,6 +44,7 @@ public class Principal {
         System.out.println(pessoas);
 
 //        System.out.println(service.buscarTodos());
-
+        boolean b = service.deletarPessoa(6);
+        System.out.println(b);
     }
 }

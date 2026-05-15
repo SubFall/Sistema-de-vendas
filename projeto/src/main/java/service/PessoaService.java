@@ -23,6 +23,11 @@ public class PessoaService {
         pessoaRepository.inserirPessoa(pessoa);
     }
 
+    public boolean deletarPessoa(int id) {
+        return pessoaRepository.deletarPessoa(id) > 0;
+    }
+
+
     public Pessoa buscarPorDocumento(String documento) {
         Pessoa pessoa = pessoaRepository.buscarPorDocumento(documento);
         if (pessoa == null) {
