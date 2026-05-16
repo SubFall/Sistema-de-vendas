@@ -19,8 +19,8 @@ public class PessoaRepository {
     public void inserirPessoa(Pessoa pessoa) {
         String sql = "INSERT INTO pessoa (`descricao`, `documento`, `tipo`) VALUES (?, ?, ?);";
 
-        try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, pessoa.getNome());
             ps.setString(2, pessoa.getDocumento().getValor());
@@ -36,8 +36,8 @@ public class PessoaRepository {
     public int deletarPessoa(int id) {
         String sql = "DELETE FROM pessoa WHERE (id_pessoa = ?);";
 
-        try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             return ps.executeUpdate();
@@ -46,35 +46,18 @@ public class PessoaRepository {
         }
     }
 
-    public int atualizarPessoa(int id, Pessoa pessoa) {
+    public int atualizarPessoa(Pessoa pessoa) {
         String sql = "UPDATE pessoa SET descricao = ?, documento = ?, tipo = ? WHERE id_pessoa = ?;";
 
-        try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, pessoa.getNome());
             ps.setString(2, pessoa.getDocumento().getValor());
             ps.setInt(3, pessoa.getDocumento().getTipo().getCodigo());
-            ps.setInt(4, id);
+            ps.setInt(4, pessoa.getId());
 
-            return  ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public boolean existeDocumento(String documento) {
-        String sql = "SELECT 1 FROM pessoa WHERE documento = ? LIMIT 1;";
-
-        try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, documento);
-
-            try(ResultSet rs = ps.executeQuery();) {
-                return rs.next();
-            }
-
+            return ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -83,12 +66,12 @@ public class PessoaRepository {
     public Pessoa buscarPorDocumento(String documentoBusca) {
         String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa WHERE documento = ?;";
 
-        try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
 
             ps.setString(1, documentoBusca);
 
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapearPessoa(rs);
                 }
@@ -103,12 +86,12 @@ public class PessoaRepository {
         String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa WHERE descricao LIKE ?;";
         List<Pessoa> pessoaList = new ArrayList<>();
 
-        try(Connection conn = ConnectionFactory.getConnection();
-           PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "%"+nome+"%");
+            ps.setString(1, "%" + nome + "%");
 
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     pessoaList.add(mapearPessoa(rs));
                 }
@@ -119,14 +102,13 @@ public class PessoaRepository {
         return pessoaList;
     }
 
-
     public List<Pessoa> buscarTodos() {
         String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa;";
         List<Pessoa> pessoasList = new ArrayList<>();
 
-        try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();) {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery();) {
 
             while (rs.next()) {
                 pessoasList.add(mapearPessoa(rs));
@@ -144,7 +126,7 @@ public class PessoaRepository {
 
         if (tipo == TipoPessoa.FISICA.getCodigo()) {
             documento = new CPF(rs.getString("documento"));
-        }else {
+        } else {
             documento = new CNPJ(rs.getString("documento"));
         }
 
@@ -153,6 +135,41 @@ public class PessoaRepository {
                 .nome(rs.getString("descricao"))
                 .documento(documento)
                 .build();
+    }
+
+    public boolean existeDocumento(String documento) {
+        String sql = "SELECT 1 FROM pessoa WHERE documento = ? LIMIT 1;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, documento);
+
+            try (ResultSet rs = ps.executeQuery();) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean existeDocumentoPorOutroId(String documento, int id) {
+        String sql = "SELECT 1 FROM pessoa WHERE documento = ? AND id_pessoa <> ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, documento);
+            ps.setInt(2, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

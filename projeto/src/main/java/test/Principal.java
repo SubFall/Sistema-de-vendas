@@ -44,8 +44,17 @@ public class Principal {
 //        System.out.println(pessoas);
 
         System.out.println(service.buscarTodos());
-        Pessoa thalysom1 = Pessoa.builder().nome("thalysom s2").documento(new CNPJ("01123456000180")).build();
-        boolean b = service.atualizarPessoa(4,thalysom1);
+        List<Pessoa> pessoas = service.buscarTodos();
+        Pessoa thalysomTemp =  pessoas.getFirst();
+
+//        System.out.println(thalysomTemp);
+        Pessoa thalysomNew = Pessoa.builder()
+                .id(thalysomTemp.getId())
+                .nome("thalysom s2")
+                .documento(new CNPJ("01123456000180"))
+                .build();
+
+        boolean b = service.atualizarPessoa(thalysomNew);
         System.out.println(b);
     }
 }

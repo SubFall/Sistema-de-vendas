@@ -8,12 +8,6 @@ import java.util.List;
 public class PessoaService {
     PessoaRepository pessoaRepository = new PessoaRepository();
 
-//    private PessoaRepository repository;
-//
-//    public PessoaService(PessoaRepository repository) {
-//        this.repository = repository;
-//    }
-//
     public void inserirPessoa(Pessoa pessoa) {
 
         String documento = pessoa.getDocumento().getValor();
@@ -27,10 +21,13 @@ public class PessoaService {
         return pessoaRepository.deletarPessoa(id) > 0;
     }
 
-    public boolean atualizarPessoa(int id, Pessoa pessoa) {
-        return pessoaRepository.atualizarPessoa(id, pessoa) > 0;
+    public boolean atualizarPessoa(Pessoa pessoa) {
+        boolean existeDocumento = pessoaRepository.existeDocumentoPorOutroId(pessoa.getDocumento().getValor(), pessoa.getId());
+        if (existeDocumento) {
+            throw new IllegalArgumentException("Documento já cadastrado");
+        }
+        return pessoaRepository.atualizarPessoa(pessoa) > 0;
     }
-
 
     public Pessoa buscarPorDocumento(String documento) {
         Pessoa pessoa = pessoaRepository.buscarPorDocumento(documento);
