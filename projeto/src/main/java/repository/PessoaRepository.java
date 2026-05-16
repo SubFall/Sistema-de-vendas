@@ -46,6 +46,23 @@ public class PessoaRepository {
         }
     }
 
+    public int atualizarPessoa(int id, Pessoa pessoa) {
+        String sql = "UPDATE pessoa SET descricao = ?, documento = ?, tipo = ? WHERE id_pessoa = ?;";
+
+        try(Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, pessoa.getNome());
+            ps.setString(2, pessoa.getDocumento().getValor());
+            ps.setInt(3, pessoa.getDocumento().getTipo().getCodigo());
+            ps.setInt(4, id);
+
+            return  ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean existeDocumento(String documento) {
         String sql = "SELECT 1 FROM pessoa WHERE documento = ? LIMIT 1;";
 

@@ -27,6 +27,10 @@ public class PessoaService {
         return pessoaRepository.deletarPessoa(id) > 0;
     }
 
+    public boolean atualizarPessoa(int id, Pessoa pessoa) {
+        return pessoaRepository.atualizarPessoa(id, pessoa) > 0;
+    }
+
 
     public Pessoa buscarPorDocumento(String documento) {
         Pessoa pessoa = pessoaRepository.buscarPorDocumento(documento);

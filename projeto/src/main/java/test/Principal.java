@@ -40,11 +40,12 @@ public class Principal {
 //        service.inserirPessoa(thalysom);
 
 //        Pessoa pessoa = service.buscarPorDocumento("01123456000180");
-        List<Pessoa> pessoas = service.buscarPorNome("");
-        System.out.println(pessoas);
+//        List<Pessoa> pessoas = service.buscarPorNome("");
+//        System.out.println(pessoas);
 
-//        System.out.println(service.buscarTodos());
-        boolean b = service.deletarPessoa(6);
+        System.out.println(service.buscarTodos());
+        Pessoa thalysom1 = Pessoa.builder().nome("thalysom s2").documento(new CNPJ("01123456000180")).build();
+        boolean b = service.atualizarPessoa(4,thalysom1);
         System.out.println(b);
     }
 }
