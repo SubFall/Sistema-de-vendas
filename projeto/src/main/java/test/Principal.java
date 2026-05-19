@@ -15,7 +15,7 @@ public class Principal {
 
         Pessoa thalysom = Pessoa.builder()
                 .nome("thalysom gostoso")
-                .documento(new CPF("06032055183"))
+                .documento(new CPF("06032055184"))
                 .endereco(null)
                 .build();
 
@@ -28,6 +28,7 @@ public class Principal {
                 .cep("78123456")
                 .build();
 
-        service.inserirPessoa(thalysom, endereco);
+//        service.inserirPessoa(thalysom, endereco);
+        service.deletarPessoa(15);
     }
 }

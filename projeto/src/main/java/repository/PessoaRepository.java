@@ -46,20 +46,20 @@ public class PessoaRepository {
             if (rs.next()) {
                 return rs.getInt(1);
             }
-            throw new IllegalArgumentException("Erro");
+            throw new IllegalArgumentException("Erro ao inserir");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public int deletarPessoa(int id) {
+    public int deletarPessoa(Connection conn, int id) {
         String sql = "DELETE FROM pessoa WHERE (id_pessoa = ?);";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             return ps.executeUpdate();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -61,6 +61,18 @@ public class EnderecoRepository {
         }
     }
 
+    public int deletarEndereco(Connection conn, int id) {
+        String sql = "DELETE FROM endereco WHERE id_pessoa = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Endereco> buscarTodos() {
         String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco;";
         List<Endereco> enderecoList = new ArrayList<>();

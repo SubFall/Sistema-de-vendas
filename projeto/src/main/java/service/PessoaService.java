@@ -66,7 +66,40 @@ public class PessoaService {
     }
 
     public boolean deletarPessoa(int id) {
-        return pessoaRepository.deletarPessoa(id) > 0;
+
+        int row = 0;
+        Connection conn = null;
+
+        try {
+            conn = ConnectionFactory.getConnection();
+
+            conn.setAutoCommit(false);
+
+            enderecoRepository.deletarEndereco(conn, id);
+
+            row = pessoaRepository.deletarPessoa(conn, id);
+
+            conn.commit();
+        } catch (SQLException e) {
+
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Erro ao realizar rollback", ex);
+            }
+            throw new RuntimeException("Erro ao deletar Pessoa", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro ao fechar conexão", e);
+            }
+        }
+        return row > 0;
     }
 
     public boolean atualizarPessoa(Pessoa pessoa) {
