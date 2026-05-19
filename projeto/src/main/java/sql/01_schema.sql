@@ -12,9 +12,10 @@ CREATE TABLE `eclipse_net`.`pessoa`
 CREATE TABLE `eclipse_net`.`endereco`
 (
     `id_endereco` INT          NOT NULL AUTO_INCREMENT,
-    `endereco`    VARCHAR(100) NOT NULL,
+    `logradouro`  VARCHAR(100) NOT NULL,
     `cidade`      VARCHAR(45)  NOT NULL,
     `uf`          VARCHAR(2)   NOT NULL,
+    `bairro`      VARCHAR(45)  NOT NULL,
     `numero`      VARCHAR(10)  NOT NULL,
     `cep`         VARCHAR(20)  NOT NULL,
     `id_pessoa`   INT          NOT NULL,

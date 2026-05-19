@@ -7,10 +7,7 @@ import domain.documento.Documento;
 import domain.documento.TipoPessoa;
 import domain.pessoa.Pessoa;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +25,28 @@ public class PessoaRepository {
 
             ps.executeUpdate();
 
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int inserirPessoa(Connection conn, Pessoa pessoa) {
+        String sql = "INSERT INTO pessoa (`descricao`, `documento`, `tipo`) VALUES (?, ?, ?);";
+
+        try ( PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, pessoa.getNome());
+            ps.setString(2, pessoa.getDocumento().getValor());
+            ps.setInt(3, pessoa.getDocumento().getTipo().getCodigo());
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            throw new IllegalArgumentException("Erro");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

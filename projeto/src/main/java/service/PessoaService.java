@@ -1,12 +1,18 @@
 package service;
 
+import conn.ConnectionFactory;
+import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
+import repository.EnderecoRepository;
 import repository.PessoaRepository;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class PessoaService {
     PessoaRepository pessoaRepository = new PessoaRepository();
+    EnderecoRepository enderecoRepository = new EnderecoRepository();
 
     public void inserirPessoa(Pessoa pessoa) {
 
@@ -15,6 +21,48 @@ public class PessoaService {
             throw new IllegalArgumentException("Documento " + pessoa.getDocumento().getValor() + " já cadastrado");
         }
         pessoaRepository.inserirPessoa(pessoa);
+    }
+
+    public void inserirPessoa(Pessoa pessoa, Endereco endereco) {
+        if (endereco == null) {
+            inserirPessoa(pessoa);
+            return;
+        }
+
+        Connection conn = null;
+
+        try {
+            conn = ConnectionFactory.getConnection();
+
+            conn.setAutoCommit(false);
+
+            int idPessoa = pessoaRepository.inserirPessoa(conn, pessoa);
+
+            enderecoRepository.inserirEndereco(conn, idPessoa, endereco);
+
+            conn.commit();
+        } catch (SQLException e) {
+
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Erro ao realizar rollback", ex);
+            }
+
+            throw new RuntimeException("Erro ao inserir pessoa com endereço", e);
+        } finally {
+            try {
+
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro ao fechar conexão", e);
+            }
+        }
     }
 
     public boolean deletarPessoa(int id) {
