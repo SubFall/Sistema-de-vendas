@@ -14,21 +14,26 @@ public class Principal {
         EnderecoService enderecoService = new EnderecoService();
 
         Pessoa thalysom = Pessoa.builder()
-                .nome("thalysom gostoso")
+                .id(20)
+                .nome("thalysom s2")
                 .documento(new CPF("06032055184"))
                 .endereco(null)
                 .build();
 
         Endereco endereco = Endereco.builder()
+                .id(12)
                 .logradouro("Rua Girassol")
                 .cidade("Várzea Grande")
                 .uf("MT")
                 .bairro("Mapim")
                 .numero("20")
                 .cep("78123456")
+                .idPessoa(20)
                 .build();
 
+        thalysom.setEndereco(endereco);
 //        service.inserirPessoa(thalysom, endereco);
-        service.deletarPessoa(15);
+//        service.deletarPessoa(15);
+        service.atualizarPessoa(thalysom, thalysom.getEndereco());
     }
 }

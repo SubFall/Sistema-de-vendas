@@ -10,8 +10,9 @@ public class Endereco {
     private String bairro;
     private String numero;
     private String cep;
+    private int idPessoa;
 
-    private Endereco(int id, String logradouro, String cidade, String uf, String bairro, String numero, String cep) {
+    private Endereco(int id, String logradouro, String cidade, String uf, String bairro, String numero, String cep, int idPessoa) {
         this.id = id;
         this.logradouro = logradouro;
         this.cidade = cidade;
@@ -21,6 +22,7 @@ public class Endereco {
         cep = cep.replaceAll("\\D", "");
         validaCep(cep);
         this.cep = cep;
+        this.idPessoa = idPessoa;
     }
 
     public static EnderecoBuilder builder() {
@@ -35,11 +37,13 @@ public class Endereco {
         private String bairro;
         private String numero;
         private String cep;
+        private int idPessoa;
 
         public EnderecoBuilder id(int id) {
             this.id = id;
             return this;
         }
+
         public EnderecoBuilder logradouro(String logradouro) {
             this.logradouro = logradouro;
             return this;
@@ -70,8 +74,13 @@ public class Endereco {
             return this;
         }
 
+        public EnderecoBuilder idPessoa(int idPessoa) {
+            this.idPessoa = idPessoa;
+            return this;
+        }
+
         public Endereco build() {
-            return new Endereco(id, logradouro, cidade, uf, bairro, numero, cep);
+            return new Endereco(id, logradouro, cidade, uf, bairro, numero, cep, idPessoa);
         }
     }
 
@@ -81,7 +90,9 @@ public class Endereco {
         }
     }
 
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 
     public String getLogradouro() {
         return logradouro;
@@ -107,9 +118,13 @@ public class Endereco {
         return cep;
     }
 
+    public int getIdPessoa() {
+        return idPessoa;
+    }
+
     @Override
     public String toString() {
-        return logradouro + ", " + numero + " - " + cidade + "/" + uf + " - Bairro: " + bairro + " CEP: " + cep;
+        return logradouro + ", " + numero + " - " + cidade + "/" + uf + " - Bairro: " + bairro + " CEP: " + cep + "  idPessoa: " + idPessoa;
     }
 
     @Override
@@ -120,11 +135,12 @@ public class Endereco {
                 && Objects.equals(cidade, endereco.cidade)
                 && Objects.equals(uf, endereco.uf)
                 && Objects.equals(numero, endereco.numero)
-                && Objects.equals(cep, endereco.cep);
+                && Objects.equals(cep, endereco.cep)
+                && Objects.equals(idPessoa, endereco.idPessoa);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(logradouro, cidade, uf, numero, cep);
+        return Objects.hash(logradouro, cidade, uf, numero, cep, idPessoa);
     }
 }

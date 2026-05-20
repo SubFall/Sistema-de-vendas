@@ -29,10 +29,29 @@ public class EnderecoRepository {
     }
 
     public int atualizarEndereco(Endereco endereco) {
-        String sql = "UPDATE endereco SET logradouro = ?, cidade = ?, uf = ?, baiiro = ?, numero = ?, cep = ? WHERE id_endereco = ?;";
+        String sql = "UPDATE endereco SET logradouro = ?, cidade = ?, uf = ?, bairro = ?, numero = ?, cep = ? WHERE id_endereco = ?;";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, endereco.getLogradouro());
+            ps.setString(2, endereco.getCidade());
+            ps.setString(3, endereco.getUf());
+            ps.setString(4, endereco.getBairro());
+            ps.setString(5, endereco.getNumero());
+            ps.setString(6, endereco.getCep());
+            ps.setInt(7, endereco.getId());
+
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int atualizarEndereco(Connection conn, Endereco endereco) {
+        String sql = "UPDATE endereco SET logradouro = ?, cidade = ?, uf = ?, bairro = ?, numero = ?, cep = ? WHERE id_endereco = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, endereco.getLogradouro());
             ps.setString(2, endereco.getCidade());

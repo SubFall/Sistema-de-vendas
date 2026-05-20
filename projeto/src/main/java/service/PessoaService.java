@@ -110,6 +110,51 @@ public class PessoaService {
         return pessoaRepository.atualizarPessoa(pessoa) > 0;
     }
 
+    public boolean atualizarPessoa(Pessoa pessoa, Endereco endereco) {
+
+        boolean existeDocumento = pessoaRepository.existeDocumentoPorOutroId(pessoa.getDocumento().getValor(), pessoa.getId());
+
+        if (existeDocumento) {
+            throw new IllegalArgumentException("Documento já cadastrado");
+        }
+
+        if (endereco == null) {
+            return pessoaRepository.atualizarPessoa(pessoa) > 0;
+        }
+
+        int row;
+        Connection conn = null;
+
+        try {
+            conn = ConnectionFactory.getConnection();
+
+            conn.setAutoCommit(false);
+
+            row = pessoaRepository.atualizarPessoa(conn, pessoa);
+            enderecoRepository.atualizarEndereco(conn, endereco);
+
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Erro ao realizar o rollback", ex);
+            }
+            throw new RuntimeException("Erro ao atualizar pessoa", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro ao fechar a conexão", e);
+            }
+        }
+        return row > 0;
+    }
+
     public Pessoa buscarPorDocumento(String documento) {
         Pessoa pessoa = pessoaRepository.buscarPorDocumento(documento);
         if (pessoa == null) {
