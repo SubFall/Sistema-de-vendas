@@ -14,18 +14,25 @@ public class PessoaService {
     PessoaRepository pessoaRepository = new PessoaRepository();
     EnderecoRepository enderecoRepository = new EnderecoRepository();
 
+//    public void inserirPessoa(Pessoa pessoa) {
+//
+//        String documento = pessoa.getDocumento().getValor();
+//        if (pessoaRepository.existeDocumento(documento)) {
+//            throw new IllegalArgumentException("Documento " + pessoa.getDocumento().getValor() + " já cadastrado");
+//        }
+//        pessoaRepository.inserirPessoa(pessoa);
+//    }
+
     public void inserirPessoa(Pessoa pessoa) {
 
         String documento = pessoa.getDocumento().getValor();
+
         if (pessoaRepository.existeDocumento(documento)) {
             throw new IllegalArgumentException("Documento " + pessoa.getDocumento().getValor() + " já cadastrado");
         }
-        pessoaRepository.inserirPessoa(pessoa);
-    }
 
-    public void inserirPessoa(Pessoa pessoa, Endereco endereco) {
-        if (endereco == null) {
-            inserirPessoa(pessoa);
+        if (pessoa.getEndereco() == null) {
+            pessoaRepository.inserirPessoa(pessoa);
             return;
         }
 
@@ -38,7 +45,7 @@ public class PessoaService {
 
             int idPessoa = pessoaRepository.inserirPessoa(conn, pessoa);
 
-            enderecoRepository.inserirEndereco(conn, idPessoa, endereco);
+            enderecoRepository.inserirEndereco(conn, idPessoa, pessoa.getEndereco());
 
             conn.commit();
         } catch (SQLException e) {
