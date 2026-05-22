@@ -14,15 +14,6 @@ public class PessoaService {
     PessoaRepository pessoaRepository = new PessoaRepository();
     EnderecoRepository enderecoRepository = new EnderecoRepository();
 
-//    public void inserirPessoa(Pessoa pessoa) {
-//
-//        String documento = pessoa.getDocumento().getValor();
-//        if (pessoaRepository.existeDocumento(documento)) {
-//            throw new IllegalArgumentException("Documento " + pessoa.getDocumento().getValor() + " já cadastrado");
-//        }
-//        pessoaRepository.inserirPessoa(pessoa);
-//    }
-
     public void inserirPessoa(Pessoa pessoa) {
 
         String documento = pessoa.getDocumento().getValor();

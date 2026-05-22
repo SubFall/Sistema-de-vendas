@@ -1,5 +1,6 @@
 package ui.pessoa;
 
+import domain.documento.CNPJ;
 import domain.documento.CPF;
 import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
@@ -45,7 +46,7 @@ public class ConsoleMenu {
                     if (opcao == 1) {
                         cadastrarPessoaFisica();
                     } else {
-//                        cadastrarPessoaJuridica();
+                        cadastrarPessoaJuridica();
                         System.out.println();
                     }
                     break;
@@ -91,6 +92,40 @@ public class ConsoleMenu {
         Pessoa pessoa = Pessoa.builder()
                 .nome(nome)
                 .documento(new CPF(documento))
+                .endereco(endereco)
+                .build();
+
+        service.inserirPessoa(pessoa);
+
+        System.out.println("Pessoa cadastrada com sucesso!");
+    }
+
+    private void cadastrarPessoaJuridica() {
+        String nome;
+        String documento;
+        String opcao;
+        Endereco endereco = null;
+
+        System.out.print("Nome: ");
+        nome = scanner.nextLine();
+
+        System.out.print("CNPJ: ");
+        documento = scanner.nextLine();
+
+
+        System.out.println("Deseja cadastrar o Endereço :");
+        System.out.println("1 - SIM");
+        System.out.println("2 - NÃO");
+
+        opcao = scanner.nextLine();
+
+        if (opcao.equals("1")) {
+            endereco = cadastrarEndereco();
+        }
+
+        Pessoa pessoa = Pessoa.builder()
+                .nome(nome)
+                .documento(new CNPJ(documento))
                 .endereco(endereco)
                 .build();
 
