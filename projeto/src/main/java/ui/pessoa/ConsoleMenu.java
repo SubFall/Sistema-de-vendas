@@ -5,7 +5,10 @@ import domain.documento.CPF;
 import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
 import service.PessoaService;
+import util.ConsoleUtils;
 
+import java.io.PrintStream;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleMenu {
@@ -22,8 +25,8 @@ public class ConsoleMenu {
         do {
             System.out.println("\n|********** Pessoas **********|");
             System.out.println("|1 - Cadastrar          - [] X|");
-            System.out.println("|2 - Atualizar                |");
-            System.out.println("|3 - Remover                  |");
+            System.out.println("|2 - Remover                  |");
+            System.out.println("|3 - Atualizar                |");
             System.out.println("|4 - Listar                   |");
             System.out.println("|0 - Sair                     |");
             System.out.println("|*****************************|");
@@ -41,7 +44,7 @@ public class ConsoleMenu {
                         System.out.print("Opção: ");
                         opcao = scanner.nextInt();
                         scanner.nextLine();
-                    }while (opcao != 1 && opcao != 2);
+                    } while (opcao != 1 && opcao != 2);
 
                     if (opcao == 1) {
                         cadastrarPessoaFisica();
@@ -51,7 +54,7 @@ public class ConsoleMenu {
                     }
                     break;
                 case 2:
-//                    removerPessoa();
+                    removerPessoa();
                     break;
                 case 3:
 //                    service.listar().forEach(Pessoa::mostrarDados);
@@ -168,6 +171,33 @@ public class ConsoleMenu {
                 .cidade(cidade)
                 .uf(uf)
                 .build();
+    }
+
+    public void removerPessoa() {
+        listarPesso();
+    }
+
+    public void listarPesso() {
+        List<Pessoa> pessoas = service.buscarTodos();
+        String id;
+        String nome;
+        String doc;
+        String tipo;
+
+        System.out.printf(
+                "%-5s | %-20s | %-14s | %-10s%n",
+                "ID", "NOME", "DOCUMENTO", "TIPO"
+        );
+        for (Pessoa p : pessoas) {
+            id = ConsoleUtils.formatarColuna(String.valueOf(p.getId()), 5);
+            nome = ConsoleUtils.formatarColuna(p.getNome(), 20);
+            doc = ConsoleUtils.formatarColuna(p.getDocumento().getValor(), 14);
+
+            tipo = p.getDocumento().getTipo().getCodigo() == 0 ? "Física" : "Jurídica";
+
+            System.out.println(id + " | " + nome + " | " + doc + " | " + tipo);
+
+        }
     }
 }
 
