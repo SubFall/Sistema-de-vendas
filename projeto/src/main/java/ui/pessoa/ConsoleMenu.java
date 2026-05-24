@@ -174,7 +174,35 @@ public class ConsoleMenu {
     }
 
     public void removerPessoa() {
+        int id;
+        int opcao;
         listarPesso();
+
+        System.out.print("Digite o ID da pessoa para remover:");
+        id = ConsoleUtils.lerInteiro(scanner, "ID");
+
+        try {
+            Pessoa pessoa = service.buscarPorId(id);
+            System.out.println("Tem certeza que deseja Excluir " + pessoa.getNome() + " ?");
+
+            do {
+                System.out.println("1 - SIM");
+                System.out.println("2 - NÃO");
+
+                opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+            }while (opcao != 1 && opcao != 2);
+
+            if (opcao != 1) {
+                return;
+            }
+            boolean deletado = service.deletarPessoa(id);
+
+            if (deletado) {
+                System.out.println("Pessoa deletada com sucesso!");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void listarPesso() {

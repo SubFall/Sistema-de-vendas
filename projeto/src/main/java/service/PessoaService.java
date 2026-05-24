@@ -161,6 +161,14 @@ public class PessoaService {
         return pessoa;
     }
 
+    public Pessoa buscarPorId(int id) {
+        Pessoa pessoa = pessoaRepository.buscarPorId(id);
+        if (pessoa == null) {
+            throw new IllegalArgumentException("Pessoa Não existe");
+        }
+        return pessoa;
+    }
+
     public List<Pessoa> buscarPorNome(String nome) {
         return pessoaRepository.buscarPorNome(nome);
     }

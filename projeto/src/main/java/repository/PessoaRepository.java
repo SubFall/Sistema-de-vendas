@@ -117,6 +117,25 @@ public class PessoaRepository {
         return null;
     }
 
+    public Pessoa buscarPorId(int id) {
+        String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa WHERE id_pessoa = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearPessoa(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
     public List<Pessoa> buscarPorNome(String nome) {
         String sql = "SELECT id_pessoa, descricao, documento, tipo FROM pessoa WHERE descricao LIKE ?;";
         List<Pessoa> pessoaList = new ArrayList<>();

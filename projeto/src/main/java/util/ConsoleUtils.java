@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Scanner;
+
 public final class ConsoleUtils {
     public static String formatarColuna(String valor, int tamanho) {
 
@@ -12,5 +14,15 @@ public final class ConsoleUtils {
         }
         return String.format("%-" + tamanho + "s", valor);
 
+    }
+
+    public static int lerInteiro(Scanner scanner, String label) {
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Digite um " + label + " válido");
+            }
+        }
     }
 }
