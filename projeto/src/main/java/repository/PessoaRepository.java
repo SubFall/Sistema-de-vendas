@@ -13,27 +13,10 @@ import java.util.List;
 
 public class PessoaRepository {
 
-    public void inserirPessoa(Pessoa pessoa) {
-        String sql = "INSERT INTO pessoa (`descricao`, `documento`, `tipo`) VALUES (?, ?, ?);";
-
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, pessoa.getNome());
-            ps.setString(2, pessoa.getDocumento().getValor());
-            ps.setInt(3, pessoa.getDocumento().getTipo().getCodigo());
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public int inserirPessoa(Connection conn, Pessoa pessoa) {
         String sql = "INSERT INTO pessoa (`descricao`, `documento`, `tipo`) VALUES (?, ?, ?);";
 
-        try ( PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, pessoa.getNome());
             ps.setString(2, pessoa.getDocumento().getValor());

@@ -22,10 +22,37 @@ CREATE TABLE `eclipse_net`.`endereco`
     PRIMARY KEY (`id_endereco`),
     UNIQUE INDEX `id_endereco_UNIQUE` (`id_endereco` ASC) VISIBLE,
     INDEX         `id_pessoa_idx` (`id_pessoa` ASC) VISIBLE,
-    CONSTRAINT `id_pessoa`
+    CONSTRAINT `fk_pessoa_endereco`
         FOREIGN KEY (`id_pessoa`)
             REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
+
+CREATE TABLE `eclipse_net`.`papel`
+(
+    `id_papel` INT NOT NULL,
+    `descricao` VARCHAR(30) NOT NULL,
+    PRIMARY KEY (`id_papel`)
+);
+
+CREATE TABLE `eclipse_net`.`pessoa_papel` (
+    `id_pessoa` INT NOT NULL,
+    `id_papel` INT NOT NULL,
+    PRIMARY KEY (`id_pessoa`, `id_papel`),
+    INDEX `papel_idx` (`id_papel` ASC) VISIBLE,
+    CONSTRAINT `fk_pessoa_papel_pessoa`
+        FOREIGN KEY (`id_pessoa`)
+            REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_pessoa_papel_papel`
+        FOREIGN KEY (`id_papel`)
+            REFERENCES `eclipse_net`.`papel` (`id_papel`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
+
+INSERT INTO papel VALUES (1, 'CLIENTE');
+INSERT INTO papel VALUES (2, 'FUNCIONARIO');
 

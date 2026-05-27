@@ -3,7 +3,9 @@ package service;
 import conn.ConnectionFactory;
 import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
+import domain.pessoa.PessoaPapel;
 import repository.EnderecoRepository;
+import repository.PessoaPapelRepository;
 import repository.PessoaRepository;
 
 import java.sql.Connection;
@@ -12,6 +14,7 @@ import java.util.List;
 
 public class PessoaService {
     PessoaRepository pessoaRepository = new PessoaRepository();
+    PessoaPapelRepository pessoaPapelRepository = new PessoaPapelRepository();
     EnderecoRepository enderecoRepository = new EnderecoRepository();
 
     public void inserirPessoa(Pessoa pessoa) {
@@ -21,12 +24,6 @@ public class PessoaService {
         if (pessoaRepository.existeDocumento(documento)) {
             throw new IllegalArgumentException("Documento " + pessoa.getDocumento().getValor() + " já cadastrado");
         }
-
-        if (pessoa.getEndereco() == null) {
-            pessoaRepository.inserirPessoa(pessoa);
-            return;
-        }
-
         Connection conn = null;
 
         try {
@@ -36,7 +33,13 @@ public class PessoaService {
 
             int idPessoa = pessoaRepository.inserirPessoa(conn, pessoa);
 
-            enderecoRepository.inserirEndereco(conn, idPessoa, pessoa.getEndereco());
+            for (PessoaPapel pessoaPapel : pessoa.getPessoaPapel()) {
+                pessoaPapelRepository.inserirPessoaPapel(conn, idPessoa, pessoaPapel.getCodigo());
+            }
+
+            if (pessoa.getEndereco() != null) {
+                enderecoRepository.inserirEndereco(conn, idPessoa, pessoa.getEndereco());
+            }
 
             conn.commit();
         } catch (SQLException e) {
