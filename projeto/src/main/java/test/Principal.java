@@ -33,7 +33,8 @@ public class Principal {
                 .adicionarPapeis(PessoaPapel.CLIENTE)
                 .build();
 
-        service.inserirPessoa(pessoa);
+//        service.inserirPessoa(pessoa);
+        service.deletarPessoa(34);
 
     }
 }

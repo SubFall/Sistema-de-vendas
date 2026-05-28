@@ -78,6 +78,8 @@ public class PessoaService {
 
             enderecoRepository.deletarEndereco(conn, id);
 
+            pessoaPapelRepository.deletarPessoaPapel(conn, id);
+
             row = pessoaRepository.deletarPessoa(conn, id);
 
             conn.commit();

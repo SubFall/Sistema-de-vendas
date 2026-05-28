@@ -18,4 +18,17 @@ public class PessoaPapelRepository {
             throw new RuntimeException(e);
         }
     }
+
+    public void deletarPessoaPapel(Connection conn, int idPessoa) {
+        String sql = "DELETE FROM pessoa_papel WHERE id_pessoa = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idPessoa);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
