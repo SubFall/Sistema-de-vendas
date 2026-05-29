@@ -17,16 +17,18 @@ public class Principal {
 //
 //        consoleMenu.iniciar();
 
-        Endereco endereco = Endereco.builder()
-                .logradouro("Rua teste")
-                .cep("78123456")
-                .bairro("teste")
-                .numero("10")
-                .cidade("vege")
-                .uf("MT")
-                .build();
+        Endereco endereco = null;
+//                Endereco.builder()
+//                .logradouro("Rua teste")
+//                .cep("78123456")
+//                .bairro("teste")
+//                .numero("10")
+//                .cidade("vege")
+//                .uf("MT")
+//                .build();
 
         Pessoa pessoa = Pessoa.builder().nome("teste")
+                .id(35)
                 .documento(new CPF("06032055111"))
                 .endereco(endereco)
                 .adicionarPapeis(PessoaPapel.FUNCIONARIO)
@@ -34,7 +36,8 @@ public class Principal {
                 .build();
 
 //        service.inserirPessoa(pessoa);
-        service.deletarPessoa(34);
+//        service.deletarPessoa(34);
+        service.atualizarPessoa(pessoa);
 
     }
 }

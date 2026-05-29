@@ -9,6 +9,8 @@ import repository.PessoaPapelRepository;
 import repository.PessoaRepository;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -105,24 +107,13 @@ public class PessoaService {
         return row > 0;
     }
 
+
     public boolean atualizarPessoa(Pessoa pessoa) {
-        boolean existeDocumento = pessoaRepository.existeDocumentoPorOutroId(pessoa.getDocumento().getValor(), pessoa.getId());
-        if (existeDocumento) {
-            throw new IllegalArgumentException("Documento já cadastrado");
-        }
-        return pessoaRepository.atualizarPessoa(pessoa) > 0;
-    }
-
-    public boolean atualizarPessoa(Pessoa pessoa, Endereco endereco) {
 
         boolean existeDocumento = pessoaRepository.existeDocumentoPorOutroId(pessoa.getDocumento().getValor(), pessoa.getId());
 
         if (existeDocumento) {
             throw new IllegalArgumentException("Documento já cadastrado");
-        }
-
-        if (endereco == null) {
-            return pessoaRepository.atualizarPessoa(pessoa) > 0;
         }
 
         int row;
@@ -134,7 +125,26 @@ public class PessoaService {
             conn.setAutoCommit(false);
 
             row = pessoaRepository.atualizarPessoa(conn, pessoa);
-            enderecoRepository.atualizarEndereco(conn, endereco);
+
+            pessoaPapelRepository.deletarPessoaPapel(conn, pessoa.getId());
+
+            for (PessoaPapel p : pessoa.getPessoaPapel()) {
+                pessoaPapelRepository.inserirPessoaPapel(conn, pessoa.getId(), p.getCodigo());
+            }
+
+            if (pessoa.getEndereco() != null) {
+
+                boolean existeEndereco = enderecoRepository.existePessoaEndereco(conn, pessoa.getId());
+
+                if (existeEndereco) {
+                    enderecoRepository.atualizarEndereco(conn, pessoa.getEndereco());
+                }else {
+                    enderecoRepository.inserirEndereco(conn, pessoa.getId(), pessoa.getEndereco());
+                }
+
+            } else {
+                enderecoRepository.deletarEndereco(conn, pessoa.getId());
+            }
 
             conn.commit();
         } catch (SQLException e) {

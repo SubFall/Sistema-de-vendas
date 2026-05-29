@@ -177,4 +177,19 @@ public class EnderecoRepository {
                 .cep(rs.getString("cep"))
                 .build();
     }
+
+    public boolean existePessoaEndereco(Connection conn, int idPessoa) {
+        String sql = "SELECT 1 FROM endereco WHERE id_pessoa = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idPessoa);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
