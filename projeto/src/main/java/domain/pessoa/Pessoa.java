@@ -73,10 +73,6 @@ public class Pessoa {
         this.nome = nome;
     }
 
-    public void adicionarPapel(List<PessoaPapel> papeis) {
-        this.papeis = papeis;
-    }
-
     public int getId() { return this.id; }
 
     public String getNome() {
@@ -87,8 +83,16 @@ public class Pessoa {
         return documento;
     }
 
+    public void adicionarPapel(List<PessoaPapel> papeis) {
+        this.papeis = papeis;
+    }
+
     public List<PessoaPapel> getPessoaPapel() {
         return this.papeis;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
     }
 
     public Endereco getEndereco() {

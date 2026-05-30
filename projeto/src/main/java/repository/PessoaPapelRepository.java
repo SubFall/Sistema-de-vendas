@@ -1,8 +1,14 @@
 package repository;
 
+import conn.ConnectionFactory;
+import domain.pessoa.PessoaPapel;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PessoaPapelRepository {
     public void inserirPessoaPapel(Connection conn, int idPessoa, int idPapel) {
@@ -30,5 +36,32 @@ public class PessoaPapelRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<PessoaPapel> buscarPorIdPessoa(int idPessoa) {
+        String sql = """
+                SELECT p.id_papel
+                FROM pessoa_papel pp
+                JOIN papel p ON p.id_papel = pp.id_papel
+                WHERE pp.id_pessoa = ?;
+                """;
+
+        List<PessoaPapel> pessoaPapels = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idPessoa);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    pessoaPapels.add(PessoaPapel.fromCodigo(rs.getInt("id_papel")));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return pessoaPapels;
     }
 }

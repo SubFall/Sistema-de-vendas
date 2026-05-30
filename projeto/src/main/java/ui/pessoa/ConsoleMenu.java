@@ -28,7 +28,8 @@ public class ConsoleMenu {
             System.out.println("|1 - Cadastrar          - [] X|");
             System.out.println("|2 - Remover                  |");
             System.out.println("|3 - Atualizar                |");
-            System.out.println("|4 - Listar                   |");
+            System.out.println("|4 - Detalhes de Pessoa       |");
+            System.out.println("|5 - Listar                   |");
             System.out.println("|0 - Sair                     |");
             System.out.println("|*****************************|");
 
@@ -60,6 +61,17 @@ public class ConsoleMenu {
                 case 3:
 //                    service.listar().forEach(Pessoa::mostrarDados);
                     break;
+                case 4:
+                    System.out.println("Digite o ID da pessoa: ");
+                    try {
+                        detalhesPessoa(ConsoleUtils.lerInteiro(scanner, "ID"));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 5:
+                    listarPesso();
+                       break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -74,7 +86,7 @@ public class ConsoleMenu {
         String nome;
         String documento;
         String opcao;
-        List<PessoaPapel>pessoaPapels;
+        List<PessoaPapel> pessoaPapels;
         Endereco endereco = null;
 
         System.out.print("Nome: ");
@@ -112,7 +124,7 @@ public class ConsoleMenu {
         String nome;
         String documento;
         String opcao;
-        List<PessoaPapel>pessoaPapels;
+        List<PessoaPapel> pessoaPapels;
         Endereco endereco = null;
 
         System.out.print("Nome: ");
@@ -198,7 +210,7 @@ public class ConsoleMenu {
                 System.out.println("2 - NÃO");
 
                 opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
-            }while (opcao != 1 && opcao != 2);
+            } while (opcao != 1 && opcao != 2);
 
             if (opcao != 1) {
                 return;
@@ -211,6 +223,35 @@ public class ConsoleMenu {
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public void detalhesPessoa(int id) {
+        Pessoa pessoa = service.buscarPorId(id);
+        System.out.println("ID: " + pessoa.getId());
+        System.out.println("Nome: " + pessoa.getNome());
+        System.out.println("Documento: " + pessoa.getDocumento());
+        System.out.println("Tipo: " + pessoa.getDocumento().getTipo());
+
+        System.out.println();
+
+        System.out.println("Papéis:");
+        for (PessoaPapel pessoaPapel : pessoa.getPessoaPapel()) {
+            System.out.println("- " + pessoaPapel.getDescricao());
+        }
+
+        System.out.println();
+
+        if (pessoa.getEndereco() != null) {
+            System.out.println("Endereço:");
+            System.out.println("Rua: " + pessoa.getEndereco().getLogradouro());
+            System.out.println("Número: " + pessoa.getEndereco().getNumero());
+            System.out.println(pessoa.getEndereco().getBairro());
+            System.out.println(pessoa.getEndereco().getCidade() + " - " + pessoa.getEndereco().getUf());
+            System.out.println("CEP " + pessoa.getEndereco().getCep());
+        } else {
+            System.out.println("Endereço não cadastrado.");
+        }
+
     }
 
     public void listarPesso() {

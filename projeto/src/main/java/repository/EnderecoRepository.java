@@ -128,6 +128,24 @@ public class EnderecoRepository {
         return null;
     }
 
+    public Endereco buscarPoridPessoa(int id) {
+        String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco WHERE id_pessoa = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearEndereco(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
     public List<Endereco> buscarPorCidade(String cidade) {
         String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco WHERE cidade LIKE ?;";
         List<Endereco> enderecoList = new ArrayList<>();

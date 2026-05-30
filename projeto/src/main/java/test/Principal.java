@@ -10,6 +10,5 @@ public class Principal {
         ConsoleMenu consoleMenu = new ConsoleMenu(service);
         consoleMenu.iniciar();
 
-
     }
 }

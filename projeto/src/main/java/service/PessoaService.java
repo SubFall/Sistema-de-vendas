@@ -1,7 +1,6 @@
 package service;
 
 import conn.ConnectionFactory;
-import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
 import repository.EnderecoRepository;
@@ -9,8 +8,6 @@ import repository.PessoaPapelRepository;
 import repository.PessoaRepository;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -181,6 +178,11 @@ public class PessoaService {
         if (pessoa == null) {
             throw new IllegalArgumentException("Pessoa Não existe");
         }
+
+        pessoa.adicionarPapel(pessoaPapelRepository.buscarPorIdPessoa(id));
+
+        pessoa.setEndereco(enderecoRepository.buscarPoridPessoa(id));
+
         return pessoa;
     }
 
