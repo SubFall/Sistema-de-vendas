@@ -4,10 +4,11 @@ import domain.documento.CNPJ;
 import domain.documento.CPF;
 import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
+import domain.pessoa.PessoaPapel;
 import service.PessoaService;
 import util.ConsoleUtils;
 
-import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -73,6 +74,7 @@ public class ConsoleMenu {
         String nome;
         String documento;
         String opcao;
+        List<PessoaPapel>pessoaPapels;
         Endereco endereco = null;
 
         System.out.print("Nome: ");
@@ -81,6 +83,7 @@ public class ConsoleMenu {
         System.out.print("CPF: ");
         documento = scanner.nextLine();
 
+        pessoaPapels = cadastrarPapel();
 
         System.out.println("Deseja cadastrar o Endereço :");
         System.out.println("1 - SIM");
@@ -92,9 +95,11 @@ public class ConsoleMenu {
             endereco = cadastrarEndereco();
         }
 
+
         Pessoa pessoa = Pessoa.builder()
                 .nome(nome)
                 .documento(new CPF(documento))
+                .papeis(pessoaPapels)
                 .endereco(endereco)
                 .build();
 
@@ -107,6 +112,7 @@ public class ConsoleMenu {
         String nome;
         String documento;
         String opcao;
+        List<PessoaPapel>pessoaPapels;
         Endereco endereco = null;
 
         System.out.print("Nome: ");
@@ -115,6 +121,7 @@ public class ConsoleMenu {
         System.out.print("CNPJ: ");
         documento = scanner.nextLine();
 
+        pessoaPapels = cadastrarPapel();
 
         System.out.println("Deseja cadastrar o Endereço :");
         System.out.println("1 - SIM");
@@ -129,6 +136,7 @@ public class ConsoleMenu {
         Pessoa pessoa = Pessoa.builder()
                 .nome(nome)
                 .documento(new CNPJ(documento))
+                .papeis(pessoaPapels)
                 .endereco(endereco)
                 .build();
 
@@ -220,12 +228,25 @@ public class ConsoleMenu {
             id = ConsoleUtils.formatarColuna(String.valueOf(p.getId()), 5);
             nome = ConsoleUtils.formatarColuna(p.getNome(), 20);
             doc = ConsoleUtils.formatarColuna(p.getDocumento().getValor(), 14);
-
             tipo = p.getDocumento().getTipo().getCodigo() == 0 ? "Física" : "Jurídica";
 
             System.out.println(id + " | " + nome + " | " + doc + " | " + tipo);
 
         }
+    }
+
+    private List<PessoaPapel> cadastrarPapel() {
+        List<PessoaPapel> pessoaPapels = new ArrayList<>();
+
+        for (PessoaPapel papel : PessoaPapel.values()) {
+            System.out.println("A pessoa é " + papel.getDescricao() + " ?");
+            System.out.println("1 - Sim");
+            System.out.println("2 - Não");
+            if (ConsoleUtils.lerInteiro(scanner, "valor") == 1) {
+                pessoaPapels.add(papel);
+            }
+        }
+        return pessoaPapels;
     }
 }
 

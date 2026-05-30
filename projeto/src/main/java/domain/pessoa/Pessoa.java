@@ -56,8 +56,8 @@ public class Pessoa {
             return this;
         }
 
-        public PessoaBuilder adicionarPapeis(PessoaPapel papel) {
-            this.papeis.add(papel);
+        public PessoaBuilder papeis(List<PessoaPapel> papeis) {
+            this.papeis = papeis;
             return this;
         }
 

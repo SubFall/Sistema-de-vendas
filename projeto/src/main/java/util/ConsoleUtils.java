@@ -1,5 +1,8 @@
 package util;
 
+import domain.pessoa.PessoaPapel;
+
+import java.util.List;
 import java.util.Scanner;
 
 public final class ConsoleUtils {
