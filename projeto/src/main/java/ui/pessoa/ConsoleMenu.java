@@ -5,6 +5,7 @@ import domain.documento.CPF;
 import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
+import service.EnderecoService;
 import service.PessoaService;
 import util.ConsoleUtils;
 
@@ -14,10 +15,12 @@ import java.util.Scanner;
 
 public class ConsoleMenu {
     private Scanner scanner = new Scanner(System.in);
-    private PessoaService service;
+    private PessoaService pessoaService;
+    private EnderecoService enderecoService;
 
-    public ConsoleMenu(PessoaService service) {
-        this.service = service;
+    public ConsoleMenu(PessoaService pessoaService, EnderecoService enderecoService) {
+        this.pessoaService = pessoaService;
+        this.enderecoService = enderecoService;
     }
 
     public void iniciar() {
@@ -59,7 +62,7 @@ public class ConsoleMenu {
                     removerPessoa();
                     break;
                 case 3:
-//                    service.listar().forEach(Pessoa::mostrarDados);
+                    atualizarPessoa();
                     break;
                 case 4:
                     System.out.println("Digite o ID da pessoa: ");
@@ -70,8 +73,8 @@ public class ConsoleMenu {
                     }
                     break;
                 case 5:
-                    listarPesso();
-                       break;
+                    listarPessoa();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -115,7 +118,7 @@ public class ConsoleMenu {
                 .endereco(endereco)
                 .build();
 
-        service.inserirPessoa(pessoa);
+        pessoaService.inserirPessoa(pessoa);
 
         System.out.println("Pessoa cadastrada com sucesso!");
     }
@@ -152,9 +155,170 @@ public class ConsoleMenu {
                 .endereco(endereco)
                 .build();
 
-        service.inserirPessoa(pessoa);
+        pessoaService.inserirPessoa(pessoa);
 
         System.out.println("Pessoa cadastrada com sucesso!");
+    }
+
+    public void removerPessoa() {
+        int id;
+        int opcao;
+        listarPessoa();
+
+        System.out.print("Digite o ID da pessoa para remover:");
+        id = ConsoleUtils.lerInteiro(scanner, "ID");
+
+        try {
+            Pessoa pessoa = pessoaService.buscarPorId(id);
+            System.out.println("Tem certeza que deseja Excluir " + pessoa.getNome() + " ?");
+
+            do {
+                System.out.println("1 - SIM");
+                System.out.println("2 - NÃO");
+
+                opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+            } while (opcao != 1 && opcao != 2);
+
+            if (opcao != 1) {
+                return;
+            }
+            boolean deletado = pessoaService.deletarPessoa(id);
+
+            if (deletado) {
+                System.out.println("Pessoa deletada com sucesso!");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void atualizarPessoa() {
+        listarPessoa();
+        System.out.println("Selecione um ID para atualizar");
+        Pessoa pessoa = pessoaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID pessoa"));
+
+        System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
+        System.out.println("Nome Atual: " + pessoa.getNome());
+        System.out.println("Novo Nome:");
+
+        String nome = scanner.nextLine();
+        pessoa.setNome(nome.isEmpty() ? pessoa.getNome() : nome);
+
+        if (pessoa.getDocumento().getTipo().getCodigo() == 0) {
+            System.out.println("CPF Atual: " + pessoa.getDocumento());
+        } else {
+            System.out.println("CNPJ Atual: " + pessoa.getDocumento());
+        }
+        int op;
+        do {
+
+            System.out.println("Atualizar Documento");
+            System.out.println("1 - Física");
+            System.out.println("2 - Jurídica");
+            System.out.println("3 - Mnater Documento");
+
+            op = ConsoleUtils.lerInteiro(scanner, "valor");
+        } while (op != 1 && op != 2 && op != 3);
+
+        switch (op) {
+            case 1:
+                System.out.println("Novo CPF:");
+                pessoa.setDocumento(new CPF(scanner.nextLine()));
+                break;
+            case 2:
+                System.out.println("Novo CNPJ:");
+                pessoa.setDocumento(new CNPJ(scanner.nextLine()));
+                break;
+        }
+
+        do {
+            System.out.println("Deseja alterar os papéis ?");
+            System.out.println("1 - Sim");
+            System.out.println("2 - Não");
+
+            op = ConsoleUtils.lerInteiro(scanner, "Valor");
+        } while (op != 1 && op != 2);
+
+        if (op == 1) {
+            pessoa.setPapeis(cadastrarPapel());
+        }
+
+        do {
+
+            System.out.println("Deseja alterar o Endereço ?");
+            System.out.println("1 - Atualizar Endereço");
+            System.out.println("2 - Adicionar Endereço");
+            System.out.println("3 - Remover Endereço");
+            System.out.println("4 - Manter Endereço atual");
+
+            op = ConsoleUtils.lerInteiro(scanner, "valor");
+        } while (op != 1 && op != 2 && op != 3 && op != 4);
+
+        switch (op) {
+            case 1:
+            case 2:
+                if (pessoa.getEndereco() != null) {
+                    atualizaEndereco(pessoa.getEndereco());
+                } else {
+                    pessoa.setEndereco(cadastrarEndereco());
+                }
+                break;
+            case 3:
+                pessoa.setEndereco(null);
+        }
+
+        pessoaService.atualizarPessoa(pessoa);
+    }
+
+    public void detalhesPessoa(int id) {
+        Pessoa pessoa = pessoaService.buscarPorId(id);
+        System.out.println("ID: " + pessoa.getId());
+        System.out.println("Nome: " + pessoa.getNome());
+        System.out.println("Documento: " + pessoa.getDocumento());
+        System.out.println("Tipo: " + pessoa.getDocumento().getTipo());
+
+        System.out.println();
+
+        System.out.println("Papéis:");
+        for (PessoaPapel pessoaPapel : pessoa.getPessoaPapel()) {
+            System.out.println("- " + pessoaPapel.getDescricao());
+        }
+
+        System.out.println();
+
+        if (pessoa.getEndereco() != null) {
+            System.out.println("Endereço:");
+            System.out.println("Rua: " + pessoa.getEndereco().getLogradouro());
+            System.out.println("Número: " + pessoa.getEndereco().getNumero());
+            System.out.println(pessoa.getEndereco().getBairro());
+            System.out.println(pessoa.getEndereco().getCidade() + " - " + pessoa.getEndereco().getUf());
+            System.out.println("CEP " + pessoa.getEndereco().getCep());
+        } else {
+            System.out.println("Endereço não cadastrado.");
+        }
+
+    }
+
+    public void listarPessoa() {
+        List<Pessoa> pessoas = pessoaService.buscarTodos();
+        String id;
+        String nome;
+        String doc;
+        String tipo;
+
+        System.out.printf(
+                "%-5s | %-20s | %-14s | %-10s%n",
+                "ID", "NOME", "DOCUMENTO", "TIPO"
+        );
+        for (Pessoa p : pessoas) {
+            id = ConsoleUtils.formatarColuna(String.valueOf(p.getId()), 5);
+            nome = ConsoleUtils.formatarColuna(p.getNome(), 20);
+            doc = ConsoleUtils.formatarColuna(p.getDocumento().getValor(), 14);
+            tipo = p.getDocumento().getTipo().getCodigo() == 0 ? "Física" : "Jurídica";
+
+            System.out.println(id + " | " + nome + " | " + doc + " | " + tipo);
+
+        }
     }
 
     private Endereco cadastrarEndereco() {
@@ -193,87 +357,26 @@ public class ConsoleMenu {
                 .build();
     }
 
-    public void removerPessoa() {
-        int id;
-        int opcao;
-        listarPesso();
+    private void atualizaEndereco(Endereco endereco) {
 
-        System.out.print("Digite o ID da pessoa para remover:");
-        id = ConsoleUtils.lerInteiro(scanner, "ID");
+        System.out.print("Digite o CEP:");
+        endereco.setCep(scanner.nextLine());
 
-        try {
-            Pessoa pessoa = service.buscarPorId(id);
-            System.out.println("Tem certeza que deseja Excluir " + pessoa.getNome() + " ?");
+        System.out.print("Digite o logradouro:");
+        endereco.setLogradouro(scanner.nextLine());
 
-            do {
-                System.out.println("1 - SIM");
-                System.out.println("2 - NÃO");
+        System.out.print("Digite o número:");
+        endereco.setNumero(scanner.nextLine());
 
-                opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
-            } while (opcao != 1 && opcao != 2);
+        System.out.print("Digite o bairro:");
+        endereco.setBairro(scanner.nextLine());
 
-            if (opcao != 1) {
-                return;
-            }
-            boolean deletado = service.deletarPessoa(id);
+        System.out.print("Digite a cidade:");
+        endereco.setCidade(scanner.nextLine());
 
-            if (deletado) {
-                System.out.println("Pessoa deletada com sucesso!");
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-    }
+        System.out.print("Digite a UF:");
+        endereco.setUf(scanner.nextLine());
 
-    public void detalhesPessoa(int id) {
-        Pessoa pessoa = service.buscarPorId(id);
-        System.out.println("ID: " + pessoa.getId());
-        System.out.println("Nome: " + pessoa.getNome());
-        System.out.println("Documento: " + pessoa.getDocumento());
-        System.out.println("Tipo: " + pessoa.getDocumento().getTipo());
-
-        System.out.println();
-
-        System.out.println("Papéis:");
-        for (PessoaPapel pessoaPapel : pessoa.getPessoaPapel()) {
-            System.out.println("- " + pessoaPapel.getDescricao());
-        }
-
-        System.out.println();
-
-        if (pessoa.getEndereco() != null) {
-            System.out.println("Endereço:");
-            System.out.println("Rua: " + pessoa.getEndereco().getLogradouro());
-            System.out.println("Número: " + pessoa.getEndereco().getNumero());
-            System.out.println(pessoa.getEndereco().getBairro());
-            System.out.println(pessoa.getEndereco().getCidade() + " - " + pessoa.getEndereco().getUf());
-            System.out.println("CEP " + pessoa.getEndereco().getCep());
-        } else {
-            System.out.println("Endereço não cadastrado.");
-        }
-
-    }
-
-    public void listarPesso() {
-        List<Pessoa> pessoas = service.buscarTodos();
-        String id;
-        String nome;
-        String doc;
-        String tipo;
-
-        System.out.printf(
-                "%-5s | %-20s | %-14s | %-10s%n",
-                "ID", "NOME", "DOCUMENTO", "TIPO"
-        );
-        for (Pessoa p : pessoas) {
-            id = ConsoleUtils.formatarColuna(String.valueOf(p.getId()), 5);
-            nome = ConsoleUtils.formatarColuna(p.getNome(), 20);
-            doc = ConsoleUtils.formatarColuna(p.getDocumento().getValor(), 14);
-            tipo = p.getDocumento().getTipo().getCodigo() == 0 ? "Física" : "Jurídica";
-
-            System.out.println(id + " | " + nome + " | " + doc + " | " + tipo);
-
-        }
     }
 
     private List<PessoaPapel> cadastrarPapel() {

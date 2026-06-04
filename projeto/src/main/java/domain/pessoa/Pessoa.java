@@ -9,7 +9,7 @@ import java.util.List;
 public class Pessoa {
     private int id;
     private String nome;
-    private final Documento documento;
+    private Documento documento;
     private Endereco endereco;
     private List<PessoaPapel> papeis;
 
@@ -18,7 +18,7 @@ public class Pessoa {
         this.id = id;
         this.documento = documento;
         setNome(nome);
-        adicionarPapel(papeis);
+        setPapeis(papeis);
     }
 
     private Pessoa(int id, String nome, Documento documento, List<PessoaPapel> papeis, Endereco endereco) {
@@ -41,6 +41,7 @@ public class Pessoa {
             this.id = id;
             return this;
         }
+
         public PessoaBuilder nome(String nome) {
             this.nome = nome;
             return this;
@@ -73,17 +74,23 @@ public class Pessoa {
         this.nome = nome;
     }
 
-    public int getId() { return this.id; }
+    public int getId() {
+        return this.id;
+    }
 
     public String getNome() {
         return this.nome;
+    }
+
+    public void setDocumento(Documento documento) {
+        this.documento = documento;
     }
 
     public Documento getDocumento() {
         return documento;
     }
 
-    public void adicionarPapel(List<PessoaPapel> papeis) {
+    public void setPapeis(List<PessoaPapel> papeis) {
         this.papeis = papeis;
     }
 

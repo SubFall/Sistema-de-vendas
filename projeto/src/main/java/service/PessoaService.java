@@ -179,7 +179,7 @@ public class PessoaService {
             throw new IllegalArgumentException("Pessoa Não existe");
         }
 
-        pessoa.adicionarPapel(pessoaPapelRepository.buscarPorIdPessoa(id));
+        pessoa.setPapeis(pessoaPapelRepository.buscarPorIdPessoa(id));
 
         pessoa.setEndereco(enderecoRepository.buscarPoridPessoa(id));
 
