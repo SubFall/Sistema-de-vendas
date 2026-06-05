@@ -56,3 +56,11 @@ CREATE TABLE `eclipse_net`.`pessoa_papel` (
 INSERT INTO papel VALUES (1, 'CLIENTE');
 INSERT INTO papel VALUES (2, 'FUNCIONARIO');
 
+CREATE TABLE `eclipse_net`.`produtos` (
+    `id_produto` INT NOT NULL AUTO_INCREMENT,
+    `descricao` VARCHAR(60) NOT NULL,
+    `preco_venda` DECIMAL(15,2) NOT NULL,
+    `preco_custo` DECIMAL(15,2) NOT NULL,
+    `ativo` TINYINT(1) NOT NULL DEFAULT 1,
+        PRIMARY KEY (`id_produto`)
+);
