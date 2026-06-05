@@ -24,7 +24,7 @@ public class Produto {
     public static final class ProdutoBuilder {
         private int id;
         private String descricao;
-        private BigDecimal precoVenda = BigDecimal.ZERO;
+        private BigDecimal precoVenda;
         private BigDecimal precoCusto = BigDecimal.ZERO;
         private boolean ativo = true;
 
@@ -54,6 +54,14 @@ public class Produto {
         }
 
         public Produto build() {
+            if (descricao == null || descricao.isBlank()) {
+                throw new IllegalArgumentException("Descrição obrigatória.");
+            }
+
+            if (precoVenda == null) {
+                throw new IllegalArgumentException("Preço de venda obrigatório.");
+            }
+
             return new Produto(id, descricao, precoVenda, precoCusto, ativo);
         }
     }

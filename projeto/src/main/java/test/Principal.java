@@ -19,7 +19,7 @@ public class Principal {
 
 
         Produto teste = Produto.builder()
-                .descricao("TESTE 2")
+//                .descricao("")
 //                .valorVenda(new BigDecimal("10"))
 //                .precoCusto(new BigDecimal("5"))
 //                .ativo(0)
