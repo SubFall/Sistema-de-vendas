@@ -1,6 +1,9 @@
 package test;
 
+import domain.produto.Produto;
 import service.ProdutoService;
+
+import java.math.BigDecimal;
 
 public class Principal {
     static void main(String[] args) {
@@ -12,14 +15,16 @@ public class Principal {
 //        consoleMenu.iniciar();
 
 
-//        Produto teste = Produto.builder()
-////                .descricao("")
-////                .valorVenda(new BigDecimal("10"))
-////                .precoCusto(new BigDecimal("5"))
-////                .ativo(0)
-//                .build();
+        Produto teste = Produto.builder()
+                .id(1)
+                .descricao("TEST1")
+                .precoVenda(new BigDecimal("99.99"))
+                .precoCusto(new BigDecimal("45.93"))
+                .ativo(true)
+                .build();
+
 
 //        System.out.println(produtoService.inserirProduto(teste));
-        System.out.println(produtoService.atualizarStatusProduto(1));
+        System.out.println(produtoService.atualizarProduto(teste));
     }
 }

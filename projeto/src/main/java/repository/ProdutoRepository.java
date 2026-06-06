@@ -42,6 +42,24 @@ public class ProdutoRepository {
         }
     }
 
+    public boolean atualizarProduto(Produto produto) {
+        String sql = "UPDATE produtos SET descricao = ?, preco_venda = ?, preco_custo = ?, ativo = ? WHERE id_produto = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, produto.getDescricao());
+            ps.setBigDecimal(2, produto.getPrecoVenda());
+            ps.setBigDecimal(3, produto.getPrecoCusto());
+            ps.setBoolean(4, produto.getAtivo());
+            ps.setInt(5, produto.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Produto buscarPorId(int idProduto) {
         String sql = "select id_produto, descricao, preco_venda, preco_custo, ativo from produtos where id_produto = ?;";
 

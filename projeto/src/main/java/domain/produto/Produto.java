@@ -62,6 +62,14 @@ public class Produto {
                 throw new IllegalArgumentException("Preço de venda obrigatório.");
             }
 
+            if (precoVenda.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Preço de venda deve ser maior que zero");
+            }
+
+            if (precoCusto.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("Preço de custo inválido");
+            }
+
             return new Produto(id, descricao, precoVenda, precoCusto, ativo);
         }
     }
