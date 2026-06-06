@@ -10,4 +10,15 @@ public class ProdutoService {
     public boolean inserirProduto(Produto produto) {
         return produtoRepository.inserirProduto(produto);
     }
+
+    public boolean atualizarStatusProduto(int idProduto) {
+        Produto produto = produtoRepository.buscarPorId(idProduto);
+
+        if (produto == null) {
+            System.out.println("Produto não cadastrado!");
+        }
+
+        return produtoRepository.atualizarStatusProduto(!produto.getAtivo(), idProduto);
+
+    }
 }

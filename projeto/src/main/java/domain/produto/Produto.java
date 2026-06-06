@@ -38,7 +38,7 @@ public class Produto {
             return this;
         }
 
-        public ProdutoBuilder valorVenda(BigDecimal precoVenda) {
+        public ProdutoBuilder precoVenda(BigDecimal precoVenda) {
             this.precoVenda = precoVenda;
             return this;
         }

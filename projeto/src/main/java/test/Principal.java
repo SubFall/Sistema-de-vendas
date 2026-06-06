@@ -1,12 +1,6 @@
 package test;
 
-import domain.produto.Produto;
-import service.EnderecoService;
-import service.PessoaService;
 import service.ProdutoService;
-import ui.pessoa.ConsoleMenu;
-
-import java.math.BigDecimal;
 
 public class Principal {
     static void main(String[] args) {
@@ -18,14 +12,14 @@ public class Principal {
 //        consoleMenu.iniciar();
 
 
-        Produto teste = Produto.builder()
-//                .descricao("")
-//                .valorVenda(new BigDecimal("10"))
-//                .precoCusto(new BigDecimal("5"))
-//                .ativo(0)
-                .build();
+//        Produto teste = Produto.builder()
+////                .descricao("")
+////                .valorVenda(new BigDecimal("10"))
+////                .precoCusto(new BigDecimal("5"))
+////                .ativo(0)
+//                .build();
 
-        System.out.println(produtoService.inserirProduto(teste));
-
+//        System.out.println(produtoService.inserirProduto(teste));
+        System.out.println(produtoService.atualizarStatusProduto(1));
     }
 }
