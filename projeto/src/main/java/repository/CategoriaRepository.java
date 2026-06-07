@@ -54,6 +54,22 @@ public class CategoriaRepository {
         }
     }
 
+    public boolean atualizarCategoria(Categoria categoria) {
+        String sql = "UPDATE categoria SET descricao = ?, ativo = ? WHERE id_categoria = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, categoria.getDescricao());
+            ps.setBoolean(2, categoria.isAtivo());
+            ps.setInt(3, categoria.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean categoriaPossuiProdutos(String categoria) {
         String sql = "SELECT 1 FROM categoria WHERE descricao = ?;";
 
@@ -144,6 +160,23 @@ public class CategoriaRepository {
             throw new RuntimeException(e);
         }
         return categorias;
+    }
+
+    public boolean existeOutraCategoriaComDescricao(String descricao, int idCategoria) {
+        String sql = "SELECT 1 FROM categoria WHERE descricao = ? AND id_categoria <> ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, descricao);
+            ps.setInt(2, idCategoria);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Categoria mapearCategoria(ResultSet rs) throws SQLException {

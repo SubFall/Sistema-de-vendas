@@ -31,6 +31,14 @@ public class CategoriaService {
         return 1;
     }
 
+    public boolean atualizarCategoria(Categoria categoria) {
+        if (categoriaRepository.existeOutraCategoriaComDescricao(categoria.getDescricao(), categoria.getId())) {
+            throw new IllegalArgumentException("Categoria já existe");
+        }
+
+        return categoriaRepository.atualizarCategoria(categoria);
+    }
+
     public Categoria buscarPorId(int idCategoria) {
         Categoria categoria = categoriaRepository.buscarPorId(idCategoria);
 

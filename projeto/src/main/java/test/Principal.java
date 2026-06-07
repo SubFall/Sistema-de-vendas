@@ -32,11 +32,11 @@ public class Principal {
 
 //        System.out.println(produtoService.buscarTodos());
 
-//        Categoria categoria = Categoria.builder().descricao("teste 123").build();
+        Categoria categoria = Categoria.builder().id(4).descricao("teste 1234").ativo(true).build();
 //        System.out.println(categoriaService.inserirCategoria(categoria));
 //        System.out.println(categoriaService.deletarInativarCategoria(1));
 
-
+        System.out.println(categoriaService.atualizarCategoria(categoria));
 
     }
 }
