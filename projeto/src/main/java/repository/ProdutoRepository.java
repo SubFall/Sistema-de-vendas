@@ -13,7 +13,7 @@ import java.util.List;
 public class ProdutoRepository {
 
     public boolean inserirProduto(Produto produto) {
-        String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo) VALUES (?, ?, ?, ?);";
+        String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo, id_catergoria) VALUES (?, ?, ?, ?, ?);";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -22,6 +22,7 @@ public class ProdutoRepository {
             ps.setBigDecimal(2, produto.getPrecoVenda());
             ps.setBigDecimal(3, produto.getPrecoCusto());
             ps.setBoolean(4, produto.getAtivo());
+//            ps.setInt(5, );
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {

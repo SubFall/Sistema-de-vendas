@@ -31,16 +31,17 @@ CREATE TABLE `eclipse_net`.`endereco`
 
 CREATE TABLE `eclipse_net`.`papel`
 (
-    `id_papel` INT NOT NULL,
+    `id_papel`  INT         NOT NULL,
     `descricao` VARCHAR(30) NOT NULL,
     PRIMARY KEY (`id_papel`)
 );
 
-CREATE TABLE `eclipse_net`.`pessoa_papel` (
+CREATE TABLE `eclipse_net`.`pessoa_papel`
+(
     `id_pessoa` INT NOT NULL,
-    `id_papel` INT NOT NULL,
+    `id_papel`  INT NOT NULL,
     PRIMARY KEY (`id_pessoa`, `id_papel`),
-    INDEX `papel_idx` (`id_papel` ASC) VISIBLE,
+    INDEX       `papel_idx` (`id_papel` ASC) VISIBLE,
     CONSTRAINT `fk_pessoa_papel_pessoa`
         FOREIGN KEY (`id_pessoa`)
             REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
@@ -53,14 +54,33 @@ CREATE TABLE `eclipse_net`.`pessoa_papel` (
             ON UPDATE NO ACTION
 );
 
-INSERT INTO papel VALUES (1, 'CLIENTE');
-INSERT INTO papel VALUES (2, 'FUNCIONARIO');
+INSERT INTO papel
+VALUES (1, 'CLIENTE');
+INSERT INTO papel
+VALUES (2, 'FUNCIONARIO');
 
-CREATE TABLE `eclipse_net`.`produtos` (
-    `id_produto` INT NOT NULL AUTO_INCREMENT,
-    `descricao` VARCHAR(60) NOT NULL,
-    `preco_venda` DECIMAL(15,2) NOT NULL,
-    `preco_custo` DECIMAL(15,2) NOT NULL,
-    `ativo` TINYINT(1) NOT NULL DEFAULT 1,
-        PRIMARY KEY (`id_produto`)
+CREATE TABLE `eclipse_net`.`categoria`
+(
+    `id_categoria` INT         NOT NULL AUTO_INCREMENT,
+    `descricao`    VARCHAR(45) NOT NULL,
+    `ativo`        TINYINT(1)  NOT NULL DEFAULT 1,
+    PRIMARY KEY (`id_categoria`),
+    UNIQUE INDEX `descricao_UNIQUE` (`descricao` ASC) VISIBLE
+);
+
+CREATE TABLE `eclipse_net`.`produtos`
+(
+    `id_produto`   INT            NOT NULL AUTO_INCREMENT,
+    `descricao`    VARCHAR(60)    NOT NULL,
+    `preco_venda`  DECIMAL(15, 2) NOT NULL,
+    `preco_custo`  DECIMAL(15, 2) NOT NULL,
+    `ativo`        TINYINT(1) NOT NULL DEFAULT 1,
+    `id_categoria` INT            NOT NULL,
+    PRIMARY KEY (`id_produto`),
+    INDEX          `id_categoria_idx` (`id_categoria` ASC) VISIBLE,
+    CONSTRAINT `fk_produto_categoria`
+        FOREIGN KEY (`id_categoria`)
+            REFERENCES `eclipse_net`.`categoria` (`id_categoria`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
 );

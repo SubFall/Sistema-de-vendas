@@ -1,0 +1,55 @@
+package service;
+
+import domain.categoria.Categoria;
+import repository.CategoriaRepository;
+
+import java.util.List;
+
+public class CategoriaService {
+    CategoriaRepository categoriaRepository = new CategoriaRepository();
+
+    public boolean inserirCategoria(Categoria categoria) {
+        if (categoriaRepository.categoriaPossuiProdutos(categoria.getDescricao())) {
+            throw new IllegalArgumentException("Categoria já cadastrada");
+        }
+        return categoriaRepository.inserirCategoria(categoria);
+    }
+
+    public int deletarInativarCategoria(int idCategoria) {
+        Categoria categoria = categoriaRepository.buscarPorId(idCategoria);
+
+        if (categoria == null) {
+            throw new IllegalArgumentException("Categoria não existe");
+        }
+
+        if (categoriaRepository.categoriaPossuiProdutos(categoria.getId())) {
+            categoriaRepository.atualizarStatusCategoria(false, categoria.getId());
+            return 0;
+        }
+
+        categoriaRepository.deletarCategoria(categoria.getId());
+        return 1;
+    }
+
+    public Categoria buscarPorId(int idCategoria) {
+        Categoria categoria = categoriaRepository.buscarPorId(idCategoria);
+
+        if (categoria == null) {
+            throw new IllegalArgumentException("Categoria não encontrada");
+        }
+
+        return categoria;
+    }
+
+    public List<Categoria> buscarPorDescricao(String descricao) {
+        if (descricao == null || descricao.isBlank()) {
+            return categoriaRepository.buscarTodos();
+        }
+        return categoriaRepository.buscarPorDescricao(descricao);
+    }
+
+    public List<Categoria> buscarTodos() {
+        return categoriaRepository.buscarTodos();
+    }
+
+}
