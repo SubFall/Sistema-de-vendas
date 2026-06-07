@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProdutoRepository {
 
@@ -58,6 +60,48 @@ public class ProdutoRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Produto> buscarTodos() {
+        String sql = "SELECT id_produto, descricao, preco_venda, preco_custo, ativo FROM produtos ORDER BY descricao;";
+        List<Produto> produtos = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                produtos.add(mapearProduto(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return produtos;
+    }
+
+    public List<Produto> buscarPorDescricao(String descricao) {
+        String sql = """
+                SELECT id_produto, descricao, preco_venda, preco_custo, ativo 
+                FROM produtos WHERE descricao LIKE ? ORDER BY descricao;
+                """;
+        List<Produto> produtos = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%"+descricao.trim()+"%");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    produtos.add(mapearProduto(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return produtos;
     }
 
     public Produto buscarPorId(int idProduto) {

@@ -83,6 +83,10 @@ public class Produto {
     }
 
     public void setDescricao(String descricao) {
+
+        if (descricao == null || descricao.isBlank()) {
+            throw new IllegalArgumentException("Descrição obrigatória.");
+        }
         this.descricao = descricao;
     }
 
@@ -91,6 +95,14 @@ public class Produto {
     }
 
     public void setPrecoVenda(BigDecimal precoVenda) {
+
+        if (precoVenda == null) {
+            throw new IllegalArgumentException("Preço de venda obrigatório.");
+        }
+
+        if (precoVenda.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Preço de venda deve ser maior que zero");
+        }
         this.precoVenda = precoVenda;
     }
 
@@ -99,6 +111,10 @@ public class Produto {
     }
 
     public void setPrecoCusto(BigDecimal precoCusto) {
+
+        if (precoCusto.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Preço de custo inválido");
+        }
         this.precoCusto = precoCusto;
     }
 

@@ -16,8 +16,8 @@ public class Principal {
 
 
         Produto teste = Produto.builder()
-                .id(1)
-                .descricao("TEST1")
+                .id(2)
+                .descricao("TEST 2")
                 .precoVenda(new BigDecimal("99.99"))
                 .precoCusto(new BigDecimal("45.93"))
                 .ativo(true)
@@ -25,6 +25,8 @@ public class Principal {
 
 
 //        System.out.println(produtoService.inserirProduto(teste));
-        System.out.println(produtoService.atualizarProduto(teste));
+//        System.out.println(produtoService.atualizarProduto(teste));
+
+//        System.out.println(produtoService.buscarTodos());
     }
 }

@@ -3,6 +3,8 @@ package service;
 import domain.produto.Produto;
 import repository.ProdutoRepository;
 
+import java.util.List;
+
 public class ProdutoService {
 
     ProdutoRepository produtoRepository = new ProdutoRepository();
@@ -30,5 +32,17 @@ public class ProdutoService {
         }
 
         return produtoRepository.atualizarProduto(produto);
+    }
+
+    public List<Produto> buscarTodos() {
+        return produtoRepository.buscarTodos();
+    }
+
+    public List<Produto> buscarPorNome(String descricao) {
+
+        if (descricao == null || descricao.isBlank()) {
+            return produtoRepository.buscarTodos();
+        }
+        return produtoRepository.buscarPorDescricao(descricao);
     }
 }
