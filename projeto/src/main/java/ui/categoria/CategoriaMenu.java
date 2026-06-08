@@ -1,0 +1,153 @@
+package ui.categoria;
+
+import domain.categoria.Categoria;
+import service.CategoriaService;
+import util.ConsoleUtils;
+
+import java.util.List;
+import java.util.Scanner;
+
+public class CategoriaMenu {
+    private Scanner scanner = new Scanner(System.in);
+    private CategoriaService categoriaService;
+
+    public CategoriaMenu(CategoriaService categoriaService) {
+        this.categoriaService = categoriaService;
+    }
+
+    public void iniciar() {
+        int opcao;
+
+        do {
+            System.out.println("\n|********** Categoria **********|");
+            System.out.println("|1 - Cadastrar            - [] X|");
+            System.out.println("|2 - Remover                    |");
+            System.out.println("|3 - Atualizar                  |");
+            System.out.println("|4 - Listar                     |");
+            System.out.println("|0 - Sair                       |");
+            System.out.println("|*******************************|");
+
+            System.out.print("Opção: ");
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcao) {
+                case 1:
+                    cadastrar();
+                    break;
+                case 2:
+                    remover();
+                    break;
+                case 3:
+                    atualizar();
+                    break;
+                case 4:
+                    listar();
+                    break;
+                case 0:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opção inválida");
+            }
+
+        } while (opcao != 0);
+    }
+
+    private void cadastrar() {
+
+        try {
+            System.out.print("Descricao: ");
+            Categoria categoria = Categoria.builder()
+                    .descricao(scanner.nextLine())
+                    .build();
+
+            categoriaService.inserirCategoria(categoria);
+            System.out.println("Categoria " + categoria.getDescricao() + " cadastrada com sucesso!");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void remover() {
+        int id;
+        int opcao;
+        listar();
+
+        System.out.print("Digite o ID da categoria para remover:");
+        id = ConsoleUtils.lerInteiro(scanner, "ID");
+
+        try {
+            Categoria categoria = categoriaService.buscarPorId(id);
+            System.out.println("Tem certeza que deseja Excluir " + categoria.getDescricao() + " ?");
+
+            do {
+                System.out.println("1 - SIM");
+                System.out.println("2 - NÃO");
+
+                opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+            } while (opcao != 1 && opcao != 2);
+
+            if (opcao != 1) {
+                return;
+            }
+            int i = categoriaService.deletarInativarCategoria(categoria.getId());
+
+            if (i == 0) {
+                System.out.println("Categoria inativada.");
+            } else {
+                System.out.println("Categoria deletada com sucesso!");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void atualizar() {
+        listar();
+        System.out.println("Selecione um ID para atualizar");
+        Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID Categoria"));
+
+        System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
+        System.out.println("Descricao Atual: " + categoria.getDescricao());
+        System.out.println("Nova Descricao:");
+
+        String descricao = scanner.nextLine();
+        categoria.setDescricao(descricao.isBlank() ? categoria.getDescricao() : descricao);
+
+        int op;
+        do {
+            System.out.println("Ativo: " + (categoria.isAtivo() ? "SIM" : "NÃO"));
+            System.out.println("Deseja mudar ?:");
+            System.out.println("1 - Ativo");
+            System.out.println("2 - Inativo");
+
+            op = ConsoleUtils.lerInteiro(scanner, "Opção");
+        } while (op != 1 && op != 2);
+
+        categoria.setAtivo(op == 1);
+
+        categoriaService.atualizarCategoria(categoria);
+
+        System.out.println("Categoria " + categoria.getDescricao() + " atualizado com sucesso!");
+    }
+
+    public void listar() {
+        List<Categoria> categorias = categoriaService.buscarTodos();
+        String id;
+        String descricao;
+        String ativo;
+
+        System.out.printf(
+                "%-5s | %-20s | %-10s%n",
+                "ID", "DESCRICAO", "ATIVO"
+        );
+        for (Categoria c : categorias) {
+            id = ConsoleUtils.formatarColuna(String.valueOf(c.getId()), 5);
+            descricao = ConsoleUtils.formatarColuna(c.getDescricao(), 20);
+            ativo = c.isAtivo() ? "SIM" : "NÃO";
+
+            System.out.println(id + " | " + descricao + " | " + ativo );
+        }
+    }
+}

@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ConsoleMenu {
+public class PessoaMenu {
     private Scanner scanner = new Scanner(System.in);
     private PessoaService pessoaService;
     private EnderecoService enderecoService;
 
-    public ConsoleMenu(PessoaService pessoaService, EnderecoService enderecoService) {
+    public PessoaMenu(PessoaService pessoaService, EnderecoService enderecoService) {
         this.pessoaService = pessoaService;
         this.enderecoService = enderecoService;
     }
@@ -31,7 +31,7 @@ public class ConsoleMenu {
             System.out.println("|1 - Cadastrar          - [] X|");
             System.out.println("|2 - Remover                  |");
             System.out.println("|3 - Atualizar                |");
-            System.out.println("|4 - Detalhes de Pessoa       |");
+            System.out.println("|4 - Detalhes                 |");
             System.out.println("|5 - Listar                   |");
             System.out.println("|0 - Sair                     |");
             System.out.println("|*****************************|");

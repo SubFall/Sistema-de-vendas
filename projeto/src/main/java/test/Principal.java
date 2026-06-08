@@ -4,6 +4,7 @@ import domain.categoria.Categoria;
 import domain.produto.Produto;
 import service.CategoriaService;
 import service.ProdutoService;
+import ui.categoria.CategoriaMenu;
 
 import java.math.BigDecimal;
 
@@ -13,30 +14,14 @@ public class Principal {
 //        PessoaService pessoaService = new PessoaService();
 //        EnderecoService enderecoService = new EnderecoService();
 //        ConsoleMenu consoleMenu = new ConsoleMenu(pessoaService, enderecoService);
-        ProdutoService produtoService = new ProdutoService();
         CategoriaService categoriaService = new CategoriaService();
+        CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
+        ProdutoService produtoService = new ProdutoService();
 //        consoleMenu.iniciar();
 
-
-        Produto teste = Produto.builder()
-                .id(2)
-                .descricao("TEST 2")
-                .precoVenda(new BigDecimal("99.99"))
-                .precoCusto(new BigDecimal("45.93"))
-                .ativo(true)
-                .build();
+        categoriaMenu.iniciar();
 
 
-//        System.out.println(produtoService.inserirProduto(teste));
-//        System.out.println(produtoService.atualizarProduto(teste));
-
-//        System.out.println(produtoService.buscarTodos());
-
-        Categoria categoria = Categoria.builder().id(4).descricao("teste 1234").ativo(true).build();
-//        System.out.println(categoriaService.inserirCategoria(categoria));
-//        System.out.println(categoriaService.deletarInativarCategoria(1));
-
-        System.out.println(categoriaService.atualizarCategoria(categoria));
 
     }
 }
