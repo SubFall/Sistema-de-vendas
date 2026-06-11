@@ -4,6 +4,7 @@ import domain.categoria.Categoria;
 import service.CategoriaService;
 import util.ConsoleUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,8 +29,7 @@ public class CategoriaMenu {
             System.out.println("|*******************************|");
 
             System.out.print("Opção: ");
-            opcao = scanner.nextInt();
-            scanner.nextLine();
+            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
                 case 1:
@@ -42,7 +42,17 @@ public class CategoriaMenu {
                     atualizar();
                     break;
                 case 4:
-                    listar();
+                    int op;
+                    do {
+                        System.out.println("1 - Listar todas categoriras");
+                        System.out.println("2 - Listar categora por descricao");
+                        System.out.println("3 - Listar categora por id");
+
+                        op = ConsoleUtils.lerInteiro(scanner, "Opção");
+
+                    } while (op != 1 && op != 2 && op != 3);
+
+                    listar(op);
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -72,7 +82,7 @@ public class CategoriaMenu {
     public void remover() {
         int id;
         int opcao;
-        listar();
+        listar(1);
 
         System.out.print("Digite o ID da categoria para remover:");
         id = ConsoleUtils.lerInteiro(scanner, "ID");
@@ -104,36 +114,64 @@ public class CategoriaMenu {
     }
 
     public void atualizar() {
-        listar();
+        listar(1);
         System.out.println("Selecione um ID para atualizar");
-        Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID Categoria"));
 
-        System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
-        System.out.println("Descricao Atual: " + categoria.getDescricao());
-        System.out.println("Nova Descricao:");
+        try {
+            Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID Categoria"));
 
-        String descricao = scanner.nextLine();
-        categoria.setDescricao(descricao.isBlank() ? categoria.getDescricao() : descricao);
 
-        int op;
-        do {
-            System.out.println("Ativo: " + (categoria.isAtivo() ? "SIM" : "NÃO"));
-            System.out.println("Deseja mudar ?:");
-            System.out.println("1 - Ativo");
-            System.out.println("2 - Inativo");
+            System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
+            System.out.println("Descricao Atual: " + categoria.getDescricao());
+            System.out.println("Nova Descricao:");
 
-            op = ConsoleUtils.lerInteiro(scanner, "Opção");
-        } while (op != 1 && op != 2);
+            String descricao = scanner.nextLine();
+            categoria.setDescricao(descricao.isBlank() ? categoria.getDescricao() : descricao);
 
-        categoria.setAtivo(op == 1);
+            int op;
+            do {
+                System.out.println("Ativo: " + (categoria.isAtivo() ? "SIM" : "NÃO"));
+                System.out.println("Deseja mudar ?:");
+                System.out.println("1 - Ativo");
+                System.out.println("2 - Inativo");
 
-        categoriaService.atualizarCategoria(categoria);
+                op = ConsoleUtils.lerInteiro(scanner, "Opção");
+            } while (op != 1 && op != 2);
 
-        System.out.println("Categoria " + categoria.getDescricao() + " atualizado com sucesso!");
+            categoria.setAtivo(op == 1);
+
+            categoriaService.atualizarCategoria(categoria);
+
+            System.out.println("Categoria " + categoria.getDescricao() + " atualizado com sucesso!");
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    public void listar() {
-        List<Categoria> categorias = categoriaService.buscarTodos();
+    public void listar(int idLista) {
+        List<Categoria> categorias = new ArrayList<>();
+        switch (idLista) {
+            case 1:
+                categorias = categoriaService.buscarTodos();
+                break;
+            case 2:
+                System.out.print("Digite a descrição: ");
+                categorias = categoriaService.buscarPorDescricao(scanner.nextLine());
+                break;
+            case 3:
+                System.out.print("Digite o ID: ");
+
+                try {
+                    categorias.add(categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+
+                break;
+            default:
+                System.out.println("opção inválida!");
+        }
         String id;
         String descricao;
         String ativo;
@@ -147,7 +185,7 @@ public class CategoriaMenu {
             descricao = ConsoleUtils.formatarColuna(c.getDescricao(), 20);
             ativo = c.isAtivo() ? "SIM" : "NÃO";
 
-            System.out.println(id + " | " + descricao + " | " + ativo );
+            System.out.println(id + " | " + descricao + " | " + ativo);
         }
     }
 }
