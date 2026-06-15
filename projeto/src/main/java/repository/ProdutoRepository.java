@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import domain.categoria.Categoria;
 import domain.produto.Produto;
 
 import java.sql.Connection;
@@ -13,7 +14,7 @@ import java.util.List;
 public class ProdutoRepository {
 
     public boolean inserirProduto(Produto produto) {
-        String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo, id_catergoria) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo, id_categoria) VALUES (?, ?, ?, ?, ?);";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -21,8 +22,9 @@ public class ProdutoRepository {
             ps.setString(1, produto.getDescricao());
             ps.setBigDecimal(2, produto.getPrecoVenda());
             ps.setBigDecimal(3, produto.getPrecoCusto());
-            ps.setBoolean(4, produto.getAtivo());
-//            ps.setInt(5, );
+            ps.setBoolean(4, produto.isAtivo());
+            ps.setInt(5, produto.getCategoria().getId());
+
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -46,7 +48,10 @@ public class ProdutoRepository {
     }
 
     public boolean atualizarProduto(Produto produto) {
-        String sql = "UPDATE produtos SET descricao = ?, preco_venda = ?, preco_custo = ?, ativo = ? WHERE id_produto = ?;";
+        String sql = """
+                    UPDATE produtos SET descricao = ?, preco_venda = ?, preco_custo = ?, ativo = ?, id_categoria = ? 
+                    WHERE id_produto = ?;
+                """;
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -54,8 +59,9 @@ public class ProdutoRepository {
             ps.setString(1, produto.getDescricao());
             ps.setBigDecimal(2, produto.getPrecoVenda());
             ps.setBigDecimal(3, produto.getPrecoCusto());
-            ps.setBoolean(4, produto.getAtivo());
-            ps.setInt(5, produto.getId());
+            ps.setBoolean(4, produto.isAtivo());
+            ps.setInt(5, produto.getCategoria().getId());
+            ps.setInt(6, produto.getId());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -83,15 +89,17 @@ public class ProdutoRepository {
 
     public List<Produto> buscarPorDescricao(String descricao) {
         String sql = """
-                SELECT id_produto, descricao, preco_venda, preco_custo, ativo 
-                FROM produtos WHERE descricao LIKE ? ORDER BY descricao;
+                SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
+                    		p.ativo, p.id_categoria,c.descricao
+                    FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria
+                    WHERE p.descricao LIKE ? ORDER BY p.descricao;
                 """;
         List<Produto> produtos = new ArrayList<>();
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "%"+descricao.trim()+"%");
+            ps.setString(1, "%" + descricao.trim() + "%");
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -106,7 +114,12 @@ public class ProdutoRepository {
     }
 
     public Produto buscarPorId(int idProduto) {
-        String sql = "select id_produto, descricao, preco_venda, preco_custo, ativo from produtos where id_produto = ?;";
+        String sql = """
+                        SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
+                            		p.ativo, p.id_categoria,c.descricao
+                            FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria
+                            WHERE id_produto = ?;
+                """;
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -131,6 +144,14 @@ public class ProdutoRepository {
                 .precoVenda(rs.getBigDecimal("preco_venda"))
                 .precoCusto(rs.getBigDecimal("preco_custo"))
                 .ativo(rs.getBoolean("ativo"))
+                .categoria(mapearCategoria(rs))
+                .build();
+    }
+
+    private Categoria mapearCategoria(ResultSet rs) throws SQLException {
+        return Categoria.builder()
+                .id(rs.getInt("p.id_categoria"))
+                .descricao("c.descricao")
                 .build();
     }
 

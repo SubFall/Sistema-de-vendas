@@ -5,6 +5,8 @@ public class Categoria {
     private String descricao;
     private boolean ativo;
 
+    public static final int ID_SEM_CATEGORIA = 1;
+
     private Categoria(int id, String descricao, boolean ativo) {
         this.id = id;
         this.descricao = descricao;
@@ -18,7 +20,7 @@ public class Categoria {
     public static final class CategoriaBuilder {
         private int id;
         private String descricao;
-        private boolean ativo;
+        private boolean ativo = true;
 
         public CategoriaBuilder id(int id) {
             this.id = id;

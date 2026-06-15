@@ -68,6 +68,9 @@ CREATE TABLE `eclipse_net`.`categoria`
     UNIQUE INDEX `descricao_UNIQUE` (`descricao` ASC) VISIBLE
 );
 
+INSERT INTO `eclipse_net`.`categoria` (`id_categoria`, `descricao`, `ativo`)
+VALUES ('1', 'Sem Categoria', '1');
+
 CREATE TABLE `eclipse_net`.`produtos`
 (
     `id_produto`   INT            NOT NULL AUTO_INCREMENT,

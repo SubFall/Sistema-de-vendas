@@ -19,7 +19,17 @@ public class Principal {
         ProdutoService produtoService = new ProdutoService();
 //        consoleMenu.iniciar();
 
-        categoriaMenu.iniciar();
+        Produto produto = Produto.builder()
+                .id(5)
+                .descricao("Mouse Gamer")
+                .precoVenda(new BigDecimal("499.99"))
+                .precoCusto(new BigDecimal("299.99"))
+                .categoria(null)
+                .build();
+
+//        System.out.println(produtoService.inserirProduto(produto));
+        System.out.println(produtoService.atualizarProduto(produto));
+//        System.out.println(produtoService.buscarPorId(1));
 
 
 

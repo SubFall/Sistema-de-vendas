@@ -1,6 +1,8 @@
 package service;
 
+import domain.categoria.Categoria;
 import domain.produto.Produto;
+import repository.CategoriaRepository;
 import repository.ProdutoRepository;
 
 import java.util.List;
@@ -8,8 +10,13 @@ import java.util.List;
 public class ProdutoService {
 
     ProdutoRepository produtoRepository = new ProdutoRepository();
+    CategoriaRepository categoriaRepository = new CategoriaRepository();
 
     public boolean inserirProduto(Produto produto) {
+
+        if (produto.getCategoria() == null) {
+            produto.setCategoria(categoriaRepository.buscarPorId(Categoria.ID_SEM_CATEGORIA));
+        }
         return produtoRepository.inserirProduto(produto);
     }
 
@@ -20,7 +27,7 @@ public class ProdutoService {
             throw new IllegalArgumentException("Produto não cadastrado!");
         }
 
-        return produtoRepository.atualizarStatusProduto(!produto.getAtivo(), idProduto);
+        return produtoRepository.atualizarStatusProduto(!produto.isAtivo(), idProduto);
 
     }
 
@@ -31,11 +38,19 @@ public class ProdutoService {
             throw new IllegalArgumentException("Produto não cadastrado");
         }
 
+        if (produto.getCategoria() == null) {
+            produto.setCategoria(categoriaRepository.buscarPorId(Categoria.ID_SEM_CATEGORIA));
+        }
+
         return produtoRepository.atualizarProduto(produto);
     }
 
     public List<Produto> buscarTodos() {
         return produtoRepository.buscarTodos();
+    }
+
+    public Produto buscarPorId(int idProduto) {
+        return produtoRepository.buscarPorId(idProduto);
     }
 
     public List<Produto> buscarPorNome(String descricao) {

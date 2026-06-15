@@ -22,6 +22,10 @@ public class CategoriaService {
             throw new IllegalArgumentException("Categoria não existe");
         }
 
+        if (categoria.getId() == Categoria.ID_SEM_CATEGORIA) {
+            throw new IllegalArgumentException("A categoria padrão não pode se removida.");
+        }
+
         if (categoriaRepository.categoriaPossuiProdutos(categoria.getId())) {
             categoriaRepository.atualizarStatusCategoria(false, categoria.getId());
             return 0;
@@ -32,6 +36,10 @@ public class CategoriaService {
     }
 
     public boolean atualizarCategoria(Categoria categoria) {
+        if (categoria.getId() == Categoria.ID_SEM_CATEGORIA) {
+            throw new IllegalArgumentException("A categoria padrão não pode ser alterada.");
+        }
+
         if (categoriaRepository.existeOutraCategoriaComDescricao(categoria.getDescricao(), categoria.getId())) {
             throw new IllegalArgumentException("Categoria já existe");
         }

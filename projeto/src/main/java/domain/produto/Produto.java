@@ -1,5 +1,7 @@
 package domain.produto;
 
+import domain.categoria.Categoria;
+
 import java.math.BigDecimal;
 
 public class Produto {
@@ -8,13 +10,15 @@ public class Produto {
     private BigDecimal precoVenda;
     private BigDecimal precoCusto;
     private boolean ativo;
+    private Categoria categoria;
 
-    private Produto(int id, String descricao, BigDecimal precoVenda, BigDecimal precoCusto, boolean ativo) {
+    private Produto(int id, String descricao, BigDecimal precoVenda, BigDecimal precoCusto, boolean ativo, Categoria categoria) {
         this.id = id;
         this.descricao = descricao;
         this.precoVenda = precoVenda;
         this.precoCusto = precoCusto;
         this.ativo = ativo;
+        this.categoria = categoria;
     }
 
     public static ProdutoBuilder builder() {
@@ -27,6 +31,7 @@ public class Produto {
         private BigDecimal precoVenda;
         private BigDecimal precoCusto = BigDecimal.ZERO;
         private boolean ativo = true;
+        private Categoria categoria;
 
         public ProdutoBuilder id(int id) {
             this.id = id;
@@ -53,6 +58,11 @@ public class Produto {
             return this;
         }
 
+        public ProdutoBuilder categoria(Categoria categoria) {
+            this.categoria = categoria;
+            return this;
+        }
+
         public Produto build() {
             if (descricao == null || descricao.isBlank()) {
                 throw new IllegalArgumentException("Descrição obrigatória.");
@@ -70,7 +80,7 @@ public class Produto {
                 throw new IllegalArgumentException("Preço de custo inválido");
             }
 
-            return new Produto(id, descricao, precoVenda, precoCusto, ativo);
+            return new Produto(id, descricao, precoVenda, precoCusto, ativo, categoria);
         }
     }
 
@@ -118,12 +128,20 @@ public class Produto {
         this.precoCusto = precoCusto;
     }
 
-    public boolean getAtivo() {
+    public boolean isAtivo() {
         return ativo;
     }
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
     @Override
@@ -134,6 +152,7 @@ public class Produto {
                 ", precoVenda=" + precoVenda +
                 ", precoCusto=" + precoCusto +
                 ", ativo=" + ativo +
+                ", categoria=" + categoria +
                 '}';
     }
 }
