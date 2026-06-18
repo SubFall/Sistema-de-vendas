@@ -1,5 +1,6 @@
 package util;
 
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public final class ConsoleUtils {
@@ -22,6 +23,20 @@ public final class ConsoleUtils {
                 return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Digite um " + label + " válido");
+            }
+        }
+    }
+
+    public static BigDecimal lerBigDecimal(Scanner scanner, String label) {
+        while (true) {
+            try {
+
+                System.out.println(label + ": ");
+
+                return new BigDecimal(scanner.nextLine().replace(",", "."));
+
+            } catch (NumberFormatException e) {
+                System.out.println("Valor inválido");
             }
         }
     }

@@ -5,6 +5,7 @@ import domain.produto.Produto;
 import service.CategoriaService;
 import service.ProdutoService;
 import ui.categoria.CategoriaMenu;
+import ui.produto.ProdutoMenu;
 
 import java.math.BigDecimal;
 
@@ -17,7 +18,9 @@ public class Principal {
         CategoriaService categoriaService = new CategoriaService();
         CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
         ProdutoService produtoService = new ProdutoService();
+        ProdutoMenu produtoMenu = new ProdutoMenu(produtoService, categoriaService, categoriaMenu);
 //        consoleMenu.iniciar();
+        produtoMenu.iniciar();
 
         Produto produto = Produto.builder()
                 .id(5)
@@ -27,9 +30,7 @@ public class Principal {
                 .categoria(null)
                 .build();
 
-//        System.out.println(produtoService.inserirProduto(produto));
-        System.out.println(produtoService.atualizarProduto(produto));
-//        System.out.println(produtoService.buscarPorId(1));
+
 
 
 
