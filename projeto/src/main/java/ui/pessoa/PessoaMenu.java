@@ -5,7 +5,6 @@ import domain.documento.CPF;
 import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
-import service.EnderecoService;
 import service.PessoaService;
 import util.ConsoleUtils;
 
@@ -16,11 +15,9 @@ import java.util.Scanner;
 public class PessoaMenu {
     private Scanner scanner = new Scanner(System.in);
     private PessoaService pessoaService;
-    private EnderecoService enderecoService;
 
-    public PessoaMenu(PessoaService pessoaService, EnderecoService enderecoService) {
+    public PessoaMenu(PessoaService pessoaService) {
         this.pessoaService = pessoaService;
-        this.enderecoService = enderecoService;
     }
 
     public void iniciar() {
@@ -100,16 +97,9 @@ public class PessoaMenu {
 
         pessoaPapels = cadastrarPapel();
 
-        System.out.println("Deseja cadastrar o Endereço :");
-        System.out.println("1 - SIM");
-        System.out.println("2 - NÃO");
-
-        opcao = scanner.nextLine();
-
-        if (opcao.equals("1")) {
+        if (ConsoleUtils.confirmar(scanner, "Deseja cadastrar o Endereço :")) {
             endereco = cadastrarEndereco();
         }
-
 
         Pessoa pessoa = Pessoa.builder()
                 .nome(nome)
@@ -138,13 +128,7 @@ public class PessoaMenu {
 
         pessoaPapels = cadastrarPapel();
 
-        System.out.println("Deseja cadastrar o Endereço :");
-        System.out.println("1 - SIM");
-        System.out.println("2 - NÃO");
-
-        opcao = scanner.nextLine();
-
-        if (opcao.equals("1")) {
+        if (ConsoleUtils.confirmar(scanner, "Deseja cadastrar o Endereço :")) {
             endereco = cadastrarEndereco();
         }
 
@@ -162,7 +146,6 @@ public class PessoaMenu {
 
     public void removerPessoa() {
         int id;
-        int opcao;
         listarPessoa();
 
         System.out.print("Digite o ID da pessoa para remover:");
@@ -170,16 +153,8 @@ public class PessoaMenu {
 
         try {
             Pessoa pessoa = pessoaService.buscarPorId(id);
-            System.out.println("Tem certeza que deseja Excluir " + pessoa.getNome() + " ?");
 
-            do {
-                System.out.println("1 - SIM");
-                System.out.println("2 - NÃO");
-
-                opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
-            } while (opcao != 1 && opcao != 2);
-
-            if (opcao != 1) {
+            if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja Excluir " + pessoa.getNome() + " ?")) {
                 return;
             }
             boolean deletado = pessoaService.deletarPessoa(id);
@@ -231,15 +206,7 @@ public class PessoaMenu {
                 break;
         }
 
-        do {
-            System.out.println("Deseja alterar os papéis ?");
-            System.out.println("1 - Sim");
-            System.out.println("2 - Não");
-
-            op = ConsoleUtils.lerInteiro(scanner, "Valor");
-        } while (op != 1 && op != 2);
-
-        if (op == 1) {
+        if (ConsoleUtils.confirmar(scanner, "Deseja alterar os papéis ?")) {
             pessoa.setPapeis(cadastrarPapel());
         }
 

@@ -16,11 +16,7 @@ public class CategoriaService {
     }
 
     public int deletarInativarCategoria(int idCategoria) {
-        Categoria categoria = categoriaRepository.buscarPorId(idCategoria);
-
-        if (categoria == null) {
-            throw new IllegalArgumentException("Categoria não existe");
-        }
+        Categoria categoria = validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
 
         if (categoria.getId() == Categoria.ID_SEM_CATEGORIA) {
             throw new IllegalArgumentException("A categoria padrão não pode se removida.");
@@ -43,18 +39,12 @@ public class CategoriaService {
         if (categoriaRepository.existeOutraCategoriaComDescricao(categoria.getDescricao(), categoria.getId())) {
             throw new IllegalArgumentException("Categoria já existe");
         }
-
         return categoriaRepository.atualizarCategoria(categoria);
     }
 
     public Categoria buscarPorId(int idCategoria) {
-        Categoria categoria = categoriaRepository.buscarPorId(idCategoria);
 
-        if (categoria == null) {
-            throw new IllegalArgumentException("Categoria não encontrada");
-        }
-
-        return categoria;
+        return validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
     }
 
     public List<Categoria> buscarPorDescricao(String descricao) {
@@ -68,4 +58,10 @@ public class CategoriaService {
         return categoriaRepository.buscarTodos();
     }
 
+    private Categoria validarCategoriaExiste(Categoria categoria) {
+        if (categoria == null) {
+            throw new IllegalArgumentException("Categoria não encontrada");
+        }
+        return categoria;
+    }
 }

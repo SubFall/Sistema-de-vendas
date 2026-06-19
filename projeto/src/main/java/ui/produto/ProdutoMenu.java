@@ -8,6 +8,8 @@ import ui.categoria.CategoriaMenu;
 import util.ConsoleUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class ProdutoMenu {
@@ -29,7 +31,7 @@ public class ProdutoMenu {
         do {
             System.out.println("\n|*********** Produto ***********|");
             System.out.println("|1 - Cadastrar            - [] X|");
-            System.out.println("|2 - Remover                    |");
+            System.out.println("|2 - Inativar                   |");
             System.out.println("|3 - Atualizar                  |");
             System.out.println("|4 - Listar                     |");
             System.out.println("|0 - Sair                       |");
@@ -43,7 +45,7 @@ public class ProdutoMenu {
                     cadastrar();
                     break;
                 case 2:
-//                    remover();
+                    inativar();
                     break;
                 case 3:
 //                    atualizar();
@@ -51,15 +53,16 @@ public class ProdutoMenu {
                 case 4:
                     int op;
                     do {
-                        System.out.println("1 - Listar todas categoriras");
-                        System.out.println("2 - Listar categora por descricao");
-                        System.out.println("3 - Listar categora por id");
+                        System.out.println("1 - Listar todos produtos");
+                        System.out.println("2 - Listar produtos por descricao");
+                        System.out.println("3 - Listar produto por id");
+                        System.out.println("4 - Listar somente ativos");
 
                         op = ConsoleUtils.lerInteiro(scanner, "Opção");
 
-                    } while (op != 1 && op != 2 && op != 3);
+                    } while (op != 1 && op != 2 && op != 3 && op != 4);
 
-//                    listar(op);
+                    listar(op);
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -80,10 +83,8 @@ public class ProdutoMenu {
             System.out.print("Descricao: ");
             descricao = scanner.nextLine();
 
-//            System.out.print("Preço de Venda: ");
             precoVenda = ConsoleUtils.lerBigDecimal(scanner, "Preço de venda");
 
-//            System.out.println("Custo de Venda: ");
             precoCusto = ConsoleUtils.lerBigDecimal(scanner, "Preço de custo");
 
             int op;
@@ -114,16 +115,98 @@ public class ProdutoMenu {
         }
     }
 
+    private void inativar() {
+        listar(4); //somente produtos ativos
+        try {
+            System.out.print("Digite o ID do produto para inativar:");
+            Produto produto = produtoService.buscarPorIdAtivo(ConsoleUtils.lerInteiro(scanner, "ID"));
+
+            if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja inativar " + produto.getDescricao() + " ?")) {
+                return;
+            }
+            boolean atualizado = produtoService.atualizarStatusProduto(produto.getId());
+
+            if (atualizado) {
+                System.out.println("Produto " + produto.getDescricao() + " inativado com sucesso!");
+            }
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void listar(int idLista) {
+        List<Produto> produtos = new ArrayList<>();
+        switch (idLista) {
+            case 1:
+                produtos = produtoService.buscarTodos();
+                break;
+            case 2:
+                System.out.print("Digite a descrição: ");
+                produtos = produtoService.buscarPorDescricao(scanner.nextLine());
+                break;
+            case 3:
+                System.out.print("Digite o ID: ");
+
+                try {
+                    produtos.add(produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+            case 4:
+                produtos = produtoService.buscarTodosAtivo();
+                break;
+
+            default:
+                System.out.println("opção inválida!");
+        }
+
+        exibirGrid(produtos);
+    }
+
     private Categoria selecionarCategoria() {
         while (true) {
             try {
 
-                categoriaMenu.listar(1); //1 - Listar todos os produtos
+                categoriaMenu.listar(1); //1 - Listar todas as categorias
                 return categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
 
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+    private void exibirCabecalhoGrid() {
+        System.out.printf(
+                "%-5s | %-20s | %-10s | %-10s | %-10s%n",
+                "ID", "DESCRICAO", "PRECO VENDA", "PRECO CUSTO", "ATIVO"
+        );
+    }
+
+    private void exibirGrid(List<Produto> produtos) {
+        String id;
+        String descricao;
+        String precoVenda;
+        String precoCusto;
+        String ativo;
+
+        if (produtos.isEmpty()) {
+            System.out.println("Nenhum produto encontrado.");
+            return;
+        }
+
+        exibirCabecalhoGrid();
+
+        for (Produto p : produtos) {
+            id = ConsoleUtils.formatarColuna(String.valueOf(p.getId()), 5);
+            descricao = ConsoleUtils.formatarColuna(p.getDescricao(), 20);
+            precoVenda = ConsoleUtils.formatarColuna(String.format("%.2f", p.getPrecoVenda()), 11);
+            precoCusto = ConsoleUtils.formatarColuna(String.format("%.2f", p.getPrecoCusto()), 11);
+            ativo = p.isAtivo() ? "SIM" : "NÃO";
+
+            System.out.printf("%s | %s | %s | %s | %s %n", id, descricao, precoVenda, precoCusto, ativo);
         }
     }
 }

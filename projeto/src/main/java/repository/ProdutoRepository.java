@@ -70,7 +70,34 @@ public class ProdutoRepository {
     }
 
     public List<Produto> buscarTodos() {
-        String sql = "SELECT id_produto, descricao, preco_venda, preco_custo, ativo FROM produtos ORDER BY descricao;";
+        String sql = """
+                    SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
+                    		p.ativo, p.id_categoria,c.descricao
+                    FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria ORDER BY p.descricao;
+                    """;
+        List<Produto> produtos = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                produtos.add(mapearProduto(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return produtos;
+    }
+
+    public List<Produto> buscarTodosAtivo() {
+        String sql = """
+                    SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
+                    		p.ativo, p.id_categoria,c.descricao
+                    FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria 
+                    WHERE p.ativo = 1 ORDER BY p.descricao;
+                    """;
         List<Produto> produtos = new ArrayList<>();
 
         try (Connection conn = ConnectionFactory.getConnection();

@@ -40,4 +40,20 @@ public final class ConsoleUtils {
             }
         }
     }
+
+    public static boolean confirmar(Scanner scanner, String mensagem) {
+        int opcao;
+
+        System.out.println(mensagem);
+
+        do {
+            System.out.println("1 - SIM");
+            System.out.println("2 - NÃO");
+
+            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+        } while (opcao != 1 && opcao != 2);
+
+        return opcao == 1;
+
+    }
 }

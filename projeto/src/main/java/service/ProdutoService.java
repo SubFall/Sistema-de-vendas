@@ -21,22 +21,14 @@ public class ProdutoService {
     }
 
     public boolean atualizarStatusProduto(int idProduto) {
-        Produto produto = produtoRepository.buscarPorId(idProduto);
-
-        if (produto == null) {
-            throw new IllegalArgumentException("Produto não cadastrado!");
-        }
+        Produto produto = validarProdutoDisponivel(produtoRepository.buscarPorId(idProduto));
 
         return produtoRepository.atualizarStatusProduto(!produto.isAtivo(), idProduto);
 
     }
 
     public boolean atualizarProduto(Produto produto) {
-        Produto produtoOriginal = produtoRepository.buscarPorId(produto.getId());
-
-        if (produtoOriginal == null) {
-            throw new IllegalArgumentException("Produto não cadastrado");
-        }
+        Produto produtoOriginal = validarProdutoDisponivel(produtoRepository.buscarPorId(produto.getId()));
 
         if (produto.getCategoria() == null) {
             produto.setCategoria(categoriaRepository.buscarPorId(Categoria.ID_SEM_CATEGORIA));
@@ -49,15 +41,37 @@ public class ProdutoService {
         return produtoRepository.buscarTodos();
     }
 
-    public Produto buscarPorId(int idProduto) {
-        return produtoRepository.buscarPorId(idProduto);
+    public List<Produto> buscarTodosAtivo() {
+        return produtoRepository.buscarTodosAtivo();
     }
 
-    public List<Produto> buscarPorNome(String descricao) {
+    public Produto buscarPorId(int idProduto) {
+
+        return validarProdutoDisponivel(produtoRepository.buscarPorId(idProduto));
+    }
+
+    public Produto buscarPorIdAtivo(int idProduto) {
+
+        return validarProdutoDisponivel(produtoRepository.buscarPorId(idProduto));
+    }
+
+    public List<Produto> buscarPorDescricao(String descricao) {
 
         if (descricao == null || descricao.isBlank()) {
             return produtoRepository.buscarTodos();
         }
         return produtoRepository.buscarPorDescricao(descricao);
     }
+
+    private Produto validarProdutoDisponivel(Produto produto) {
+        if (produto == null) {
+            throw new IllegalArgumentException("Produto não cadastrado");
+        }
+
+        if (!produto.isAtivo()) {
+            throw new IllegalArgumentException("Produto está inativo");
+        }
+        return produto;
+    }
+
 }

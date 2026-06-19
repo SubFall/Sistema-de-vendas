@@ -79,26 +79,13 @@ public class CategoriaMenu {
         }
     }
 
-    public void remover() {
-        int id;
-        int opcao;
+    private void remover() {
         listar(1);
-
-        System.out.print("Digite o ID da categoria para remover:");
-        id = ConsoleUtils.lerInteiro(scanner, "ID");
-
         try {
-            Categoria categoria = categoriaService.buscarPorId(id);
-            System.out.println("Tem certeza que deseja Excluir " + categoria.getDescricao() + " ?");
+            System.out.print("Digite o ID da categoria para remover:");
+            Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
 
-            do {
-                System.out.println("1 - SIM");
-                System.out.println("2 - NÃO");
-
-                opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
-            } while (opcao != 1 && opcao != 2);
-
-            if (opcao != 1) {
+            if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja Excluir " + categoria.getDescricao() + " ?")) {
                 return;
             }
             int i = categoriaService.deletarInativarCategoria(categoria.getId());
@@ -113,7 +100,7 @@ public class CategoriaMenu {
         }
     }
 
-    public void atualizar() {
+    private void atualizar() {
         listar(1);
         System.out.println("Selecione um ID para atualizar");
 
@@ -172,14 +159,29 @@ public class CategoriaMenu {
             default:
                 System.out.println("opção inválida!");
         }
-        String id;
-        String descricao;
-        String ativo;
 
+        exibirGrid(categorias);
+    }
+
+    private void exibirCabecalhoGrid() {
         System.out.printf(
                 "%-5s | %-20s | %-10s%n",
                 "ID", "DESCRICAO", "ATIVO"
         );
+    }
+
+    private void exibirGrid(List<Categoria> categorias) {
+        String id;
+        String descricao;
+        String ativo;
+
+        if (categorias.isEmpty()) {
+            System.out.println("Nenhuma categoria encontrado.");
+            return;
+        }
+
+        exibirCabecalhoGrid();
+
         for (Categoria c : categorias) {
             id = ConsoleUtils.formatarColuna(String.valueOf(c.getId()), 5);
             descricao = ConsoleUtils.formatarColuna(c.getDescricao(), 20);
