@@ -1,6 +1,8 @@
 package ui.produto;
 
 import domain.categoria.Categoria;
+import domain.pessoa.Pessoa;
+import domain.pessoa.PessoaPapel;
 import domain.produto.Produto;
 import service.CategoriaService;
 import service.ProdutoService;
@@ -33,7 +35,8 @@ public class ProdutoMenu {
             System.out.println("|1 - Cadastrar            - [] X|");
             System.out.println("|2 - Inativar                   |");
             System.out.println("|3 - Atualizar                  |");
-            System.out.println("|4 - Listar                     |");
+            System.out.println("|4 - Detalhes                   |");
+            System.out.println("|5 - Listar                     |");
             System.out.println("|0 - Sair                       |");
             System.out.println("|*******************************|");
 
@@ -48,9 +51,12 @@ public class ProdutoMenu {
                     inativar();
                     break;
                 case 3:
-//                    atualizar();
+                    atualizar();
                     break;
                 case 4:
+                    detalhes();
+                    break;
+                case 5:
                     int op;
                     do {
                         System.out.println("1 - Listar todos produtos");
@@ -130,6 +136,77 @@ public class ProdutoMenu {
                 System.out.println("Produto " + produto.getDescricao() + " inativado com sucesso!");
             }
 
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void atualizar() {
+        listar(1);
+
+        try {
+            System.out.println("Selecione um ID para atualizar");
+            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+
+            System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
+            System.out.println("Descricao Atual: " + produto.getDescricao());
+            System.out.println("Nova Descricao:");
+
+            String descricao = scanner.nextLine();
+            produto.setDescricao(descricao.isBlank() ? produto.getDescricao() : descricao);
+
+            System.out.println("Preco Atual: " + produto.getPrecoVenda());
+            BigDecimal precoVenda = ConsoleUtils.lerDecimal(scanner, "Novo valor");
+
+            if (precoVenda != null) {
+                produto.setPrecoVenda(precoVenda);
+            }
+
+            System.out.println("Custo Atual: " + produto.getPrecoCusto());
+            BigDecimal precoCusto = ConsoleUtils.lerDecimal(scanner, "Novo valor");
+
+            if (precoCusto != null) {
+                produto.setPrecoCusto(precoCusto);
+            }
+
+            int op;
+            do {
+                System.out.println("Ativo: " + (produto.isAtivo() ? "SIM" : "NÃO"));
+                System.out.println("Deseja mudar ?:");
+                System.out.println("1 - Ativo");
+                System.out.println("2 - Inativo");
+                System.out.println("3 - Manter atual");
+
+                op = ConsoleUtils.lerInteiro(scanner, "Opção");
+            } while (op != 1 && op != 2 && op != 3);
+
+            if (op == 1) {
+                produto.setAtivo(true);
+            } else if (op == 2) {
+                produto.setAtivo(false);
+            }
+
+            if (produtoService.atualizarProduto(produto)) {
+                System.out.println("Produto " + produto.getDescricao() + " atualizado com sucesso!");
+            };
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void detalhes() {
+        listar(1);
+
+        try {
+            System.out.println("Selecione um ID");
+            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+            System.out.println("ID: " + produto.getId());
+            System.out.println("Descricao: " + produto.getDescricao());
+            System.out.println("Preco venda: " + produto.getPrecoVenda());
+            System.out.println("Preco custo: " + produto.getPrecoCusto());
+            System.out.println("Categoria: " + produto.getCategoria().getDescricao());
+            System.out.println("Ativo: " + (produto.isAtivo() ? "SIM" : "NÃO"));
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

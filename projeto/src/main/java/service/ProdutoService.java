@@ -21,14 +21,14 @@ public class ProdutoService {
     }
 
     public boolean atualizarStatusProduto(int idProduto) {
-        Produto produto = validarProdutoDisponivel(produtoRepository.buscarPorId(idProduto));
+        Produto produto = validarProdutoExiste(produtoRepository.buscarPorId(idProduto));
 
         return produtoRepository.atualizarStatusProduto(!produto.isAtivo(), idProduto);
 
     }
 
     public boolean atualizarProduto(Produto produto) {
-        Produto produtoOriginal = validarProdutoDisponivel(produtoRepository.buscarPorId(produto.getId()));
+        Produto produtoOriginal = validarProdutoExiste(produtoRepository.buscarPorId(produto.getId()));
 
         if (produto.getCategoria() == null) {
             produto.setCategoria(categoriaRepository.buscarPorId(Categoria.ID_SEM_CATEGORIA));
@@ -47,12 +47,12 @@ public class ProdutoService {
 
     public Produto buscarPorId(int idProduto) {
 
-        return validarProdutoDisponivel(produtoRepository.buscarPorId(idProduto));
+        return validarProdutoExiste(produtoRepository.buscarPorId(idProduto));
     }
 
     public Produto buscarPorIdAtivo(int idProduto) {
 
-        return validarProdutoDisponivel(produtoRepository.buscarPorId(idProduto));
+        return validarProdutoAtivo(produtoRepository.buscarPorId(idProduto));
     }
 
     public List<Produto> buscarPorDescricao(String descricao) {
@@ -63,10 +63,15 @@ public class ProdutoService {
         return produtoRepository.buscarPorDescricao(descricao);
     }
 
-    private Produto validarProdutoDisponivel(Produto produto) {
+    private Produto validarProdutoExiste(Produto produto) {
         if (produto == null) {
             throw new IllegalArgumentException("Produto não cadastrado");
         }
+        return produto;
+    }
+
+    private Produto validarProdutoAtivo(Produto produto) {
+        validarProdutoExiste(produto);
 
         if (!produto.isAtivo()) {
             throw new IllegalArgumentException("Produto está inativo");

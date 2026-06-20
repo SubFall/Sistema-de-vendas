@@ -41,6 +41,24 @@ public final class ConsoleUtils {
         }
     }
 
+    public static BigDecimal lerDecimal(Scanner scanner, String label) {
+        while (true) {
+            try {
+
+                System.out.println(label + ": ");
+                String valor = scanner.nextLine();
+
+                if (valor.isBlank()) {
+                    return null;
+                }
+                return new BigDecimal(valor.replace(",", "."));
+
+            } catch (NumberFormatException e) {
+                System.out.println("Valor inválido");
+            }
+        }
+    }
+
     public static boolean confirmar(Scanner scanner, String mensagem) {
         int opcao;
 

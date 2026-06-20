@@ -143,7 +143,7 @@ public class ProdutoRepository {
     public Produto buscarPorId(int idProduto) {
         String sql = """
                         SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
-                            		p.ativo, p.id_categoria,c.descricao
+                            		p.ativo, p.id_categoria, c.descricao
                             FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria
                             WHERE id_produto = ?;
                 """;
@@ -166,11 +166,11 @@ public class ProdutoRepository {
 
     private Produto mapearProduto(ResultSet rs) throws SQLException {
         return Produto.builder()
-                .id(rs.getInt("id_produto"))
-                .descricao(rs.getString("descricao"))
-                .precoVenda(rs.getBigDecimal("preco_venda"))
-                .precoCusto(rs.getBigDecimal("preco_custo"))
-                .ativo(rs.getBoolean("ativo"))
+                .id(rs.getInt("p.id_produto"))
+                .descricao(rs.getString("p.descricao"))
+                .precoVenda(rs.getBigDecimal("p.preco_venda"))
+                .precoCusto(rs.getBigDecimal("p.preco_custo"))
+                .ativo(rs.getBoolean("p.ativo"))
                 .categoria(mapearCategoria(rs))
                 .build();
     }
@@ -178,7 +178,7 @@ public class ProdutoRepository {
     private Categoria mapearCategoria(ResultSet rs) throws SQLException {
         return Categoria.builder()
                 .id(rs.getInt("p.id_categoria"))
-                .descricao("c.descricao")
+                .descricao(rs.getString("c.descricao"))
                 .build();
     }
 
