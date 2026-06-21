@@ -104,6 +104,11 @@ public class PessoaService {
         return row > 0;
     }
 
+    public boolean inativarPessoa(int idPessoa) {
+        Pessoa pessoa = validarPessoaAtivo(pessoaRepository.buscarPorId(idPessoa));
+
+        return pessoaRepository.inativarPessoa(!pessoa.isAtivo(), idPessoa);
+    }
 
     public boolean atualizarPessoa(Pessoa pessoa) {
 
@@ -174,10 +179,17 @@ public class PessoaService {
     }
 
     public Pessoa buscarPorId(int id) {
-        Pessoa pessoa = pessoaRepository.buscarPorId(id);
-        if (pessoa == null) {
-            throw new IllegalArgumentException("Pessoa Não existe");
-        }
+        Pessoa pessoa = validarPessoaExiste(pessoaRepository.buscarPorId(id));
+
+        pessoa.setPapeis(pessoaPapelRepository.buscarPorIdPessoa(id));
+
+        pessoa.setEndereco(enderecoRepository.buscarPoridPessoa(id));
+
+        return pessoa;
+    }
+
+    public Pessoa buscarPorIdAtivo(int id) {
+        Pessoa pessoa = validarPessoaAtivo(pessoaRepository.buscarPorId(id));
 
         pessoa.setPapeis(pessoaPapelRepository.buscarPorIdPessoa(id));
 
@@ -194,4 +206,23 @@ public class PessoaService {
         return pessoaRepository.buscarTodos();
     }
 
+    public List<Pessoa> buscarTodosAtivo() {
+        return pessoaRepository.buscarTodosAtivo();
+    }
+
+    private Pessoa validarPessoaExiste(Pessoa pessoa) {
+        if (pessoa == null) {
+            throw new IllegalArgumentException("Pessoa Não existe");
+        }
+        return pessoa;
+    }
+
+    private Pessoa validarPessoaAtivo(Pessoa pessoa) {
+        validarPessoaExiste(pessoa);
+
+        if (!pessoa.isAtivo()) {
+            throw new IllegalArgumentException("Pessoa inativa!");
+        }
+        return pessoa;
+    }
 }

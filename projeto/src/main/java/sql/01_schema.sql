@@ -1,9 +1,10 @@
-CREATE TABLE `eclipse_net`.`pessoa`
+CREATE TABLE `eclipse_net`.`pessoas`
 (
     `id_pessoa` INT         NOT NULL AUTO_INCREMENT,
     `descricao` VARCHAR(60) NOT NULL,
     `documento` VARCHAR(14) NOT NULL,
     `tipo`      TINYINT(1)  NOT NULL,
+    `ativo`     TINYINT(1)  NOT NULL DEFAULT 1,
     PRIMARY KEY (`id_pessoa`),
     UNIQUE INDEX `id_pessoa_UNIQUE` (`id_pessoa` ASC) VISIBLE,
     UNIQUE INDEX `documento_UNIQUE` (`documento` ASC) VISIBLE
@@ -24,7 +25,7 @@ CREATE TABLE `eclipse_net`.`endereco`
     INDEX         `id_pessoa_idx` (`id_pessoa` ASC) VISIBLE,
     CONSTRAINT `fk_pessoa_endereco`
         FOREIGN KEY (`id_pessoa`)
-            REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
+            REFERENCES `eclipse_net`.`pessoas` (`id_pessoa`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
@@ -44,7 +45,7 @@ CREATE TABLE `eclipse_net`.`pessoa_papel`
     INDEX       `papel_idx` (`id_papel` ASC) VISIBLE,
     CONSTRAINT `fk_pessoa_papel_pessoa`
         FOREIGN KEY (`id_pessoa`)
-            REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
+            REFERENCES `eclipse_net`.`pessoas` (`id_pessoa`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
     CONSTRAINT `fk_pessoa_papel_papel`

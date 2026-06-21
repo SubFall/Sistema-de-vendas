@@ -12,17 +12,19 @@ public class Pessoa {
     private Documento documento;
     private Endereco endereco;
     private List<PessoaPapel> papeis;
+    private boolean ativo;
 
 
-    private Pessoa(int id, String nome, Documento documento, List<PessoaPapel> papeis) {
+    private Pessoa(int id, String nome, Documento documento, List<PessoaPapel> papeis, boolean ativo) {
         this.id = id;
         this.documento = documento;
         setNome(nome);
         setPapeis(papeis);
+        this.ativo = ativo;
     }
 
-    private Pessoa(int id, String nome, Documento documento, List<PessoaPapel> papeis, Endereco endereco) {
-        this(id, nome, documento, papeis);
+    private Pessoa(int id, String nome, Documento documento, List<PessoaPapel> papeis, boolean ativo, Endereco endereco) {
+        this(id, nome, documento, papeis, ativo);
         this.endereco = endereco;
     }
 
@@ -36,6 +38,7 @@ public class Pessoa {
         private Documento documento;
         private Endereco endereco;
         private List<PessoaPapel> papeis = new ArrayList<>();
+        private boolean ativo = true;
 
         public PessoaBuilder id(int id) {
             this.id = id;
@@ -62,8 +65,13 @@ public class Pessoa {
             return this;
         }
 
+        public PessoaBuilder ativo(boolean ativo) {
+            this.ativo = ativo;
+            return this;
+        }
+
         public Pessoa build() {
-            return new Pessoa(id, nome, documento, papeis, endereco);
+            return new Pessoa(id, nome, documento, papeis, ativo, endereco);
         }
     }
 
@@ -106,6 +114,14 @@ public class Pessoa {
         return endereco;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     @Override
     public String toString() {
         return "Pessoa{" +
@@ -114,6 +130,7 @@ public class Pessoa {
                 ", documento=" + documento +
                 ", endereco=" + endereco +
                 ", papeis=" + papeis +
+                ", ativo=" + ativo +
                 '}';
     }
 }
