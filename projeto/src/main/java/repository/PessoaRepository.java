@@ -25,16 +25,17 @@ public class PessoaRepository {
 
             ps.executeUpdate();
 
-            ResultSet rs = ps.getGeneratedKeys();
-
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
-            throw new IllegalArgumentException("Erro ao inserir");
+            throw new IllegalArgumentException("Erro ao obter ID da pessoa");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
     //TODO Voltar  nesse método quando movimento estiver pronto
     public int deletarPessoa(Connection conn, int id) {
         String sql = "DELETE FROM pessoa WHERE (id_pessoa = ?);";

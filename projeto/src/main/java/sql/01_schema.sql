@@ -88,3 +88,43 @@ CREATE TABLE `eclipse_net`.`produtos`
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
+
+CREATE TABLE `eclipse_net`.`movimento`
+(
+    `id_movimento`     INT            NOT NULL AUTO_INCREMENT,
+    `id_pessoa`        INT            NOT NULL,
+    `data_movimento`   DATETIME       NOT NULL,
+    `quantidade_itens` DECIMAL(15,2)  NOT NULL,
+    `valor_total`      DECIMAL(15, 2) NOT NULL,
+    PRIMARY KEY (`id_movimento`),
+    INDEX              `id_pessoa_idx` (`id_pessoa` ASC) VISIBLE,
+    CONSTRAINT `fk_movimento_pessoa`
+        FOREIGN KEY (`id_pessoa`)
+            REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
+
+
+CREATE TABLE `eclipse_net`.`movimento_item`
+(
+    `id_movimento_item` INT            NOT NULL AUTO_INCREMENT,
+    `id_movimento`      INT            NOT NULL,
+    `id_produto`        INT            NOT NULL,
+    `quantidade`        INT            NOT NULL,
+    `valor_unitario`    DECIMAL(15, 2) NOT NULL,
+    `valor_total`       DECIMAL(15, 2) NOT NULL,
+    PRIMARY KEY (`id_movimento_item`),
+    INDEX               `id_movimento_idx` (`id_movimento` ASC) VISIBLE,
+    INDEX               `id_produto_idx` (`id_produto` ASC) VISIBLE,
+    CONSTRAINT `fk_movimento_item_movimento`
+        FOREIGN KEY (`id_movimento`)
+            REFERENCES `eclipse_net`.`movimento` (`id_movimento`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_movimento_item_produto`
+        FOREIGN KEY (`id_produto`)
+            REFERENCES `eclipse_net`.`produtos` (`id_produto`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
