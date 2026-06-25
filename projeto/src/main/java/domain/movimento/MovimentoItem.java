@@ -5,11 +5,13 @@ import domain.produto.Produto;
 import java.math.BigDecimal;
 
 public class MovimentoItem {
+    private int id;
     private Produto produto;
     private BigDecimal quantidade;
     private BigDecimal valorUnitario;
 
-    public MovimentoItem(Produto produto, BigDecimal quantidade, BigDecimal valorUnitario) {
+    public MovimentoItem(int id, Produto produto, BigDecimal quantidade, BigDecimal valorUnitario) {
+        this.id = id;
         this.produto = produto;
         this.quantidade = quantidade;
         this.valorUnitario = valorUnitario;
@@ -20,9 +22,15 @@ public class MovimentoItem {
     }
 
     public static final class BuilderMovimentoItem {
+        private int id;
         private Produto produto;
         private BigDecimal quantidade;
         private BigDecimal valorUnitario;
+
+        public BuilderMovimentoItem id(int id) {
+            this.id = id;
+            return this;
+        }
 
         public BuilderMovimentoItem produto(Produto produto) {
             this.produto = produto;
@@ -52,8 +60,16 @@ public class MovimentoItem {
                 throw new IllegalArgumentException("Valor unitário inválido");
             }
 
-            return new MovimentoItem(produto, quantidade, valorUnitario);
+            return new MovimentoItem(id, produto, quantidade, valorUnitario);
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Produto getProduto() {

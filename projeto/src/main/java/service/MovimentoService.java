@@ -3,6 +3,8 @@ package service;
 import conn.ConnectionFactory;
 import domain.movimento.Movimento;
 import domain.movimento.MovimentoItem;
+import domain.movimento.StatusMovimento;
+import domain.pessoa.PessoaPapel;
 import repository.MovimentoItemRepository;
 import repository.MovimentoRepository;
 
@@ -15,6 +17,22 @@ public class MovimentoService {
 
     public void inserirMovimento(Movimento movimento) {
         Connection conn = null;
+
+        if (!movimento.getPessoa().getPessoaPapel().contains(PessoaPapel.CLIENTE)) {
+            throw new IllegalArgumentException("Pessoa informada não é um cliente");
+        }
+
+        if (!movimento.getFuncionario().getPessoaPapel().contains(PessoaPapel.FUNCIONARIO)) {
+            throw new IllegalArgumentException("Pessoa informada não é um funcionário");
+        }
+
+        if (movimento.getMovimentoItens().isEmpty()) {
+            throw new IllegalArgumentException("Movimento sem itens");
+        }
+
+        if (movimento.getStatusMovimento() == StatusMovimento.CANCELADO) {
+            throw new IllegalArgumentException("Movimento não pode ser criado cancelado");
+        }
 
         try {
             conn = ConnectionFactory.getConnection();
@@ -51,5 +69,33 @@ public class MovimentoService {
                 throw new RuntimeException("Erro ao fechar a conexão", e);
             }
         }
+    }
+
+    public boolean estornarMovimento(int idMovimento) {
+        Movimento movimento = validarMovimentoFinalizado(
+                validarMovimentoExiste(
+                        movimentoRepository.buscarPorId(idMovimento)
+                )
+        );
+
+        return movimentoRepository.reabrirMovimento(movimento.getId());
+    }
+
+    public Movimento buscarPorId(int idMovimento) {
+        return movimentoRepository.buscarPorId(idMovimento);
+    }
+
+    private Movimento validarMovimentoExiste(Movimento movimento) {
+        if (movimento == null) {
+            throw new IllegalArgumentException("Movimento não encontrado");
+        }
+        return movimento;
+    }
+
+    private Movimento validarMovimentoFinalizado(Movimento movimento) {
+        if (movimento.getStatusMovimento() != StatusMovimento.FINALIZADO) {
+            throw new IllegalArgumentException("Movimento não está finalizado");
+        }
+        return movimento;
     }
 }

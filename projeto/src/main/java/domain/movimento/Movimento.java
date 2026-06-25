@@ -11,12 +11,17 @@ import java.util.List;
 public class Movimento {
     private int id;
     private Pessoa pessoa;
+    private Pessoa funcionario;
+    private StatusMovimento statusMovimento;
     private LocalDateTime dataMovimento;
     private List<MovimentoItem> movimentoItens;
 
-    public Movimento(int id, Pessoa pessoa, LocalDateTime dataMovimento, List<MovimentoItem> movimentoItens) {
+    public Movimento(int id, Pessoa pessoa, Pessoa funcionario, StatusMovimento statusMovimento,
+                     LocalDateTime dataMovimento, List<MovimentoItem> movimentoItens) {
         this.id = id;
         this.pessoa = pessoa;
+        this.funcionario = funcionario;
+        this.statusMovimento = statusMovimento;
         this.dataMovimento = dataMovimento;
         this.movimentoItens = new ArrayList<>(movimentoItens);
     }
@@ -28,8 +33,10 @@ public class Movimento {
     public static final class MovimentoBuilder {
         private int id;
         private Pessoa pessoa;
+        private Pessoa funcionario;
+        private StatusMovimento statusMovimento = StatusMovimento.ABERTO;
         private LocalDateTime dataMovimento;
-        private List<MovimentoItem> movimentoItens = new ArrayList<>();
+        private List<MovimentoItem> movimentoItens;
 
         public MovimentoBuilder id(int id) {
             this.id = id;
@@ -41,13 +48,23 @@ public class Movimento {
             return this;
         }
 
+        public MovimentoBuilder funcionario(Pessoa funcionario) {
+            this.funcionario = funcionario;
+            return this;
+        }
+
+        public MovimentoBuilder statusMovimento(StatusMovimento statusMovimento) {
+            this.statusMovimento = statusMovimento;
+            return this;
+        }
+
         public MovimentoBuilder dataMovimento(LocalDateTime dataMovimento) {
             this.dataMovimento = LocalDateTime.now();
             return this;
         }
 
-        public MovimentoBuilder movimentoItens(MovimentoItem item) {
-            this.movimentoItens.add(item);
+        public MovimentoBuilder movimentoItens(List<MovimentoItem> itens) {
+            this.movimentoItens = new ArrayList<>(itens);
             return this;
         }
 
@@ -57,10 +74,14 @@ public class Movimento {
                 throw new IllegalArgumentException("Pessoa obrigatória");
             }
 
+            if (funcionario == null) {
+                throw new IllegalArgumentException("Funcionário obrigatório");
+            }
+
             if (movimentoItens.isEmpty()) {
                 throw new IllegalArgumentException("Movimento sem itens");
             }
-            return new Movimento(id, pessoa, dataMovimento, movimentoItens);
+            return new Movimento(id, pessoa, funcionario, statusMovimento, dataMovimento, movimentoItens );
         }
     }
 
@@ -74,6 +95,22 @@ public class Movimento {
 
     public void setPessoa(Pessoa pessoa) {
         this.pessoa = pessoa;
+    }
+
+    public Pessoa getFuncionario() {
+        return funcionario;
+    }
+
+    public void setFuncionario(Pessoa funcionario) {
+        this.funcionario = funcionario;
+    }
+
+    public StatusMovimento getStatusMovimento() {
+        return statusMovimento;
+    }
+
+    public void setStatusMovimento(StatusMovimento statusMovimento) {
+        this.statusMovimento = statusMovimento;
     }
 
     public LocalDateTime getDataMovimento() {
@@ -104,7 +141,9 @@ public class Movimento {
     public String toString() {
         return "Movimento{" +
                 "id=" + id +
-                ", pessoa=" + getPessoa().getNome() +
+                ", cliente=" + getPessoa().getNome() +
+                ", vendedor=" + getFuncionario().getNome() +
+                ", status=" + getStatusMovimento() +
                 ", dataMovimento=" + dataMovimento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) +
                 ", valorTotal=" + getValorTotal() +
                 ", quantidadeTotal=" + getQuantidadeTotal() +

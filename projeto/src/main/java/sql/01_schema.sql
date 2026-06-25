@@ -93,13 +93,21 @@ CREATE TABLE `eclipse_net`.`movimento`
 (
     `id_movimento`     INT            NOT NULL AUTO_INCREMENT,
     `id_pessoa`        INT            NOT NULL,
+    `id_funcionario`   INT            NOT NULL,
+    `status`           INT            NOT NULL,
     `data_movimento`   DATETIME       NOT NULL,
-    `quantidade_itens` DECIMAL(15,2)  NOT NULL,
+    `quantidade_itens` DECIMAL(15, 2) NOT NULL,
     `valor_total`      DECIMAL(15, 2) NOT NULL,
-    PRIMARY KEY (`id_movimento`),
-    INDEX              `id_pessoa_idx` (`id_pessoa` ASC) VISIBLE,
+        PRIMARY KEY (`id_movimento`),
+    INDEX              `id_cliente_idx` (`id_pessoa` ASC) VISIBLE,
+    INDEX              `id_funcionario_idx` (`id_funcionario` ASC) VISIBLE,
     CONSTRAINT `fk_movimento_pessoa`
         FOREIGN KEY (`id_pessoa`)
+            REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_movimento_funcionario`
+        FOREIGN KEY (`id_funcionario`)
             REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
