@@ -7,7 +7,6 @@ import domain.movimento.StatusMovimento;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
 import domain.produto.Produto;
-import repository.MovimentoRepository;
 import service.CategoriaService;
 import service.MovimentoService;
 import service.PessoaService;
@@ -18,7 +17,6 @@ import ui.produto.ProdutoMenu;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Principal {
@@ -37,12 +35,13 @@ public class Principal {
         Pessoa teste = Pessoa.builder()
                 .id(41)
                 .nome("Teste")
+//                .ativo(false)
                 .documento(new CPF("06032055183"))
                 .papeis(List.of(PessoaPapel.FUNCIONARIO, PessoaPapel.CLIENTE))
                 .build();
 
         Pessoa funcionario = Pessoa.builder()
-                .id(20)
+                .id(38)
                 .nome("Teste")
                 .documento(new CPF("06032055183"))
                 .papeis(List.of(PessoaPapel.CLIENTE, PessoaPapel.FUNCIONARIO))
@@ -54,10 +53,11 @@ public class Principal {
         Produto build2 = Produto.builder().id(11).descricao("teste 3").precoVenda(new BigDecimal("17.99")).precoCusto(new BigDecimal("11.99")).build();
 
         Movimento movimento = Movimento.builder()
-                .id(1)
+                .id(7)
                 .pessoa(teste)
                 .funcionario(funcionario)
                 .dataMovimento(LocalDateTime.now())
+                .statusMovimento(StatusMovimento.CANCELADO)
                 .movimentoItens(List.of(MovimentoItem.builder().produto(build).valorUnitario(build.getPrecoVenda()).quantidade(new BigDecimal("2")).build(),
                                 MovimentoItem.builder().produto(build1).valorUnitario(build1.getPrecoVenda()).quantidade(new BigDecimal("4")).build()))
                 .build();
@@ -70,7 +70,7 @@ public class Principal {
 //        movimentoItems.add(mi2);
 //        movimento.setMovimentoItens(movimentoItems);
 
-        movimento.adicionarItem(MovimentoItem.builder().produto(build2).valorUnitario(build1.getPrecoVenda()).quantidade(new BigDecimal("1")).build());
+        movimento.adicionarItem(MovimentoItem.builder().produto(build2).valorUnitario(build2.getPrecoVenda()).quantidade(new BigDecimal("1")).build());
 
         MovimentoService movimentoService = new MovimentoService();
 
@@ -78,8 +78,9 @@ public class Principal {
 
 //        Movimento movimento1 = movimentoService.buscarPorId(7);
 
-        System.out.println(movimentoService.estornarMovimento(7));
+//        System.out.println(movimentoService.reabrirMovimento(7));
+//        System.out.println(movimentoService.cancelarMovimento(7));
 
-
+        movimentoService.editarMovimento(movimento);
     }
 }

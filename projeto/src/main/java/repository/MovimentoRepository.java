@@ -38,13 +38,50 @@ public class MovimentoRepository {
         }
     }
 
+    public void editarMovimento(Connection conn, Movimento movimento) {
+        String sql = """
+                UPDATE movimento SET id_pessoa = ?, id_funcionario = ?, status = ?, data_movimento = ?, quantidade_itens = ?, valor_total = ?
+                WHERE id_movimento = ?;
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, movimento.getPessoa().getId());
+            ps.setInt(2, movimento.getFuncionario().getId());
+            ps.setInt(3, movimento.getStatusMovimento().getCodigo());
+            ps.setTimestamp(4, Timestamp.valueOf(movimento.getDataMovimento()));
+            ps.setBigDecimal(5, movimento.getQuantidadeTotal());
+            ps.setBigDecimal(6, movimento.getValorTotal());
+            ps.setInt(7, movimento.getId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean reabrirMovimento(int idMovimento) {
-        String sql = "UPDATE movimento SET status = 0 WHERE id_movimento = ?;";
+        String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, idMovimento);
+            ps.setInt(1, StatusMovimento.ABERTO.getCodigo());
+            ps.setInt(2, idMovimento);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean cancelarMovimento(int idMovimento) {
+        String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, StatusMovimento.CANCELADO.getCodigo());
+            ps.setInt(2, idMovimento);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);

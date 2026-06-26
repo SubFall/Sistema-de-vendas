@@ -32,6 +32,20 @@ public class MovimentoItemRepository {
         }
     }
 
+    public boolean deletarMovimentoItem(Connection conn, int idMovimento) {
+        String sql = "DELETE FROM movimento_item WHERE id_movimento = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idMovimento);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<MovimentoItem> buscarPorIdMovimento(int idMovimento) {
         List<MovimentoItem> itens = new ArrayList<>();
         String sql = """
