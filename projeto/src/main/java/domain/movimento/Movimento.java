@@ -35,7 +35,7 @@ public class Movimento {
         private Pessoa pessoa;
         private Pessoa funcionario;
         private StatusMovimento statusMovimento = StatusMovimento.ABERTO;
-        private LocalDateTime dataMovimento;
+        private LocalDateTime dataMovimento = LocalDateTime.now();
         private List<MovimentoItem> movimentoItens;
 
         public MovimentoBuilder id(int id) {
@@ -59,7 +59,7 @@ public class Movimento {
         }
 
         public MovimentoBuilder dataMovimento(LocalDateTime dataMovimento) {
-            this.dataMovimento = LocalDateTime.now();
+            this.dataMovimento = dataMovimento;
             return this;
         }
 

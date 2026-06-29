@@ -12,6 +12,7 @@ import service.MovimentoService;
 import service.PessoaService;
 import service.ProdutoService;
 import ui.categoria.CategoriaMenu;
+import ui.movimento.MovimentoMenu;
 import ui.pessoa.PessoaMenu;
 import ui.produto.ProdutoMenu;
 
@@ -28,6 +29,8 @@ public class Principal {
         CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
         ProdutoService produtoService = new ProdutoService();
         ProdutoMenu produtoMenu = new ProdutoMenu(produtoService, categoriaService, categoriaMenu);
+        MovimentoService movimentoService = new MovimentoService();
+        MovimentoMenu movimentoMenu = new MovimentoMenu(movimentoService);
 
 //        produtoMenu.iniciar();
 //        pessoaMenu.iniciar();
@@ -72,7 +75,7 @@ public class Principal {
 
         movimento.adicionarItem(MovimentoItem.builder().produto(build2).valorUnitario(build2.getPrecoVenda()).quantidade(new BigDecimal("1")).build());
 
-        MovimentoService movimentoService = new MovimentoService();
+
 
 //        movimentoService.inserirMovimento(movimento);
 
@@ -81,6 +84,9 @@ public class Principal {
 //        System.out.println(movimentoService.reabrirMovimento(7));
 //        System.out.println(movimentoService.cancelarMovimento(7));
 
-        movimentoService.editarMovimento(movimento);
+//        movimentoService.editarMovimento(movimento);
+//        System.out.println(movimentoService.finalizarMovimento(7));
+        movimentoMenu.iniciar();
     }
+
 }

@@ -431,7 +431,7 @@ public class PessoaMenu {
         );
     }
 
-    private void exibirGrid(List<Pessoa> pessoas) {
+    public void exibirGrid(List<Pessoa> pessoas) {
         String id;
         String nome;
         String doc;

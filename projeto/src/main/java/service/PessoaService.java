@@ -210,6 +210,10 @@ public class PessoaService {
         return pessoaRepository.buscarTodosAtivo();
     }
 
+    public List<Pessoa> buscarPessoaPorPapelAtivo(PessoaPapel pessoaPapel) {
+        return pessoaRepository.buscarPessoaPorPapelAtivo(pessoaPapel);
+    }
+
     private Pessoa validarPessoaExiste(Pessoa pessoa) {
         if (pessoa == null) {
             throw new IllegalArgumentException("Pessoa Não existe");

@@ -110,11 +110,15 @@ public class MovimentoService {
 
     public boolean cancelarMovimento(int idMovimento) {
         Movimento movimento = validarMovimentoPodeSerCancelado(
-                validarMovimentoNaoNulo(
-                        movimentoRepository.buscarPorId(idMovimento)
-                )
+                validarMovimentoNaoNulo(buscarPorId(idMovimento))
         );
         return movimentoRepository.cancelarMovimento(movimento.getId());
+    }
+
+    public boolean finalizarMovimento(int idMovimento) {
+        Movimento movimento = validarMovimentoNaoNulo(buscarPorId(idMovimento));
+        validarMovimentoAberto(movimento);
+        return movimentoRepository.finalizarMovimento(movimento.getId());
     }
 
     public Movimento buscarPorId(int idMovimento) {
@@ -193,6 +197,12 @@ public class MovimentoService {
     private void validarMovimentoFinalizado(Movimento movimentoOriginal) {
         if (movimentoOriginal.getStatusMovimento() == StatusMovimento.FINALIZADO) {
             throw new IllegalArgumentException("Movimento finalizado não pode ser alterado.");
+        }
+    }
+
+    private void validarMovimentoAberto(Movimento movimento) {
+        if (movimento.getStatusMovimento() != StatusMovimento.ABERTO) {
+            throw new IllegalArgumentException("Movimento não está em aberto.");
         }
     }
 

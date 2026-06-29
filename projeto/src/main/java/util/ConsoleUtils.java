@@ -31,7 +31,7 @@ public final class ConsoleUtils {
         while (true) {
             try {
 
-                System.out.println(label + ": ");
+                System.out.print(label + ": ");
 
                 return new BigDecimal(scanner.nextLine().replace(",", "."));
 

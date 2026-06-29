@@ -212,7 +212,7 @@ public class ProdutoMenu {
         }
     }
 
-    private void listar(int idLista) {
+    public void listar(int idLista) {
         List<Produto> produtos = new ArrayList<>();
         switch (idLista) {
             case 1:

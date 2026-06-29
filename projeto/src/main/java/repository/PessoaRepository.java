@@ -6,6 +6,7 @@ import domain.documento.CPF;
 import domain.documento.Documento;
 import domain.documento.TipoPessoa;
 import domain.pessoa.Pessoa;
+import domain.pessoa.PessoaPapel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -186,6 +187,31 @@ public class PessoaRepository {
 
             while (rs.next()) {
                 pessoasList.add(mapearPessoa(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return pessoasList;
+    }
+
+    public List<Pessoa> buscarPessoaPorPapelAtivo(PessoaPapel pessoaPapel) {
+        String sql = """
+                SELECT p.id_pessoa, p.descricao, p.documento, p.tipo, p.ativo
+                FROM pessoa AS p
+                JOIN pessoa_papel AS pp ON pp.id_pessoa = p.id_pessoa
+                WHERE pp.id_papel = ? AND p.ativo = 1;
+                """;
+        List<Pessoa> pessoasList = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+
+            ps.setInt(1, pessoaPapel.getCodigo());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    pessoasList.add(mapearPessoa(rs));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

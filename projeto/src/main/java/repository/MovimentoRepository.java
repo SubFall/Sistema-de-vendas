@@ -88,6 +88,20 @@ public class MovimentoRepository {
         }
     }
 
+    public boolean finalizarMovimento(int idMovimento) {
+        String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, StatusMovimento.FINALIZADO.getCodigo());
+            ps.setInt(2, idMovimento);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Movimento buscarPorId(int idMovimento) {
         String sql = """
                 SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
