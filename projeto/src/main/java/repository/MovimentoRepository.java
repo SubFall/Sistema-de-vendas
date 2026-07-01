@@ -5,6 +5,8 @@ import domain.movimento.Movimento;
 import domain.movimento.StatusMovimento;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovimentoRepository {
     PessoaRepository pessoaRepository = new PessoaRepository();
@@ -109,7 +111,7 @@ public class MovimentoRepository {
                 """;
 
         try (Connection conn = ConnectionFactory.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idMovimento);
 
@@ -122,6 +124,27 @@ public class MovimentoRepository {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    public List<Movimento> buscarTodos() {
+        List<Movimento> movimentos = new ArrayList<>();
+        String sql = """
+                SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
+                FROM movimento;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                movimentos.add(mapearMovimento(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return movimentos;
     }
 
     private Movimento mapearMovimento(ResultSet rs) throws SQLException {

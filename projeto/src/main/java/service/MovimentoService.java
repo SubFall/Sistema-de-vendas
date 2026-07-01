@@ -11,6 +11,7 @@ import repository.MovimentoRepository;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public class MovimentoService {
     MovimentoRepository movimentoRepository = new MovimentoRepository();
@@ -123,6 +124,10 @@ public class MovimentoService {
 
     public Movimento buscarPorId(int idMovimento) {
         return movimentoRepository.buscarPorId(idMovimento);
+    }
+
+    public List<Movimento> buscarTodos() {
+        return movimentoRepository.buscarTodos();
     }
 
     private Movimento validarMovimentoNaoNulo(Movimento movimento) {

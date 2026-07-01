@@ -16,6 +16,7 @@ import ui.produto.ProdutoMenu;
 import util.ConsoleUtils;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -44,7 +45,7 @@ public class MovimentoMenu {
             System.out.println("|3 - Finalizar Movimento        |");
             System.out.println("|4 - Estornar Movimento         |");
             System.out.println("|5 - Cancelar Movimento         |");
-            System.out.println("|6 - Cancelar Movimento         |");
+            System.out.println("|6 - excluir Movimento          |");
             System.out.println("|7 - Consultar                  |");
             System.out.println("|0 - Voltar                     |");
             System.out.println("|*******************************|");
@@ -54,13 +55,16 @@ public class MovimentoMenu {
 
             switch (opcao) {
                 case 1:
-                    novaVenda();
+                    novoMovimento();
                     break;
                 case 2:
                     break;
                 case 3:
                     break;
                 case 4:
+                    break;
+                case 7:
+                    consultarMovimento();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -72,7 +76,7 @@ public class MovimentoMenu {
         } while (opcao != 0);
     }
 
-    private void novaVenda() {
+    private void novoMovimento() {
         try {
             Pessoa cliente = selecionarCliente();
 
@@ -91,7 +95,7 @@ public class MovimentoMenu {
                     case 1 -> criarMovimentoItem(movimentoItens);
                     case 2 -> removerItem(movimentoItens);
                     case 3 -> {
-                        if (concluirVenda(cliente, vendedor, movimentoItens)) {
+                        if (concluirMovimento(cliente, vendedor, movimentoItens)) {
                             repeticao = false;
                         }
                     }
@@ -102,12 +106,20 @@ public class MovimentoMenu {
         }
     }
 
-    private void criarMovimentoItem(List<MovimentoItem> movimentoItens) {
-        movimentoItens.add(criarMovimentoItem());
-        exibirGrid(movimentoItens);
+    private void editarMovimento() {
+
     }
 
-    private boolean concluirVenda(Pessoa cliente, Pessoa vendedor, List<MovimentoItem> movimentoItens) {
+    private void consultarMovimento() {
+        exibirGridMovimento(movimentoService.buscarTodos());
+    }
+
+    private void criarMovimentoItem(List<MovimentoItem> movimentoItens) {
+        movimentoItens.add(criarMovimentoItem());
+        exibirGridItens(movimentoItens);
+    }
+
+    private boolean concluirMovimento(Pessoa cliente, Pessoa vendedor, List<MovimentoItem> movimentoItens) {
         int opcao;
         do {
             System.out.println("1 - Salvar venda em aberto");
@@ -140,7 +152,7 @@ public class MovimentoMenu {
     }
 
     private void removerItem(List<MovimentoItem> movimentoItens) {
-        exibirGrid(movimentoItens);
+        exibirGridItens(movimentoItens);
         System.out.print("Digite o ID do produto: ");
         int id = ConsoleUtils.lerInteiro(scanner, "ID");
         movimentoItens.removeIf(i -> i.getProduto().getId() == id);
@@ -169,14 +181,54 @@ public class MovimentoMenu {
         return pessoaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
     }
 
-    private void exibirCabecalhoGrid() {
+    private void exibirCabecalhoGridMovimento() {
+        System.out.printf(
+                "%-3s | %-15s | %-15s | %-10s | %-16s | %-5s | %-10s%n",
+                "ID", "CLIENTE", "VENDEDOR", "STATUS", "DATA", "ITENS", "VALOR"
+        );
+    }
+
+    private void exibirGridMovimento(List<Movimento> movimentos) {
+        String id;
+        String nomeCliente;
+        String nomeVendedor;
+        String status;
+        String dataMovimento;
+        String qtdeItens;
+        String valorTotal;
+
+        if (movimentos.isEmpty()) {
+            System.out.println("Nenhum movimento encontrado");
+            return;
+        }
+
+        exibirCabecalhoGridMovimento();
+
+        for (Movimento movimento : movimentos) {
+            id = ConsoleUtils.formatarColuna(String.valueOf(movimento.getId()), 3);
+            nomeCliente = ConsoleUtils.formatarColuna(movimento.getPessoa().getNome(), 15);
+            nomeVendedor = ConsoleUtils.formatarColuna(movimento.getFuncionario().getNome(), 15);
+            status = ConsoleUtils.formatarColuna(movimento.getStatusMovimento().getDescricao(), 10);
+            dataMovimento = ConsoleUtils.formatarColuna(
+                    movimento.getDataMovimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")), 16);
+            qtdeItens = ConsoleUtils.formatarColuna(String.valueOf(movimento.getQuantidadeTotal()), 5);
+            valorTotal = ConsoleUtils.formatarColuna(ConsoleUtils.formatarMoeda(movimento.getValorTotal()), 10);
+
+            System.out.printf("%s | %s | %s | %s | %s | %s | %s %n",
+                    id, nomeCliente, nomeVendedor, status, dataMovimento, qtdeItens, valorTotal);
+        }
+
+
+    }
+
+    private void exibirCabecalhoGridItens() {
         System.out.printf(
                 "%-3s | %-15s | %-10s | %-11s | %-11s%n",
                 "ID", "PRODUTO", "QTDE", "P.UNITÁRIO", "P.TOTAL"
         );
     }
 
-    private void exibirGrid(List<MovimentoItem> itens) {
+    private void exibirGridItens(List<MovimentoItem> itens) {
         String id;
         String produto;
         String quantidade;
@@ -188,7 +240,7 @@ public class MovimentoMenu {
             return;
         }
 
-        exibirCabecalhoGrid();
+        exibirCabecalhoGridItens();
 
         for (MovimentoItem i : itens) {
             id = ConsoleUtils.formatarColuna(String.valueOf(i.getProduto().getId()), 3);
@@ -201,10 +253,10 @@ public class MovimentoMenu {
             System.out.printf("%s | %s | %s | %s | %s %n", id, produto, quantidade, precoVenda, precoTotal);
 
         }
-        exibirGridRodape(itens);
+        exibirGridRodapeItens(itens);
     }
 
-    private void exibirGridRodape(List<MovimentoItem> itens) {
+    private void exibirGridRodapeItens(List<MovimentoItem> itens) {
         BigDecimal totalQuantidade = itens.stream().
                 map(MovimentoItem::getQuantidade)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
