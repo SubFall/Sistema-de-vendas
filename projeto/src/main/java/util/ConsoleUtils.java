@@ -17,6 +17,10 @@ public final class ConsoleUtils {
 
     }
 
+    public static String formatarMoeda(BigDecimal valor) {
+        return String.format("R$ %.2f", valor);
+    }
+
     public static int lerInteiro(Scanner scanner, String label) {
         while (true) {
             try {

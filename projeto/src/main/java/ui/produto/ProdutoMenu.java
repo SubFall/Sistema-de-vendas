@@ -279,8 +279,8 @@ public class ProdutoMenu {
         for (Produto p : produtos) {
             id = ConsoleUtils.formatarColuna(String.valueOf(p.getId()), 5);
             descricao = ConsoleUtils.formatarColuna(p.getDescricao(), 20);
-            precoVenda = ConsoleUtils.formatarColuna(String.format("%.2f", p.getPrecoVenda()), 11);
-            precoCusto = ConsoleUtils.formatarColuna(String.format("%.2f", p.getPrecoCusto()), 11);
+            precoVenda = ConsoleUtils.formatarColuna(ConsoleUtils.formatarMoeda(p.getPrecoVenda()), 11);
+            precoCusto = ConsoleUtils.formatarColuna(ConsoleUtils.formatarMoeda(p.getPrecoCusto()), 11);
             ativo = p.isAtivo() ? "SIM" : "NÃO";
 
             System.out.printf("%s | %s | %s | %s | %s %n", id, descricao, precoVenda, precoCusto, ativo);
