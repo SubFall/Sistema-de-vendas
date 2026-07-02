@@ -122,12 +122,26 @@ public class MovimentoService {
         return movimentoRepository.finalizarMovimento(movimento.getId());
     }
 
+    public boolean recuperarMovimento(int idMovimento) {
+        Movimento movimento = validarMovimentoNaoNulo(buscarPorId(idMovimento));
+        validarMovimentoEstaCancelado(movimento);
+        return movimentoRepository.recuperarMovimento(movimento.getId());
+    }
+
     public Movimento buscarPorId(int idMovimento) {
-        return movimentoRepository.buscarPorId(idMovimento);
+        return validarMovimentoNaoNulo(movimentoRepository.buscarPorId(idMovimento));
+    }
+
+    public Movimento buscarPorIdStatus(int idMovimento, StatusMovimento statusMovimento) {
+        return validarMovimentoNaoNulo(movimentoRepository.buscarPorIdStatus(idMovimento, statusMovimento));
     }
 
     public List<Movimento> buscarTodos() {
         return movimentoRepository.buscarTodos();
+    }
+
+    public List<Movimento> buscarPorStatus(StatusMovimento statusMovimento) {
+        return movimentoRepository.buscarPorStatus(statusMovimento);
     }
 
     private Movimento validarMovimentoNaoNulo(Movimento movimento) {
@@ -188,15 +202,15 @@ public class MovimentoService {
         }
     }
 
+    private void validarMovimentoEditavel(Movimento movimentoOriginal) {
+        validarMovimentoCancelado(movimentoOriginal);
+        validarMovimentoFinalizado(movimentoOriginal);
+    }
+
     private void validarMovimentoCancelado(Movimento movimento) {
         if (movimento.getStatusMovimento() == StatusMovimento.CANCELADO) {
             throw new IllegalArgumentException("Movimento cancelado não pode ser alterado.");
         }
-    }
-
-    private void validarMovimentoEditavel(Movimento movimentoOriginal) {
-        validarMovimentoCancelado(movimentoOriginal);
-        validarMovimentoFinalizado(movimentoOriginal);
     }
 
     private void validarMovimentoFinalizado(Movimento movimentoOriginal) {
@@ -208,6 +222,12 @@ public class MovimentoService {
     private void validarMovimentoAberto(Movimento movimento) {
         if (movimento.getStatusMovimento() != StatusMovimento.ABERTO) {
             throw new IllegalArgumentException("Movimento não está em aberto.");
+        }
+    }
+
+    private void validarMovimentoEstaCancelado(Movimento movimento) {
+        if (movimento.getStatusMovimento() != StatusMovimento.CANCELADO) {
+            throw new IllegalArgumentException("Movimento não está em cancelado.");
         }
     }
 

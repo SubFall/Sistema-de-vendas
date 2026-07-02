@@ -45,7 +45,7 @@ public class MovimentoMenu {
             System.out.println("|3 - Finalizar Movimento        |");
             System.out.println("|4 - Estornar Movimento         |");
             System.out.println("|5 - Cancelar Movimento         |");
-            System.out.println("|6 - excluir Movimento          |");
+            System.out.println("|6 - Recuperar Movimento        |");
             System.out.println("|7 - Consultar                  |");
             System.out.println("|0 - Voltar                     |");
             System.out.println("|*******************************|");
@@ -54,23 +54,15 @@ public class MovimentoMenu {
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
-                case 1:
-                    novoMovimento();
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                case 7:
-                    consultarMovimento();
-                    break;
-                case 0:
-                    System.out.println("Saindo...");
-                    break;
-                default:
-                    System.out.println("Opção inválida");
+                case 1 -> novoMovimento();
+                //case 2 ->
+                case 3 -> finalizarMovimento();
+                case 4 -> reabrirMovimento();
+                case 5 -> cancelarMovimento();
+                case 6 -> recuperarMovimento();
+                case 7 -> consultarMovimento();
+                case 0 -> System.out.println("Saindo...");
+                default ->System.out.println("Opção inválida");
             }
 
         } while (opcao != 0);
@@ -108,6 +100,74 @@ public class MovimentoMenu {
 
     private void editarMovimento() {
 
+    }
+
+    private void finalizarMovimento() {
+        exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.ABERTO));
+
+        try {
+            System.out.print("Digite o ID do movimento: ");
+            Movimento movimento = movimentoService.buscarPorIdStatus(ConsoleUtils.lerInteiro(scanner, "ID"), StatusMovimento.ABERTO);
+
+            if (movimentoService.finalizarMovimento(movimento.getId())) {
+                System.out.printf("Movimento %d finalizado com sucesso%n", movimento.getId());
+            } else {
+                System.out.println("Erro ao finalizar");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void reabrirMovimento() {
+        exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.FINALIZADO));
+
+        try {
+            System.out.print("Digite o ID do movimento: ");
+            Movimento movimento = movimentoService.buscarPorIdStatus(ConsoleUtils.lerInteiro(scanner, "ID"), StatusMovimento.FINALIZADO);
+
+            if (movimentoService.reabrirMovimento(movimento.getId())) {
+                System.out.printf("Movimento %d estornado com sucesso%n", movimento.getId());
+            } else {
+                System.out.println("Erro ao reabrir");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void cancelarMovimento() {
+        exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.ABERTO));
+
+        try {
+            System.out.print("Digite o ID do movimento: ");
+            Movimento movimento = movimentoService.buscarPorIdStatus(ConsoleUtils.lerInteiro(scanner, "ID"), StatusMovimento.ABERTO);
+
+            if (movimentoService.cancelarMovimento(movimento.getId())) {
+                System.out.printf("Movimento %d cancelado com sucesso%n", movimento.getId());
+            } else {
+                System.out.println("Erro ao cancelar");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void recuperarMovimento() {
+        exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.CANCELADO));
+
+        try {
+            System.out.print("Digite o ID do movimento: ");
+            Movimento movimento = movimentoService.buscarPorIdStatus(ConsoleUtils.lerInteiro(scanner, "ID"), StatusMovimento.CANCELADO);
+
+            if (movimentoService.recuperarMovimento(movimento.getId())) {
+                System.out.printf("Movimento %d recuperado com sucesso%n", movimento.getId());
+            } else {
+                System.out.println("Erro ao recuperar");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void consultarMovimento() {

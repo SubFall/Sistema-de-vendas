@@ -104,6 +104,20 @@ public class MovimentoRepository {
         }
     }
 
+    public boolean recuperarMovimento(int idMovimento) {
+        String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, StatusMovimento.ABERTO.getCodigo());
+            ps.setInt(2, idMovimento);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Movimento buscarPorId(int idMovimento) {
         String sql = """
                 SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
@@ -114,6 +128,29 @@ public class MovimentoRepository {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idMovimento);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearMovimento(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public Movimento buscarPorIdStatus(int idMovimento, StatusMovimento statusMovimento) {
+        String sql = """
+                SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
+                FROM movimento WHERE id_movimento = ? AND status = ?;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idMovimento);
+            ps.setInt(2, statusMovimento.getCodigo());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -141,6 +178,28 @@ public class MovimentoRepository {
                 movimentos.add(mapearMovimento(rs));
             }
 
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return movimentos;
+    }
+
+    public List<Movimento> buscarPorStatus(StatusMovimento statusMovimento) {
+        List<Movimento> movimentos = new ArrayList<>();
+        String sql = """
+                SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
+                FROM movimento WHERE status = ?;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, statusMovimento.getCodigo());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    movimentos.add(mapearMovimento(rs));
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
