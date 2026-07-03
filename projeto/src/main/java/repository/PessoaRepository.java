@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PessoaRepository {
+    PessoaPapelRepository pessoaPapelRepository = new PessoaPapelRepository();
 
     public int inserirPessoa(Connection conn, Pessoa pessoa) {
         String sql = "INSERT INTO pessoa (`descricao`, `documento`, `tipo`, `ativo`) VALUES (?, ?, ?, ?);";
@@ -234,6 +235,7 @@ public class PessoaRepository {
                 .id(rs.getInt("id_pessoa"))
                 .nome(rs.getString("descricao"))
                 .documento(documento)
+                .papeis(pessoaPapelRepository.buscarPorIdPessoa(rs.getInt("id_pessoa")))
                 .ativo(rs.getBoolean("ativo"))
                 .build();
     }

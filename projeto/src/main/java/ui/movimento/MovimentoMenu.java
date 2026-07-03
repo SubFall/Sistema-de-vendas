@@ -55,7 +55,7 @@ public class MovimentoMenu {
 
             switch (opcao) {
                 case 1 -> novoMovimento();
-                //case 2 ->
+                case 2 -> editarMovimento();
                 case 3 -> finalizarMovimento();
                 case 4 -> reabrirMovimento();
                 case 5 -> cancelarMovimento();
@@ -99,7 +99,47 @@ public class MovimentoMenu {
     }
 
     private void editarMovimento() {
+        exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.ABERTO));
 
+        try {
+            System.out.print("Digite o ID do movimento: ");
+            Movimento movimento = movimentoService.buscarPorIdStatus(ConsoleUtils.lerInteiro(scanner, "ID"), StatusMovimento.ABERTO);
+
+            if (ConsoleUtils.confirmar(scanner, "Deseja atualizar o cliente ?")) {
+                movimento.setPessoa(selecionarCliente());
+            }
+
+            if (ConsoleUtils.confirmar(scanner, "Deseja atualizar o vendedor ?")) {
+                movimento.setFuncionario(selecionarVendedor());
+            }
+
+            boolean repeticao = true;
+            while (repeticao) {
+                System.out.println("1 - Adicionar item");
+                System.out.println("2 - remover item");
+                System.out.println("3 - finalizar lançamento");
+                System.out.print("Opção: ");
+
+                switch (ConsoleUtils.lerInteiro(scanner, "Opção")) {
+                    case 1 -> {
+                        adicionarItem(movimento.getMovimentoItens());
+                        exibirGridItens(movimento.getMovimentoItens());
+                    }
+                    case 2 -> {
+                        removerItem(movimento.getMovimentoItens());
+                        exibirGridItens(movimento.getMovimentoItens());
+                    }
+                    case 3 -> {
+                        if (concluirMovimento(movimento)) {
+                            repeticao = false;
+                        }
+                    }
+                }
+            }
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void finalizarMovimento() {
@@ -209,6 +249,45 @@ public class MovimentoMenu {
         movimentoService.inserirMovimento(movimento);
         System.out.println("Venda criada com sucesso!");
         return true;
+    }
+
+    private boolean concluirMovimento(Movimento movimento) {
+        int opcao;
+        do {
+            System.out.println("1 - Salvar venda em aberto");
+            System.out.println("2 - Finalizar venda");
+            System.out.println("3 - Cancelar operação");
+
+            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+        } while (opcao != 1 && opcao != 2 && opcao != 3);
+
+        if (movimento.getMovimentoItens().isEmpty()) {
+            System.out.println("Adicione pelo menos um item antes de concluir a venda.");
+            return false;
+        }
+
+        if (opcao == 2) {
+            movimento.setStatusMovimento(StatusMovimento.FINALIZADO);
+        } else if (opcao == 3) {
+            System.out.println("Alteração cancelada.");
+            return true;
+        }
+
+        movimentoService.editarMovimento(movimento);
+        System.out.println("Venda alterada com sucesso!");
+        return true;
+    }
+
+    private void adicionarItem(List<MovimentoItem> movimentoItems) {
+        produtoMenu.listar(4);//todos ativos
+        System.out.print("Digite o ID do produto: ");
+        Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+        MovimentoItem item = MovimentoItem.builder()
+                .produto(produto)
+                .quantidade(ConsoleUtils.lerBigDecimal(scanner, "Quantidade"))
+                .valorUnitario(produto.getPrecoVenda())
+                .build();
+        movimentoItems.add(item);
     }
 
     private void removerItem(List<MovimentoItem> movimentoItens) {
