@@ -35,7 +35,8 @@ public class Principal {
             System.out.println("\n|** Bem vindo - Eclipse.NET **|");
             System.out.println("|1 - Pessoa             - [] X|");
             System.out.println("|2 - Produto                  |");
-            System.out.println("|3 - Movimento                |");
+            System.out.println("|3 - Categoria                |");
+            System.out.println("|4 - Movimento                |");
             System.out.println("|0 - Sair                     |");
             System.out.println("|*****************************|");
             System.out.print("Opção: ");
@@ -46,7 +47,8 @@ public class Principal {
             switch (opcao) {
                 case 1 -> pessoaMenu.iniciar();
                 case 2 -> produtoMenu.iniciar();
-                case 3 -> movimentoMenu.iniciar();
+                case 3 -> categoriaMenu.iniciar();
+                case 4 -> movimentoMenu.iniciar();
                 case 0 -> {
                     System.out.println("Saindo...");
                     return;

@@ -5,7 +5,6 @@ import domain.documento.CPF;
 import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
-import domain.produto.Produto;
 import service.PessoaService;
 import util.ConsoleUtils;
 

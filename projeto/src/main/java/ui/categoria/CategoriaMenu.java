@@ -20,28 +20,22 @@ public class CategoriaMenu {
         int opcao;
 
         do {
-            System.out.println("\n|********** Categoria **********|");
-            System.out.println("|1 - Cadastrar            - [] X|");
-            System.out.println("|2 - Remover                    |");
-            System.out.println("|3 - Atualizar                  |");
-            System.out.println("|4 - Listar                     |");
-            System.out.println("|0 - Sair                       |");
-            System.out.println("|*******************************|");
+            System.out.println("\n|********* Categoria *********|");
+            System.out.println("|1 - Cadastrar          - [] X|");
+            System.out.println("|2 - Remover                  |");
+            System.out.println("|3 - Atualizar                |");
+            System.out.println("|4 - Listar                   |");
+            System.out.println("|0 - Voltar                   |");
+            System.out.println("|*****************************|");
 
             System.out.print("Opção: ");
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
-                case 1:
-                    cadastrar();
-                    break;
-                case 2:
-                    remover();
-                    break;
-                case 3:
-                    atualizar();
-                    break;
-                case 4:
+                case 1 -> cadastrar();
+                case 2 -> remover();
+                case 3 -> atualizar();
+                case 4 -> {
                     int op;
                     do {
                         System.out.println("1 - Listar todas categoriras");
@@ -53,14 +47,10 @@ public class CategoriaMenu {
                     } while (op != 1 && op != 2 && op != 3);
 
                     listar(op);
-                    break;
-                case 0:
-                    System.out.println("Saindo...");
-                    break;
-                default:
-                    System.out.println("Opção inválida");
+                }
+                case 0 -> System.out.println("Saindo...");
+                default -> System.out.println("Opção inválida");
             }
-
         } while (opcao != 0);
     }
 
@@ -139,14 +129,12 @@ public class CategoriaMenu {
     public void listar(int idLista) {
         List<Categoria> categorias = new ArrayList<>();
         switch (idLista) {
-            case 1:
-                categorias = categoriaService.buscarTodos();
-                break;
-            case 2:
+            case 1 -> categorias = categoriaService.buscarTodos();
+            case 2 -> {
                 System.out.print("Digite a descrição: ");
                 categorias = categoriaService.buscarPorDescricao(scanner.nextLine());
-                break;
-            case 3:
+            }
+            case 3 -> {
                 System.out.print("Digite o ID: ");
 
                 try {
@@ -154,12 +142,9 @@ public class CategoriaMenu {
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
-
-                break;
-            default:
-                System.out.println("opção inválida!");
+            }
+            default -> System.out.println("opção inválida!");
         }
-
         exibirGrid(categorias);
     }
 

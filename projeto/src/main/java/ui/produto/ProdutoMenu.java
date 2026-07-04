@@ -1,8 +1,6 @@
 package ui.produto;
 
 import domain.categoria.Categoria;
-import domain.pessoa.Pessoa;
-import domain.pessoa.PessoaPapel;
 import domain.produto.Produto;
 import service.CategoriaService;
 import service.ProdutoService;

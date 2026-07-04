@@ -24,12 +24,13 @@ import java.util.Scanner;
 public class MovimentoMenu {
     private Scanner scanner = new Scanner(System.in);
     private PessoaService pessoaService = new PessoaService();
-    private PessoaMenu pessoaMenu = new PessoaMenu(pessoaService);
     private CategoriaService categoriaService = new CategoriaService();
-    private CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
     private ProdutoService produtoService = new ProdutoService();
-    private ProdutoMenu produtoMenu = new ProdutoMenu(produtoService, categoriaService, categoriaMenu);
     private MovimentoService movimentoService;
+
+    private PessoaMenu pessoaMenu = new PessoaMenu(pessoaService);
+    private CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
+    private ProdutoMenu produtoMenu = new ProdutoMenu(produtoService, categoriaService, categoriaMenu);
 
     public MovimentoMenu(MovimentoService movimentoService) {
         this.movimentoService = movimentoService;
