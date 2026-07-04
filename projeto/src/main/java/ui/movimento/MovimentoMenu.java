@@ -211,7 +211,35 @@ public class MovimentoMenu {
     }
 
     private void consultarMovimento() {
-        exibirGridMovimento(movimentoService.buscarTodos());
+        while (true) {
+            System.out.println("\n1 - Listar todos os Movimentos");
+            System.out.println("2 - Listar todos os Movimentos com status Abertos");
+            System.out.println("3 - Listar todos os Movimentos com status Finalizados");
+            System.out.println("4 - Listar todos os Movimentos com status Cancelados");
+            System.out.println("5 - Consultar detalhes de um movimento");
+            System.out.println("0 - Voltar");
+
+            switch (ConsoleUtils.lerInteiro(scanner, "Opção")) {
+                case 1 -> listarTodosMovimentos();
+                case 2 -> exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.ABERTO));
+                case 3 -> exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.FINALIZADO));
+                case 4 -> exibirGridMovimento(movimentoService.buscarPorStatus(StatusMovimento.CANCELADO));
+                case 5 -> {
+                    listarTodosMovimentos();
+                    System.out.print("Digite o ID do movimento: ");
+                    try {
+                        detalhesMovimento(movimentoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                case 0 -> {
+                    System.out.println("Voltando...");
+                    return;
+                }
+                default -> System.out.println("Opção inválida");
+            }
+        }
     }
 
     private void criarMovimentoItem(List<MovimentoItem> movimentoItens) {
@@ -406,5 +434,18 @@ public class MovimentoMenu {
         System.out.println("------------------------------");
         System.out.printf("Quantidade : %s%n", totalQuantidade);
         System.out.printf("Valor Total: %s%n", valorTotal);
+    }
+
+    private void listarTodosMovimentos() {
+        exibirGridMovimento(movimentoService.buscarTodos());
+    }
+
+    private void detalhesMovimento (Movimento movimento) {
+        System.out.println("ID: " + movimento.getId());
+        System.out.println("Cliente: " + movimento.getPessoa().getNome());
+        System.out.println("Vendedor: " + movimento.getFuncionario().getNome());
+        System.out.println("Status: " + movimento.getStatusMovimento().getDescricao());
+        System.out.println("\nitens:");
+        exibirGridItens(movimento.getMovimentoItens());
     }
 }
