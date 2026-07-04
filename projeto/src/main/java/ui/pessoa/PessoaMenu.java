@@ -31,12 +31,11 @@ public class PessoaMenu {
             System.out.println("|3 - Atualizar                |");
             System.out.println("|4 - Detalhes                 |");
             System.out.println("|5 - Listar                   |");
-            System.out.println("|0 - Sair                     |");
+            System.out.println("|0 - Voltar                   |");
             System.out.println("|*****************************|");
 
             System.out.print("Opção: ");
-            opcao = scanner.nextInt();
-            scanner.nextLine();
+            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
                 case 1:

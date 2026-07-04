@@ -1,12 +1,5 @@
 package test;
 
-import domain.documento.CPF;
-import domain.movimento.Movimento;
-import domain.movimento.MovimentoItem;
-import domain.movimento.StatusMovimento;
-import domain.pessoa.Pessoa;
-import domain.pessoa.PessoaPapel;
-import domain.produto.Produto;
 import service.CategoriaService;
 import service.MovimentoService;
 import service.PessoaService;
@@ -15,27 +8,51 @@ import ui.categoria.CategoriaMenu;
 import ui.movimento.MovimentoMenu;
 import ui.pessoa.PessoaMenu;
 import ui.produto.ProdutoMenu;
+import util.ConsoleUtils;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Scanner;
+
 
 public class Principal {
+    private final Scanner scanner = new Scanner(System.in);
+    private final PessoaService pessoaService = new PessoaService();
+    private final CategoriaService categoriaService = new CategoriaService();
+    private final ProdutoService produtoService = new ProdutoService();
+    private final MovimentoService movimentoService = new MovimentoService();
+
+    private final PessoaMenu pessoaMenu = new PessoaMenu(pessoaService);
+    private final CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
+    private final ProdutoMenu produtoMenu = new ProdutoMenu(produtoService, categoriaService, categoriaMenu);
+    private final MovimentoMenu movimentoMenu = new MovimentoMenu(movimentoService);
+
     static void main(String[] args) {
-
-        PessoaService pessoaService = new PessoaService();
-        PessoaMenu pessoaMenu = new PessoaMenu(pessoaService);
-        CategoriaService categoriaService = new CategoriaService();
-        CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
-        ProdutoService produtoService = new ProdutoService();
-        ProdutoMenu produtoMenu = new ProdutoMenu(produtoService, categoriaService, categoriaMenu);
-        MovimentoService movimentoService = new MovimentoService();
-        MovimentoMenu movimentoMenu = new MovimentoMenu(movimentoService);
-
-//        produtoMenu.iniciar();
-//        pessoaMenu.iniciar();
-
-        movimentoMenu.iniciar();
+        Principal principal = new Principal();
+        principal.iniciar();
     }
 
+    public void iniciar() {
+        while (true) {
+            System.out.println("\n|** Bem vindo - Eclipse.NET **|");
+            System.out.println("|1 - Pessoa             - [] X|");
+            System.out.println("|2 - Produto                  |");
+            System.out.println("|3 - Movimento                |");
+            System.out.println("|0 - Sair                     |");
+            System.out.println("|*****************************|");
+            System.out.print("Opção: ");
+
+            int opcao;
+            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+
+            switch (opcao) {
+                case 1 -> pessoaMenu.iniciar();
+                case 2 -> produtoMenu.iniciar();
+                case 3 -> movimentoMenu.iniciar();
+                case 0 -> {
+                    System.out.println("Saindo...");
+                    return;
+                }
+                default -> System.out.println("Opção inválida");
+            }
+        }
+    }
 }

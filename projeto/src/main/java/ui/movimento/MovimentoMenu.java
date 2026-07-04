@@ -39,16 +39,16 @@ public class MovimentoMenu {
         int opcao;
 
         do {
-            System.out.println("\n|********** Movimento **********|");
-            System.out.println("|1 - Nova Venda           - [] X|");
-            System.out.println("|2 - Editar Movimento           |");
-            System.out.println("|3 - Finalizar Movimento        |");
-            System.out.println("|4 - Estornar Movimento         |");
-            System.out.println("|5 - Cancelar Movimento         |");
-            System.out.println("|6 - Recuperar Movimento        |");
-            System.out.println("|7 - Consultar                  |");
-            System.out.println("|0 - Voltar                     |");
-            System.out.println("|*******************************|");
+            System.out.println("\n|********* Movimento *********|");
+            System.out.println("|1 - Nova Venda         - [] X|");
+            System.out.println("|2 - Editar Movimento         |");
+            System.out.println("|3 - Finalizar Movimento      |");
+            System.out.println("|4 - Estornar Movimento       |");
+            System.out.println("|5 - Cancelar Movimento       |");
+            System.out.println("|6 - Recuperar Movimento      |");
+            System.out.println("|7 - Consultar                |");
+            System.out.println("|0 - Voltar                   |");
+            System.out.println("|*****************************|");
 
             System.out.print("Opção: ");
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");

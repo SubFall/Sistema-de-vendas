@@ -31,14 +31,14 @@ public class ProdutoMenu {
         int opcao;
 
         do {
-            System.out.println("\n|*********** Produto ***********|");
-            System.out.println("|1 - Cadastrar            - [] X|");
-            System.out.println("|2 - Inativar                   |");
-            System.out.println("|3 - Atualizar                  |");
-            System.out.println("|4 - Detalhes                   |");
-            System.out.println("|5 - Listar                     |");
-            System.out.println("|0 - Sair                       |");
-            System.out.println("|*******************************|");
+            System.out.println("\n|********** Produto **********|");
+            System.out.println("|1 - Cadastrar          - [] X|");
+            System.out.println("|2 - Inativar                 |");
+            System.out.println("|3 - Atualizar                |");
+            System.out.println("|4 - Detalhes                 |");
+            System.out.println("|5 - Listar                   |");
+            System.out.println("|0 - Voltar                     |");
+            System.out.println("|*****************************|");
 
             System.out.print("Opção: ");
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
