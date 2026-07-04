@@ -38,7 +38,7 @@ public class PessoaMenu {
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
-                case 1:
+                case 1 -> {
                     do {
                         System.out.println("1 - Cadastrar Pessoa Física");
                         System.out.println("2 - Cadastrar Pessoa Jurídica");
@@ -54,23 +54,22 @@ public class PessoaMenu {
                         cadastrarPessoaJuridica();
                         System.out.println();
                     }
-                    break;
-                case 2:
+                }
+                case 2 -> {
 //                    removerPessoa();
                     inativarPessoa();
-                    break;
-                case 3:
-                    atualizarPessoa();
-                    break;
-                case 4:
+                }
+                case 3 -> atualizarPessoa();
+                case 4 -> {
                     System.out.println("Digite o ID da pessoa: ");
+
                     try {
                         detalhesPessoa(ConsoleUtils.lerInteiro(scanner, "ID"));
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                     }
-                    break;
-                case 5:
+                }
+                case 5 -> {
                     int op;
                     do {
                         System.out.println("1 - Listar todoas as pessoas");
@@ -83,14 +82,10 @@ public class PessoaMenu {
                     } while (op != 1 && op != 2 && op != 3 && op != 4);
 
                     listar(op);
-                    break;
-                case 0:
-                    System.out.println("Saindo...");
-                    break;
-                default:
-                    System.out.println("Opção inválida");
+                }
+                case 0 -> System.out.println("Saindo...");
+                default -> System.out.println("Opção inválida");
             }
-
         } while (opcao != 0);
     }
 
@@ -256,16 +251,14 @@ public class PessoaMenu {
             } while (op != 1 && op != 2 && op != 3 && op != 4);
 
             switch (op) {
-                case 1:
-                case 2:
+                case 1, 2 -> {
                     if (pessoa.getEndereco() != null) {
                         atualizaEndereco(pessoa.getEndereco());
                     } else {
                         pessoa.setEndereco(cadastrarEndereco());
                     }
-                    break;
-                case 3:
-                    pessoa.setEndereco(null);
+                }
+                case 3 -> pessoa.setEndereco(null);
             }
 
             do {
@@ -325,28 +318,21 @@ public class PessoaMenu {
     public void listar(int idLista) {
         List<Pessoa> pessoas = new ArrayList<>();
         switch (idLista) {
-            case 1:
-                pessoas = pessoaService.buscarTodos();
-                break;
-            case 2:
+            case 1 -> pessoas = pessoaService.buscarTodos();
+            case 2 -> {
                 System.out.print("Digite o nome: ");
                 pessoas = pessoaService.buscarPorNome(scanner.nextLine());
-                break;
-            case 3:
+            }
+            case 3 -> {
                 System.out.print("Digite o ID: ");
-
                 try {
                     pessoas.add(pessoaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
-                break;
-            case 4:
-                pessoas = pessoaService.buscarTodosAtivo();
-                break;
-
-            default:
-                System.out.println("opção inválida!");
+            }
+            case 4 -> pessoas = pessoaService.buscarTodosAtivo();
+            default -> System.out.println("opção inválida!");
         }
         exibirGrid(pessoas);
     }

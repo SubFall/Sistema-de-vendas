@@ -44,19 +44,11 @@ public class ProdutoMenu {
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
-                case 1:
-                    cadastrar();
-                    break;
-                case 2:
-                    inativar();
-                    break;
-                case 3:
-                    atualizar();
-                    break;
-                case 4:
-                    detalhes();
-                    break;
-                case 5:
+                case 1 -> cadastrar();
+                case 2 -> inativar();
+                case 3 -> atualizar();
+                case 4 -> detalhes();
+                case 5 -> {
                     int op;
                     do {
                         System.out.println("1 - Listar todos produtos");
@@ -69,14 +61,10 @@ public class ProdutoMenu {
                     } while (op != 1 && op != 2 && op != 3 && op != 4);
 
                     listar(op);
-                    break;
-                case 0:
-                    System.out.println("Saindo...");
-                    break;
-                default:
-                    System.out.println("Opção inválida");
+                }
+                case 0 -> System.out.println("Saindo...");
+                default -> System.out.println("Opção inválida");
             }
-
         } while (opcao != 0);
     }
 
@@ -215,30 +203,22 @@ public class ProdutoMenu {
     public void listar(int idLista) {
         List<Produto> produtos = new ArrayList<>();
         switch (idLista) {
-            case 1:
-                produtos = produtoService.buscarTodos();
-                break;
-            case 2:
+            case 1 -> produtos = produtoService.buscarTodos();
+            case 2 -> {
                 System.out.print("Digite a descrição: ");
                 produtos = produtoService.buscarPorDescricao(scanner.nextLine());
-                break;
-            case 3:
+            }
+            case 3 -> {
                 System.out.print("Digite o ID: ");
-
                 try {
                     produtos.add(produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
-                break;
-            case 4:
-                produtos = produtoService.buscarTodosAtivo();
-                break;
-
-            default:
-                System.out.println("opção inválida!");
+            }
+            case 4 -> produtos = produtoService.buscarTodosAtivo();
+            default -> System.out.println("opção inválida!");
         }
-
         exibirGrid(produtos);
     }
 
