@@ -1,6 +1,8 @@
 package domain.endereco;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class Endereco {
     private int id;
@@ -16,7 +18,7 @@ public class Endereco {
         this.id = id;
         this.logradouro = logradouro;
         this.cidade = cidade;
-        this.uf = uf;
+        this.uf = validaUF(uf);
         this.bairro = bairro;
         this.numero = numero;
         cep = cep.replaceAll("\\D", "");
@@ -90,6 +92,15 @@ public class Endereco {
         }
     }
 
+    private String validaUF(String uf) {
+        uf = uf.trim().toUpperCase();
+
+        if (!UFs().contains(uf)) {
+            throw new IllegalArgumentException("Estado inválido.");
+        }
+        return uf;
+    }
+
     public int getId() {
         return id;
     }
@@ -115,7 +126,7 @@ public class Endereco {
     }
 
     public void setUf(String uf) {
-        this.uf = uf;
+        this.uf = validaUF(uf);
     }
 
     public String getBairro() {
@@ -145,6 +156,16 @@ public class Endereco {
 
     public int getIdPessoa() {
         return idPessoa;
+    }
+
+    private static Set<String> UFs() {
+        return Set.of(
+                "AC", "AP", "AM", "PA", "RO", "RR", "TO",
+                "MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA",
+                "GO", "MT", "MS", "DF",
+                "SP", "RJ", "MG", "ES",
+                "PR", "SC", "RS"
+        );
     }
 
     @Override

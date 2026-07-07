@@ -104,7 +104,13 @@ public class PessoaMenu {
         pessoaPapels = cadastrarPapel();
 
         if (ConsoleUtils.confirmar(scanner, "Deseja cadastrar o Endereço :")) {
-            endereco = cadastrarEndereco();
+            while (endereco == null) {
+                try {
+                    endereco = cadastrarEndereco();
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
         }
 
         Pessoa pessoa = Pessoa.builder()
@@ -122,7 +128,6 @@ public class PessoaMenu {
     private void cadastrarPessoaJuridica() {
         String nome;
         String documento;
-        String opcao;
         List<PessoaPapel> pessoaPapels;
         Endereco endereco = null;
 
@@ -135,7 +140,13 @@ public class PessoaMenu {
         pessoaPapels = cadastrarPapel();
 
         if (ConsoleUtils.confirmar(scanner, "Deseja cadastrar o Endereço :")) {
-            endereco = cadastrarEndereco();
+            while (endereco == null) {
+                try {
+                    endereco = cadastrarEndereco();
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
         }
 
         Pessoa pessoa = Pessoa.builder()
@@ -437,5 +448,6 @@ public class PessoaMenu {
             System.out.printf("%s | %s | %s | %s | %s%n", id, nome, doc, tipo, ativo);
         }
     }
+
 }
 
