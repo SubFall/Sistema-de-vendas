@@ -60,6 +60,7 @@ public class PessoaMenu {
                 }
                 case 3 -> atualizarPessoa();
                 case 4 -> {
+                    listar(1); //todos
                     System.out.println("Digite o ID da pessoa: ");
 
                     try {
@@ -69,18 +70,19 @@ public class PessoaMenu {
                     }
                 }
                 case 5 -> {
-                    int op;
-                    do {
-                        System.out.println("1 - Listar todoas as pessoas");
-                        System.out.println("2 - Listar pessoas por descricao");
-                        System.out.println("3 - Listar pessoa por id");
-                        System.out.println("4 - Listar somente ativos");
+                    System.out.println("1 - Listar todoas as pessoas");
+                    System.out.println("2 - Listar pessoas por descricao");
+                    System.out.println("3 - Listar somente ativos");
 
-                        op = ConsoleUtils.lerInteiro(scanner, "Opção");
+                    int op = ConsoleUtils.lerInteiro(scanner, "Opção");
 
-                    } while (op != 1 && op != 2 && op != 3 && op != 4);
-
-                    listar(op);
+                    switch (op) {
+                        case 1 -> listar(1);
+                        case 2 -> listar(2);
+                        case 3 -> listar(3);
+                        case 0 -> System.out.println("Voltando...");
+                        default -> System.out.println("Opção inválida");
+                    }
                 }
                 case 0 -> System.out.println("Saindo...");
                 default -> System.out.println("Opção inválida");
@@ -90,16 +92,21 @@ public class PessoaMenu {
 
     private void cadastrarPessoaFisica() {
         String nome;
-        String documento;
-        String opcao;
+        CPF cpf = null;
         List<PessoaPapel> pessoaPapels;
         Endereco endereco = null;
 
         System.out.print("Nome: ");
         nome = scanner.nextLine();
 
-        System.out.print("CPF: ");
-        documento = scanner.nextLine();
+        while (cpf == null) {
+            try {
+                System.out.print("CPF: ");
+                cpf = new CPF(scanner.nextLine());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
 
         pessoaPapels = cadastrarPapel();
 
@@ -115,27 +122,38 @@ public class PessoaMenu {
 
         Pessoa pessoa = Pessoa.builder()
                 .nome(nome)
-                .documento(new CPF(documento))
+                .documento(cpf)
                 .papeis(pessoaPapels)
                 .endereco(endereco)
                 .build();
 
-        pessoaService.inserirPessoa(pessoa);
+        try {
+            pessoaService.inserirPessoa(pessoa);
 
-        System.out.println("Pessoa cadastrada com sucesso!");
+            System.out.println("Pessoa cadastrada com sucesso!");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private void cadastrarPessoaJuridica() {
         String nome;
-        String documento;
+        CNPJ cnpj = null;
         List<PessoaPapel> pessoaPapels;
         Endereco endereco = null;
 
         System.out.print("Nome: ");
         nome = scanner.nextLine();
 
-        System.out.print("CNPJ: ");
-        documento = scanner.nextLine();
+        while (cnpj == null) {
+            try {
+                System.out.print("CNPJ: ");
+                cnpj = new CNPJ(scanner.nextLine());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
 
         pessoaPapels = cadastrarPapel();
 
@@ -151,14 +169,19 @@ public class PessoaMenu {
 
         Pessoa pessoa = Pessoa.builder()
                 .nome(nome)
-                .documento(new CNPJ(documento))
+                .documento(cnpj)
                 .papeis(pessoaPapels)
                 .endereco(endereco)
                 .build();
 
-        pessoaService.inserirPessoa(pessoa);
+        try {
+            pessoaService.inserirPessoa(pessoa);
 
-        System.out.println("Pessoa cadastrada com sucesso!");
+            System.out.println("Pessoa cadastrada com sucesso!");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public void removerPessoa() {
@@ -333,15 +356,7 @@ public class PessoaMenu {
                 System.out.print("Digite o nome: ");
                 pessoas = pessoaService.buscarPorNome(scanner.nextLine());
             }
-            case 3 -> {
-                System.out.print("Digite o ID: ");
-                try {
-                    pessoas.add(pessoaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-            case 4 -> pessoas = pessoaService.buscarTodosAtivo();
+            case 3 -> pessoas = pessoaService.buscarTodosAtivo();
             default -> System.out.println("opção inválida!");
         }
         exibirGrid(pessoas);
