@@ -6,11 +6,9 @@ import domain.movimento.StatusMovimento;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
 import domain.produto.Produto;
-import service.CategoriaService;
 import service.MovimentoService;
 import service.PessoaService;
 import service.ProdutoService;
-import ui.categoria.CategoriaMenu;
 import ui.pessoa.PessoaMenu;
 import ui.produto.ProdutoMenu;
 import util.ConsoleUtils;
@@ -22,18 +20,28 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MovimentoMenu {
-    private Scanner scanner = new Scanner(System.in);
-    private PessoaService pessoaService = new PessoaService();
-    private CategoriaService categoriaService = new CategoriaService();
-    private ProdutoService produtoService = new ProdutoService();
-    private MovimentoService movimentoService;
+    private final Scanner scanner;
+    private final PessoaService pessoaService;
+    private final ProdutoService produtoService;
+    private final MovimentoService movimentoService;
 
-    private PessoaMenu pessoaMenu = new PessoaMenu(pessoaService);
-    private CategoriaMenu categoriaMenu = new CategoriaMenu(categoriaService);
-    private ProdutoMenu produtoMenu = new ProdutoMenu(produtoService, categoriaService, categoriaMenu);
+    private final PessoaMenu pessoaMenu;
+    private final ProdutoMenu produtoMenu;
 
-    public MovimentoMenu(MovimentoService movimentoService) {
+    public MovimentoMenu(
+            Scanner scanner,
+            MovimentoService movimentoService,
+            PessoaService pessoaService,
+            ProdutoService produtoService,
+            PessoaMenu pessoaMenu,
+            ProdutoMenu produtoMenu) {
+
+        this.scanner = scanner;
         this.movimentoService = movimentoService;
+        this.pessoaService = pessoaService;
+        this.produtoService = produtoService;
+        this.pessoaMenu = pessoaMenu;
+        this.produtoMenu = produtoMenu;
     }
 
     public void iniciar() {
@@ -63,7 +71,7 @@ public class MovimentoMenu {
                 case 6 -> recuperarMovimento();
                 case 7 -> consultarMovimento();
                 case 0 -> System.out.println("Saindo...");
-                default ->System.out.println("Opção inválida");
+                default -> System.out.println("Opção inválida");
             }
 
         } while (opcao != 0);
@@ -441,7 +449,7 @@ public class MovimentoMenu {
         exibirGridMovimento(movimentoService.buscarTodos());
     }
 
-    private void detalhesMovimento (Movimento movimento) {
+    private void detalhesMovimento(Movimento movimento) {
         System.out.println("ID: " + movimento.getId());
         System.out.println("Cliente: " + movimento.getPessoa().getNome());
         System.out.println("Vendedor: " + movimento.getFuncionario().getNome());

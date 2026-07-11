@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class PessoaMenu {
-    private Scanner scanner = new Scanner(System.in);
-    private PessoaService pessoaService;
+    private final Scanner scanner;
+    private final PessoaService pessoaService;
 
-    public PessoaMenu(PessoaService pessoaService) {
+    public PessoaMenu(Scanner scanner, PessoaService pessoaService) {
+        this.scanner = scanner;
         this.pessoaService = pessoaService;
     }
 
@@ -234,87 +235,104 @@ public class PessoaMenu {
             System.out.println("Selecione um ID para atualizar");
             Pessoa pessoa = pessoaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID pessoa"));
 
-            System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
-            System.out.println("Nome Atual: " + pessoa.getNome());
-            System.out.println("Novo Nome:");
-
-            String nome = scanner.nextLine();
-            pessoa.setNome(nome.isEmpty() ? pessoa.getNome() : nome);
-
-            if (pessoa.getDocumento().getTipo().getCodigo() == 0) {
-                System.out.println("CPF Atual: " + pessoa.getDocumento());
-            } else {
-                System.out.println("CNPJ Atual: " + pessoa.getDocumento());
-            }
-            int op;
-            do {
-
-                System.out.println("Atualizar Documento");
-                System.out.println("1 - Física");
-                System.out.println("2 - Jurídica");
-                System.out.println("3 - Mnater Documento");
-
-                op = ConsoleUtils.lerInteiro(scanner, "valor");
-            } while (op != 1 && op != 2 && op != 3);
-
-            switch (op) {
-                case 1:
-                    System.out.println("Novo CPF:");
-                    pessoa.setDocumento(new CPF(scanner.nextLine()));
-                    break;
-                case 2:
-                    System.out.println("Novo CNPJ:");
-                    pessoa.setDocumento(new CNPJ(scanner.nextLine()));
-                    break;
-            }
-
-            if (ConsoleUtils.confirmar(scanner, "Deseja alterar os papéis ?")) {
-                pessoa.setPapeis(cadastrarPapel());
-            }
-
-            do {
-
-                System.out.println("Deseja alterar o Endereço ?");
-                System.out.println("1 - Atualizar Endereço");
-                System.out.println("2 - Adicionar Endereço");
-                System.out.println("3 - Remover Endereço");
-                System.out.println("4 - Manter Endereço atual");
-
-                op = ConsoleUtils.lerInteiro(scanner, "valor");
-            } while (op != 1 && op != 2 && op != 3 && op != 4);
-
-            switch (op) {
-                case 1, 2 -> {
-                    if (pessoa.getEndereco() != null) {
-                        atualizaEndereco(pessoa.getEndereco());
-                    } else {
-                        pessoa.setEndereco(cadastrarEndereco());
-                    }
-                }
-                case 3 -> pessoa.setEndereco(null);
-            }
-
-            do {
-                System.out.println("Ativo: " + (pessoa.isAtivo() ? "SIM" : "NÃO"));
-                System.out.println("Deseja mudar ?:");
-                System.out.println("1 - Ativo");
-                System.out.println("2 - Inativo");
-                System.out.println("3 - Manter atual");
-
-                op = ConsoleUtils.lerInteiro(scanner, "Opção");
-            } while (op != 1 && op != 2 && op != 3);
-
-            if (op == 1) {
-                pessoa.setAtivo(true);
-            } else if (op == 2) {
-                pessoa.setAtivo(false);
-            }
+            atualizarNome(pessoa);
+            atualizarDocumento(pessoa);
+            atualizarPapel(pessoa);
+            atualizarStatus(pessoa);
 
             if (pessoaService.atualizarPessoa(pessoa)) {
                 System.out.println("Pessoa " + pessoa.getNome() + " atualizado com sucesso!");
             }
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void atualizarNome(Pessoa pessoa) {
+        System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
+        System.out.println("Nome Atual: " + pessoa.getNome());
+        System.out.println("Novo Nome:");
+
+        String nome = scanner.nextLine();
+        pessoa.setNome(nome.isEmpty() ? pessoa.getNome() : nome);
+    }
+
+    private void atualizarDocumento(Pessoa pessoa) {
+        if (pessoa.getDocumento().getTipo().getCodigo() == 0) {
+            System.out.println("CPF Atual: " + pessoa.getDocumento());
+        } else {
+            System.out.println("CNPJ Atual: " + pessoa.getDocumento());
+        }
+        int op;
+        do {
+
+            System.out.println("Atualizar Documento");
+            System.out.println("1 - Física");
+            System.out.println("2 - Jurídica");
+            System.out.println("3 - Manter Documento");
+
+            op = ConsoleUtils.lerInteiro(scanner, "valor");
+        } while (op != 1 && op != 2 && op != 3);
+
+        switch (op) {
+            case 1:
+                System.out.println("Novo CPF:");
+                pessoa.setDocumento(new CPF(scanner.nextLine()));
+                break;
+            case 2:
+                System.out.println("Novo CNPJ:");
+                pessoa.setDocumento(new CNPJ(scanner.nextLine()));
+                break;
+        }
+    }
+
+    private void atualizarPapel(Pessoa pessoa) {
+        int op;
+
+        if (ConsoleUtils.confirmar(scanner, "Deseja alterar os papéis ?")) {
+            pessoa.setPapeis(cadastrarPapel());
+        }
+
+        do {
+
+            System.out.println("Deseja alterar o Endereço ?");
+            System.out.println("1 - Atualizar Endereço");
+            System.out.println("2 - Adicionar Endereço");
+            System.out.println("3 - Remover Endereço");
+            System.out.println("4 - Manter Endereço atual");
+
+            op = ConsoleUtils.lerInteiro(scanner, "valor");
+        } while (op != 1 && op != 2 && op != 3 && op != 4);
+
+        switch (op) {
+            case 1, 2 -> {
+                if (pessoa.getEndereco() != null) {
+                    atualizaEndereco(pessoa.getEndereco());
+                } else {
+                    pessoa.setEndereco(cadastrarEndereco());
+                }
+            }
+            case 3 -> pessoa.setEndereco(null);
+        }
+    }
+
+    private void atualizarStatus(Pessoa pessoa) {
+        int op;
+
+        do {
+            System.out.println("Ativo: " + (pessoa.isAtivo() ? "SIM" : "NÃO"));
+            System.out.println("Deseja mudar ?:");
+            System.out.println("1 - Ativo");
+            System.out.println("2 - Inativo");
+            System.out.println("3 - Manter atual");
+
+            op = ConsoleUtils.lerInteiro(scanner, "Opção");
+        } while (op != 1 && op != 2 && op != 3);
+
+        if (op == 1) {
+            pessoa.setAtivo(true);
+        } else if (op == 2) {
+            pessoa.setAtivo(false);
         }
     }
 

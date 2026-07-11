@@ -13,12 +13,18 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ProdutoMenu {
-    private Scanner scanner = new Scanner(System.in);
-    private ProdutoService produtoService;
-    private CategoriaService categoriaService;
-    private CategoriaMenu categoriaMenu;
+    private final Scanner scanner;
+    private final ProdutoService produtoService;
+    private final CategoriaService categoriaService;
+    private final CategoriaMenu categoriaMenu;
 
-    public ProdutoMenu(ProdutoService produtoService, CategoriaService categoriaService, CategoriaMenu categoriaMenu) {
+    public ProdutoMenu(
+            Scanner scanner,
+            ProdutoService produtoService,
+            CategoriaService categoriaService,
+            CategoriaMenu categoriaMenu) {
+
+        this.scanner = scanner;
         this.produtoService = produtoService;
         this.categoriaService = categoriaService;
         this.categoriaMenu = categoriaMenu;

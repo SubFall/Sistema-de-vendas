@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CategoriaMenu {
-    private Scanner scanner = new Scanner(System.in);
-    private CategoriaService categoriaService;
+    private final Scanner scanner;
+    private final CategoriaService categoriaService;
 
-    public CategoriaMenu(CategoriaService categoriaService) {
+    public CategoriaMenu(Scanner scanner, CategoriaService categoriaService) {
+        this.scanner = scanner;
         this.categoriaService = categoriaService;
     }
 
@@ -97,25 +98,10 @@ public class CategoriaMenu {
         try {
             Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID Categoria"));
 
-
             System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
-            System.out.println("Descricao Atual: " + categoria.getDescricao());
-            System.out.println("Nova Descricao:");
 
-            String descricao = scanner.nextLine();
-            categoria.setDescricao(descricao.isBlank() ? categoria.getDescricao() : descricao);
-
-            int op;
-            do {
-                System.out.println("Ativo: " + (categoria.isAtivo() ? "SIM" : "NÃO"));
-                System.out.println("Deseja mudar ?:");
-                System.out.println("1 - Ativo");
-                System.out.println("2 - Inativo");
-
-                op = ConsoleUtils.lerInteiro(scanner, "Opção");
-            } while (op != 1 && op != 2);
-
-            categoria.setAtivo(op == 1);
+            atualizarDescricao(categoria);
+            atualizarStatus(categoria);
 
             categoriaService.atualizarCategoria(categoria);
 
@@ -124,6 +110,28 @@ public class CategoriaMenu {
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void atualizarDescricao(Categoria categoria) {
+        System.out.println("Descricao Atual: " + categoria.getDescricao());
+        System.out.println("Nova Descricao:");
+
+        String descricao = scanner.nextLine();
+        categoria.setDescricao(descricao.isBlank() ? categoria.getDescricao() : descricao);
+    }
+
+    private void atualizarStatus(Categoria categoria) {
+        int op;
+        do {
+            System.out.println("Ativo: " + (categoria.isAtivo() ? "SIM" : "NÃO"));
+            System.out.println("Deseja mudar ?:");
+            System.out.println("1 - Ativo");
+            System.out.println("2 - Inativo");
+
+            op = ConsoleUtils.lerInteiro(scanner, "Opção");
+        } while (op != 1 && op != 2);
+
+        categoria.setAtivo(op == 1);
     }
 
     public void listar(int idLista) {
