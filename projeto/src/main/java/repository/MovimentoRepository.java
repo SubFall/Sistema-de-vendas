@@ -14,8 +14,8 @@ public class MovimentoRepository {
 
     public int inserirMovimento(Connection conn, Movimento movimento) {
         String sql = """
-                INSERT INTO movimento (id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total) 
-                VALUES (?, ?, ?, ?, ?, ?);
+                INSERT INTO movimento (id_pessoa, id_funcionario, status, tipo_movimento, data_movimento, quantidade_itens, valor_total) 
+                VALUES (?, ?, ?, ?, ?, ?, ?);
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -23,9 +23,10 @@ public class MovimentoRepository {
             ps.setInt(1, movimento.getPessoa().getId());
             ps.setInt(2, movimento.getFuncionario().getId());
             ps.setInt(3, movimento.getStatusMovimento().getCodigo());
-            ps.setTimestamp(4, Timestamp.valueOf(movimento.getDataMovimento()));
-            ps.setBigDecimal(5, movimento.getQuantidadeTotal());
-            ps.setBigDecimal(6, movimento.getValorTotal());
+            ps.setInt(4, movimento.getTipoMovimento().getCodigo());
+            ps.setTimestamp(5, Timestamp.valueOf(movimento.getDataMovimento()));
+            ps.setBigDecimal(6, movimento.getQuantidadeTotal());
+            ps.setBigDecimal(7, movimento.getValorTotal());
 
             ps.executeUpdate();
 

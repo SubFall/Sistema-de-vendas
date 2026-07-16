@@ -95,10 +95,11 @@ CREATE TABLE `eclipse_net`.`movimento`
     `id_pessoa`        INT            NOT NULL,
     `id_funcionario`   INT            NOT NULL,
     `status`           INT            NOT NULL,
+    `tipo_movimento`   INT            NOT NULL,
     `data_movimento`   DATETIME       NOT NULL,
     `quantidade_itens` DECIMAL(15, 2) NOT NULL,
     `valor_total`      DECIMAL(15, 2) NOT NULL,
-        PRIMARY KEY (`id_movimento`),
+    PRIMARY KEY (`id_movimento`),
     INDEX              `id_cliente_idx` (`id_pessoa` ASC) VISIBLE,
     INDEX              `id_funcionario_idx` (`id_funcionario` ASC) VISIBLE,
     CONSTRAINT `fk_movimento_pessoa`
