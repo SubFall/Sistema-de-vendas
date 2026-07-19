@@ -137,3 +137,12 @@ CREATE TABLE `eclipse_net`.`movimento_item`
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
+
+CREATE TABLE `eclipse_net`.`estoque`
+(
+    `id_estoque` INT            NOT NULL AUTO_INCREMENT,
+    `id_produto` INT            NOT NULL,
+    `quantidade` DECIMAL(15, 2) NOT NULL,
+    PRIMARY KEY (`id_estoque`)
+);
+
