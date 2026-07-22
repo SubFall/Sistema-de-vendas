@@ -146,3 +146,15 @@ CREATE TABLE `eclipse_net`.`estoque`
     PRIMARY KEY (`id_estoque`)
 );
 
+CREATE TABLE `eclipse_net`.`historico_estoque`
+(
+    `id_historico_estoque` INT            NOT NULL AUTO_INCREMENT,
+    `id_produto`           INT            NOT NULL,
+    `id_movimento`         INT            NOT NULL,
+    `tipo_movimento`       INT            NOT NULL,
+    `quantidade`           DECIMAL(15, 2) NOT NULL,
+    `saldo_anterior`       DECIMAL(15, 2) NOT NULL,
+    `saldo_atual`          DECIMAL(15, 2) NOT NULL,
+    PRIMARY KEY (`id_historico_estoque`)
+);
+

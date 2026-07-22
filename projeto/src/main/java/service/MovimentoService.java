@@ -26,19 +26,18 @@ public class MovimentoService {
             conn = ConnectionFactory.getConnection();
             conn.setAutoCommit(false);
 
-
             int idMovimento = movimentoRepository.inserirMovimento(conn, movimento);
 
-            switch (movimento.getTipoMovimento()) {
-                case SAIDA -> System.out.println("SAIDA");
-                case ENTRADA -> System.out.println("ENTRADA");
-                case AJUSTE -> System.out.println("AJUSTE");
-            }
-
             for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
-                boolean inseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
+                boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
 
-                if (!inseriu) {
+                switch (movimento.getTipoMovimento()) {
+                    case SAIDA -> System.out.println("SAIDA");
+                    case ENTRADA -> System.out.println("ENTRADA");
+                    case AJUSTE -> System.out.println("AJUSTE");
+                }
+
+                if (!isInseriu) {
                     throw new IllegalArgumentException("Erro ao inserir item do movimento");
                 }
             }
