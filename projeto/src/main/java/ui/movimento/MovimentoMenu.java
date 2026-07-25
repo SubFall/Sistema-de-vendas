@@ -3,7 +3,7 @@ package ui.movimento;
 import domain.movimento.Movimento;
 import domain.movimento.MovimentoItem;
 import domain.movimento.StatusMovimento;
-import domain.movimento.TipoMovimento;
+import domain.movimento.Tipo;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
 import domain.produto.Produto;
@@ -276,7 +276,7 @@ public class MovimentoMenu {
                 .pessoa(cliente)
                 .funcionario(vendedor)
                 .movimentoItens(movimentoItens)
-                .tipoMovimento(TipoMovimento.SAIDA)
+                .tipo(Tipo.SAIDA)
                 .build();
         if (opcao == 2) {
             movimento.setStatusMovimento(StatusMovimento.FINALIZADO);

@@ -3,6 +3,7 @@ package repository;
 import conn.ConnectionFactory;
 import domain.movimento.Movimento;
 import domain.movimento.StatusMovimento;
+import domain.movimento.Tipo;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class MovimentoRepository {
 
     public int inserirMovimento(Connection conn, Movimento movimento) {
         String sql = """
-                INSERT INTO movimento (id_pessoa, id_funcionario, status, tipo_movimento, data_movimento, quantidade_itens, valor_total) 
+                INSERT INTO movimento (id_pessoa, id_funcionario, status, tipo, data_movimento, quantidade_itens, valor_total) 
                 VALUES (?, ?, ?, ?, ?, ?, ?);
                 """;
 
@@ -23,7 +24,7 @@ public class MovimentoRepository {
             ps.setInt(1, movimento.getPessoa().getId());
             ps.setInt(2, movimento.getFuncionario().getId());
             ps.setInt(3, movimento.getStatusMovimento().getCodigo());
-            ps.setInt(4, movimento.getTipoMovimento().getCodigo());
+            ps.setInt(4, movimento.getTipo().getCodigo());
             ps.setTimestamp(5, Timestamp.valueOf(movimento.getDataMovimento()));
             ps.setBigDecimal(6, movimento.getQuantidadeTotal());
             ps.setBigDecimal(7, movimento.getValorTotal());
@@ -121,7 +122,7 @@ public class MovimentoRepository {
 
     public Movimento buscarPorId(int idMovimento) {
         String sql = """
-                SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
+                SELECT id_movimento, id_pessoa, id_funcionario, status, tipo, data_movimento, quantidade_itens, valor_total 
                 FROM movimento WHERE id_movimento = ?;
                 """;
 
@@ -143,7 +144,7 @@ public class MovimentoRepository {
 
     public Movimento buscarPorIdStatus(int idMovimento, StatusMovimento statusMovimento) {
         String sql = """
-                SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
+                SELECT id_movimento, id_pessoa, id_funcionario, status, tipo, data_movimento, quantidade_itens, valor_total 
                 FROM movimento WHERE id_movimento = ? AND status = ?;
                 """;
 
@@ -167,7 +168,7 @@ public class MovimentoRepository {
     public List<Movimento> buscarTodos() {
         List<Movimento> movimentos = new ArrayList<>();
         String sql = """
-                SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
+                SELECT id_movimento, id_pessoa, id_funcionario, status, tipo, data_movimento, quantidade_itens, valor_total 
                 FROM movimento;
                 """;
 
@@ -188,7 +189,7 @@ public class MovimentoRepository {
     public List<Movimento> buscarPorStatus(StatusMovimento statusMovimento) {
         List<Movimento> movimentos = new ArrayList<>();
         String sql = """
-                SELECT id_movimento, id_pessoa, id_funcionario, status, data_movimento, quantidade_itens, valor_total 
+                SELECT id_movimento, id_pessoa, id_funcionario, status, tipo, data_movimento, quantidade_itens, valor_total 
                 FROM movimento WHERE status = ?;
                 """;
 
@@ -213,6 +214,7 @@ public class MovimentoRepository {
                 .pessoa(pessoaRepository.buscarPorId(rs.getInt("id_pessoa")))
                 .funcionario(pessoaRepository.buscarPorId(rs.getInt("id_funcionario")))
                 .statusMovimento(StatusMovimento.porCodigo(rs.getInt("status")))
+                .tipo(Tipo.porCodigo(rs.getInt("tipo")))
                 .dataMovimento(rs.getTimestamp("data_movimento").toLocalDateTime())
                 .movimentoItens(movimentoItemRepository.buscarPorIdMovimento(rs.getInt("id_movimento")))
                 .build();

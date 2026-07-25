@@ -2,7 +2,7 @@ package repository;
 
 import domain.estoque.HistoricoEstoque;
 import domain.movimento.Movimento;
-import domain.movimento.TipoMovimento;
+import domain.movimento.Tipo;
 import domain.produto.Produto;
 
 import java.math.BigDecimal;
@@ -16,18 +16,18 @@ public class HistoricoEstoqueRepository {
     private MovimentoRepository movimentoRepository = new MovimentoRepository();
 
     public boolean inserirHistoricoEstoque(
-            Connection conn, int idProduto, int idMoivmento, int tipoMovimento,
+            Connection conn, int idProduto, int idMoivmento, int tipo,
             BigDecimal quantidade, BigDecimal saldoAnterior, BigDecimal saldoAtual
     ) {
         String sql = """
-                INSERT INTO historico_estoque (id_produto, id_movimento, tipo_movimento, quantidade, saldo_anterior, saldo_atual)
+                INSERT INTO historico_estoque (id_produto, id_movimento, tipo, quantidade, saldo_anterior, saldo_atual)
                 VALUES (?, ?, ?, ?, ?, ?);
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idProduto);
             ps.setInt(2, idMoivmento);
-            ps.setInt(3, tipoMovimento);
+            ps.setInt(3, tipo);
             ps.setBigDecimal(4, quantidade);
             ps.setBigDecimal(5, saldoAnterior);
             ps.setBigDecimal(6, saldoAtual);
@@ -40,7 +40,7 @@ public class HistoricoEstoqueRepository {
 
     public HistoricoEstoque buscarPorId(Connection conn, int idProduto) {
         String sql = """
-                SELECT id_produto, id_movimento, tipo_movimento, quantidade, saldo_anterior, saldo_atual 
+                SELECT id_produto, id_movimento, tipo, quantidade, saldo_anterior, saldo_atual 
                 FROM historico_estoque WHERE id_produto = ?;
     """;
 
@@ -55,7 +55,7 @@ public class HistoricoEstoqueRepository {
                 return HistoricoEstoque.builder()
                         .produto(produto)
                         .movimento(movimento)
-                        .tipoMovimento(TipoMovimento.porCodigo(rs.getInt("tipo_movimento")))
+                        .tipo(Tipo.porCodigo(rs.getInt("tipo")))
                         .quantidade(rs.getBigDecimal("quantidade"))
                         .saldoAnterior(rs.getBigDecimal("saldo_anterior"))
                         .saldoAtual(rs.getBigDecimal("saldo_atual"))

@@ -1,8 +1,6 @@
 package repository;
 
-import conn.ConnectionFactory;
 import domain.estoque.Estoque;
-import domain.produto.Produto;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -11,8 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class EstoqueRepository {
-    ProdutoRepository produtoRepository = new ProdutoRepository();
-    
+//    ProdutoRepository produtoRepository = new ProdutoRepository();
+
     public boolean inserirEstoque(Connection conn, int idProduto, BigDecimal saldo) {
         String sql = "INSERT INTO estoque (id_produto, quantidade) VALUES (?, ?);";
 
@@ -39,17 +37,16 @@ public class EstoqueRepository {
         }
     }
 
-    public Estoque buscarPorProduto(int idProduto) {
+    public Estoque buscarPorIdProduto(Connection conn, int idProduto) {
         String sql = "SELECT id_estoque, id_produto, quantidade FROM estoque WHERE id_produto = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idProduto);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Estoque.builder()
-                            .produto(produtoRepository.buscarPorId(rs.getInt("id_produto")))
+                            .idProduto(rs.getInt("id_produto"))
                             .quantidade(rs.getBigDecimal("quantidade"))
                             .build();
                 }

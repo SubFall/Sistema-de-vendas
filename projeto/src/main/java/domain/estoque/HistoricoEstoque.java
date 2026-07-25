@@ -1,7 +1,7 @@
 package domain.estoque;
 
 import domain.movimento.Movimento;
-import domain.movimento.TipoMovimento;
+import domain.movimento.Tipo;
 import domain.produto.Produto;
 
 import java.math.BigDecimal;
@@ -9,15 +9,15 @@ import java.math.BigDecimal;
 public class HistoricoEstoque {
     private Produto produto;
     private Movimento movimento;
-    private TipoMovimento tipoMovimento;
+    private Tipo tipo;
     private BigDecimal quantidade;
     private BigDecimal saldoAnterior;
     private BigDecimal saldoAtual;
 
-    private HistoricoEstoque(Produto produto, Movimento movimento, TipoMovimento tipoMovimento, BigDecimal quantidade, BigDecimal saldoAnterior, BigDecimal saldoAtual) {
+    private HistoricoEstoque(Produto produto, Movimento movimento, Tipo tipo, BigDecimal quantidade, BigDecimal saldoAnterior, BigDecimal saldoAtual) {
         this.produto = produto;
         this.movimento = movimento;
-        this.tipoMovimento = tipoMovimento;
+        this.tipo = tipo;
         this.quantidade = quantidade;
         this.saldoAnterior = saldoAnterior;
         this.saldoAtual = saldoAtual;
@@ -30,7 +30,7 @@ public class HistoricoEstoque {
     public static final class HistoricoEstoqueBuilder {
         private Produto produto;
         private Movimento movimento;
-        private TipoMovimento tipoMovimento;
+        private Tipo tipo;
         private BigDecimal quantidade;
         private BigDecimal saldoAnterior;
         private BigDecimal saldoAtual;
@@ -45,8 +45,8 @@ public class HistoricoEstoque {
             return this;
         }
 
-        public HistoricoEstoqueBuilder tipoMovimento(TipoMovimento tipoMovimento) {
-            this.tipoMovimento = tipoMovimento;
+        public HistoricoEstoqueBuilder tipo(Tipo tipo) {
+            this.tipo = tipo;
             return this;
         }
 
@@ -66,7 +66,7 @@ public class HistoricoEstoque {
         }
 
         public HistoricoEstoque build() {
-            return new HistoricoEstoque(produto, movimento, tipoMovimento, quantidade, saldoAnterior, saldoAtual);
+            return new HistoricoEstoque(produto, movimento, tipo, quantidade, saldoAnterior, saldoAtual);
         }
     }
 
@@ -78,8 +78,8 @@ public class HistoricoEstoque {
         return movimento;
     }
 
-    public TipoMovimento getTipoMovimento() {
-        return tipoMovimento;
+    public Tipo getTipoMovimento() {
+        return tipo;
     }
 
     public BigDecimal getQuantidade() {

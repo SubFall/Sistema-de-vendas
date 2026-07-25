@@ -1,15 +1,13 @@
 package domain.estoque;
 
-import domain.produto.Produto;
-
 import java.math.BigDecimal;
 
 public class Estoque {
-    private Produto produto;
+    private int idProduto;
     private BigDecimal quantidade;
 
-    private Estoque(Produto produto, BigDecimal quantidade) {
-        this.produto = produto;
+    private Estoque(int idProduto, BigDecimal quantidade) {
+        this.idProduto = idProduto;
         this.quantidade = quantidade;
     }
 
@@ -18,11 +16,11 @@ public class Estoque {
     }
 
     public static final class EstoqueBuilder {
-        private Produto produto;
+        private int idProduto;
         private BigDecimal quantidade;
 
-        public EstoqueBuilder produto(Produto produto) {
-            this.produto = produto;
+        public EstoqueBuilder idProduto(int idProduto) {
+            this.idProduto = idProduto;
             return this;
         }
 
@@ -32,15 +30,17 @@ public class Estoque {
         }
 
         public Estoque build() {
-            return new Estoque(produto, quantidade);
+            return new Estoque(idProduto, quantidade);
         }
     }
 
-    public Produto getProduto() {
-        return produto;
+    public int getIdProduto() {
+        return idProduto;
     }
 
     public BigDecimal getQuantidade() {
+        if (quantidade == null) return BigDecimal.ZERO;
+
         return quantidade;
     }
 }

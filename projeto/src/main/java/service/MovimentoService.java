@@ -16,6 +16,7 @@ import java.util.List;
 public class MovimentoService {
     MovimentoRepository movimentoRepository = new MovimentoRepository();
     MovimentoItemRepository movimentoItemRepository = new MovimentoItemRepository();
+    HistoricoEstoqueService historicoEstoqueService = new HistoricoEstoqueService();
 
     public void inserirMovimento(Movimento movimento) {
         Connection conn = null;
@@ -31,10 +32,9 @@ public class MovimentoService {
             for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
                 boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
 
-                switch (movimento.getTipoMovimento()) {
-                    case SAIDA -> System.out.println("SAIDA");
-                    case ENTRADA -> System.out.println("ENTRADA");
-                    case AJUSTE -> System.out.println("AJUSTE");
+                if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
+                    historicoEstoqueService.movimentar(conn, movimentoItem.getProduto().getId(), idMovimento,
+                            movimentoItem.getQuantidade(), movimento.getTipo());
                 }
 
                 if (!isInseriu) {
@@ -83,6 +83,11 @@ public class MovimentoService {
             for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
                 validarProdutoAtivo(movimentoItem.getProduto());
                 movimentoItemRepository.inserirMovimentoItem(conn, movimento.getId(), movimentoItem);
+
+                if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
+                    historicoEstoqueService.movimentar(conn, movimentoItem.getProduto().getId(),
+                            movimento.getId(), movimentoItem.getQuantidade(), movimento.getTipo());
+                }
             }
 
             conn.commit();
@@ -125,6 +130,38 @@ public class MovimentoService {
     public boolean finalizarMovimento(int idMovimento) {
         Movimento movimento = validarMovimentoNaoNulo(buscarPorId(idMovimento));
         validarMovimentoAberto(movimento);
+
+        Connection conn = null;
+        try {
+            conn = ConnectionFactory.getConnection();
+            conn.setAutoCommit(false);
+
+            for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
+
+                historicoEstoqueService.movimentar(conn, movimentoItem.getProduto().getId(),
+                        movimento.getId(), movimentoItem.getQuantidade(), movimento.getTipo());
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Erro ao realizar rollback", ex);
+            }
+
+            throw new RuntimeException("Erro ao inserir estoque", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro ao fechar a conexão", e);
+            }
+        }
         return movimentoRepository.finalizarMovimento(movimento.getId());
     }
 

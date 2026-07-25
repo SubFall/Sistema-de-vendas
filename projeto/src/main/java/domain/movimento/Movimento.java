@@ -13,17 +13,17 @@ public class Movimento {
     private Pessoa pessoa;
     private Pessoa funcionario;
     private StatusMovimento statusMovimento;
-    private TipoMovimento tipoMovimento;
+    private Tipo tipo;
     private LocalDateTime dataMovimento;
     private List<MovimentoItem> movimentoItens;
 
     public Movimento(int id, Pessoa pessoa, Pessoa funcionario, StatusMovimento statusMovimento,
-                     TipoMovimento tipoMovimento, LocalDateTime dataMovimento, List<MovimentoItem> movimentoItens) {
+                     Tipo tipo, LocalDateTime dataMovimento, List<MovimentoItem> movimentoItens) {
         this.id = id;
         this.pessoa = pessoa;
         this.funcionario = funcionario;
         this.statusMovimento = statusMovimento;
-        this.tipoMovimento = tipoMovimento;
+        this.tipo = tipo;
         this.dataMovimento = dataMovimento;
         this.movimentoItens = new ArrayList<>(movimentoItens);
     }
@@ -37,7 +37,7 @@ public class Movimento {
         private Pessoa pessoa;
         private Pessoa funcionario;
         private StatusMovimento statusMovimento = StatusMovimento.ABERTO;
-        private TipoMovimento tipoMovimento;
+        private Tipo tipo;
         private LocalDateTime dataMovimento = LocalDateTime.now();
         private List<MovimentoItem> movimentoItens;
 
@@ -61,8 +61,8 @@ public class Movimento {
             return this;
         }
 
-        public MovimentoBuilder tipoMovimento(TipoMovimento tipoMovimento) {
-            this.tipoMovimento = tipoMovimento;
+        public MovimentoBuilder tipo(Tipo tipo) {
+            this.tipo = tipo;
             return this;
         }
 
@@ -89,7 +89,7 @@ public class Movimento {
             if (movimentoItens.isEmpty()) {
                 throw new IllegalArgumentException("Movimento sem itens");
             }
-            return new Movimento(id, pessoa, funcionario, statusMovimento, tipoMovimento, dataMovimento, movimentoItens);
+            return new Movimento(id, pessoa, funcionario, statusMovimento, tipo, dataMovimento, movimentoItens);
         }
     }
 
@@ -121,12 +121,12 @@ public class Movimento {
         this.statusMovimento = statusMovimento;
     }
 
-    public TipoMovimento getTipoMovimento() {
-        return tipoMovimento;
+    public Tipo getTipo() {
+        return tipo;
     }
 
-    public void setTipoMovimento(TipoMovimento tipoMovimento) {
-        this.tipoMovimento = tipoMovimento;
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
     }
 
     public LocalDateTime getDataMovimento() {
