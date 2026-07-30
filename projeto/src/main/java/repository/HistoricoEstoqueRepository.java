@@ -15,22 +15,19 @@ public class HistoricoEstoqueRepository {
     private ProdutoRepository produtoRepository = new ProdutoRepository();
     private MovimentoRepository movimentoRepository = new MovimentoRepository();
 
-    public boolean inserirHistoricoEstoque(
-            Connection conn, int idProduto, int idMoivmento, int tipo,
-            BigDecimal quantidade, BigDecimal saldoAnterior, BigDecimal saldoAtual
-    ) {
+    public boolean inserirHistoricoEstoque(Connection conn, HistoricoEstoque historicoEstoque) {
         String sql = """
                 INSERT INTO historico_estoque (id_produto, id_movimento, tipo, quantidade, saldo_anterior, saldo_atual)
                 VALUES (?, ?, ?, ?, ?, ?);
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idProduto);
-            ps.setInt(2, idMoivmento);
-            ps.setInt(3, tipo);
-            ps.setBigDecimal(4, quantidade);
-            ps.setBigDecimal(5, saldoAnterior);
-            ps.setBigDecimal(6, saldoAtual);
+            ps.setInt(1, historicoEstoque.getProduto().getId());
+            ps.setInt(2, historicoEstoque.getMovimento().getId());
+            ps.setInt(3, historicoEstoque.getTipo().getCodigo());
+            ps.setBigDecimal(4, historicoEstoque.getQuantidade());
+            ps.setBigDecimal(5, historicoEstoque.getSaldoAnterior());
+            ps.setBigDecimal(6, historicoEstoque.getSaldoAtual());
 
             return ps.executeUpdate() > 0;
         }catch (SQLException e) {

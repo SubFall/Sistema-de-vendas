@@ -78,7 +78,7 @@ public class HistoricoEstoque {
         return movimento;
     }
 
-    public Tipo getTipoMovimento() {
+    public Tipo getTipo() {
         return tipo;
     }
 

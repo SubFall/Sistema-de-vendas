@@ -33,7 +33,7 @@ public class MovimentoService {
                 boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
 
                 if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
-                    historicoEstoqueService.movimentar(conn, movimentoItem.getProduto().getId(), idMovimento,
+                    historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(), movimento,
                             movimentoItem.getQuantidade(), movimento.getTipo());
                 }
 
@@ -85,8 +85,8 @@ public class MovimentoService {
                 movimentoItemRepository.inserirMovimentoItem(conn, movimento.getId(), movimentoItem);
 
                 if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
-                    historicoEstoqueService.movimentar(conn, movimentoItem.getProduto().getId(),
-                            movimento.getId(), movimentoItem.getQuantidade(), movimento.getTipo());
+                    historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(),
+                            movimento, movimentoItem.getQuantidade(), movimento.getTipo());
                 }
             }
 
@@ -138,8 +138,8 @@ public class MovimentoService {
 
             for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
 
-                historicoEstoqueService.movimentar(conn, movimentoItem.getProduto().getId(),
-                        movimento.getId(), movimentoItem.getQuantidade(), movimento.getTipo());
+                historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(),
+                        movimento, movimentoItem.getQuantidade(), movimento.getTipo());
             }
 
             conn.commit();

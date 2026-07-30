@@ -1,7 +1,10 @@
 package service;
 
 import domain.estoque.Estoque;
+import domain.estoque.HistoricoEstoque;
+import domain.movimento.Movimento;
 import domain.movimento.Tipo;
+import domain.produto.Produto;
 import repository.EstoqueRepository;
 import repository.HistoricoEstoqueRepository;
 
@@ -13,21 +16,33 @@ public class HistoricoEstoqueService {
     private final EstoqueRepository estoqueRepository = new EstoqueRepository();
     private final EstoqueService estoqueService = new EstoqueService();
 
-
     public void movimentar(
-            Connection conn, int idProduto, int idMoivmento, BigDecimal quantidade, Tipo tipo
+            Connection conn, Produto produto, Movimento movimento, BigDecimal quantidade, Tipo tipo
     ) {
-        Estoque estoque = estoqueRepository.buscarPorIdProduto(conn, idProduto);
-        BigDecimal saldoAnterior = estoque.getQuantidade();
-        BigDecimal saldoAtual = tipo == Tipo.SAIDA
-                ? estoque.getQuantidade().subtract(quantidade)
+
+        Estoque estoque = estoqueRepository.buscarPorIdProduto(conn, produto.getId());
+
+        if (tipo == Tipo.SAIDA && estoque.getQuantidade().compareTo(quantidade) < 0) {
+            throw new IllegalArgumentException("Não permititdo! saldo insuficiente para a operação.");
+        }
+
+        BigDecimal bigDecimal = tipo == Tipo.SAIDA ? estoque.getQuantidade().subtract(quantidade)
                 : estoque.getQuantidade().add(quantidade);
 
-        historicoEstoqueRepository.inserirHistoricoEstoque(
-                conn, idProduto, idMoivmento, tipo.getCodigo(), quantidade, saldoAnterior, saldoAtual
-        );
+        BigDecimal saldoAnterior = estoque.getQuantidade();
 
-        estoqueService.salvarEstoque(conn, idProduto, saldoAtual);
+        HistoricoEstoque historicoEstoque = HistoricoEstoque.builder()
+                .produto(produto)
+                .movimento(movimento)
+                .tipo(tipo)
+                .quantidade(quantidade)
+                .saldoAnterior(saldoAnterior)
+                .saldoAtual(bigDecimal)
+                .build();
+
+        historicoEstoqueRepository.inserirHistoricoEstoque(conn, historicoEstoque);
+
+        estoqueService.salvarEstoque(conn, historicoEstoque.getProduto().getId(), historicoEstoque.getSaldoAtual());
     }
 
 }
