@@ -158,3 +158,28 @@ CREATE TABLE `eclipse_net`.`historico_estoque`
     PRIMARY KEY (`id_historico_estoque`)
 );
 
+CREATE TABLE `eclipse_net`.`ajuste_estoque`
+(
+    `id_ajuste_estoque` INT         NOT NULL AUTO_INCREMENT,
+    `titulo`            VARCHAR(60) NOT NULL,
+    `data`              DATETIME    NOT NULL,
+    `status`            INT         NOT NULL,
+    PRIMARY KEY (`id_ajuste_estoque`)
+);
+
+CREATE TABLE `eclipse_net`.`ajuste_estoque_itens`
+(
+    `id_ajuste_estoque_itens` INT            NOT NULL AUTO_INCREMENT,
+    `id_produto`              INT            NOT NULL,
+    `saldo`                   DECIMAL(15, 2) NOT NULL,
+    `contagem`                DECIMAL(15, 2) NOT NULL,
+    `diferenca`               DECIMAL(15, 2) NOT NULL,
+    `id_ajuste_estoque`       INT            NOT NULL,
+    PRIMARY KEY (`id_ajuste_estoque_itens`),
+    INDEX                     `id_idx` (`id_ajuste_estoque` ASC) VISIBLE,
+    CONSTRAINT `fk_ajuste_estoque_item`
+        FOREIGN KEY (`id_ajuste_estoque`)
+            REFERENCES `eclipse_net`.`ajuste_estoque` (`id_ajuste_estoque`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);

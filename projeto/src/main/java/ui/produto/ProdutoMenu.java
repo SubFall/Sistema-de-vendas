@@ -227,6 +227,10 @@ public class ProdutoMenu {
         }
     }
 
+    /**
+     *
+     * @param idLista 1 Lista todos, 2 Lista por Descrição, 3 Lista por ID e 4 Lista todos ativos
+     */
     public void listar(int idLista) {
         List<Produto> produtos = new ArrayList<>();
         switch (idLista) {

@@ -4,6 +4,7 @@ import service.CategoriaService;
 import service.MovimentoService;
 import service.PessoaService;
 import service.ProdutoService;
+import ui.ajusteestoque.AjusteEstoqueMenu;
 import ui.categoria.CategoriaMenu;
 import ui.movimento.MovimentoMenu;
 import ui.pessoa.PessoaMenu;
@@ -23,6 +24,7 @@ public class Principal {
     private final PessoaMenu pessoaMenu = new PessoaMenu(scanner, pessoaService);
     private final CategoriaMenu categoriaMenu = new CategoriaMenu(scanner, categoriaService);
     private final ProdutoMenu produtoMenu = new ProdutoMenu(scanner, produtoService, categoriaService, categoriaMenu);
+    private final AjusteEstoqueMenu ajusteEstoqueMenu = new AjusteEstoqueMenu(scanner, produtoMenu, produtoService);
     private final MovimentoMenu movimentoMenu =
             new MovimentoMenu(
                     scanner,
@@ -45,6 +47,7 @@ public class Principal {
             System.out.println("|2 - Produto                  |");
             System.out.println("|3 - Categoria                |");
             System.out.println("|4 - Movimento                |");
+            System.out.println("|5 - Ajuste Estoque           |");
             System.out.println("|0 - Sair                     |");
             System.out.println("|*****************************|");
             System.out.print("Opção: ");
@@ -57,6 +60,7 @@ public class Principal {
                 case 2 -> produtoMenu.iniciar();
                 case 3 -> categoriaMenu.iniciar();
                 case 4 -> movimentoMenu.iniciar();
+                case 5 -> ajusteEstoqueMenu.iniciar();
                 case 0 -> {
                     System.out.println("Saindo...");
                     return;

@@ -1,71 +1,58 @@
 package domain.ajusteestoque;
 
-import domain.estoque.Estoque;
-import domain.produto.Produto;
-
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class AjusteEstoque {
-    private Produto produto;
-    private Estoque estoque;
-    private BigDecimal contagem;
-    private BigDecimal diferenca;
+    private String titulo;
+    private LocalDateTime dateTime;
+    private Status status;
+    private AjusteEstoqueItens ajusteEstoqueItens;
 
-    private AjusteEstoque(Produto produto, Estoque estoque, BigDecimal contagem, BigDecimal diferenca) {
-        this.produto = produto;
-        this.estoque = estoque;
-        this.contagem = contagem;
-        this.diferenca = diferenca;
+    private AjusteEstoque(String titulo, Status status, AjusteEstoqueItens ajusteEstoqueItens) {
+        this.titulo = titulo;
+        this.dateTime = LocalDateTime.now();
+        this.status = status;
+        this.ajusteEstoqueItens = ajusteEstoqueItens;
     }
 
-    public static AjusteEstoqueBuilder Builder() {
-        return new AjusteEstoqueBuilder();
+    public static AjusteEstoqueItens.AjusteEstoqueBuilder Builder() {
+        return new AjusteEstoqueItens.AjusteEstoqueBuilder();
     }
 
     public static class AjusteEstoqueBuilder {
-        private Produto produto;
-        private Estoque estoque;
-        private BigDecimal contagem;
-        private BigDecimal diferenca;
+        private String titulo;
+        private Status status;
+        private AjusteEstoqueItens ajusteEstoqueItens;
 
-        public AjusteEstoqueBuilder produto(Produto produto) {
-            this.produto = produto;
+        public AjusteEstoqueBuilder titulo(String titulo) {
+            this.titulo = titulo;
             return this;
         }
 
-        public AjusteEstoqueBuilder estoque(Estoque estoque) {
-            this.estoque = estoque;
+        public AjusteEstoqueBuilder status(Status status) {
+            this.status = status;
             return this;
         }
 
-        public AjusteEstoqueBuilder contagem(BigDecimal contagem) {
-            this.contagem = contagem;
+        public AjusteEstoqueBuilder ajusteEstoqueItens(AjusteEstoqueItens ajusteEstoqueItens ) {
+            this.ajusteEstoqueItens = ajusteEstoqueItens;
             return this;
         }
-
-        public AjusteEstoqueBuilder diferenca(BigDecimal diferenca) {
-            this.diferenca = diferenca;
-            return this;
-        }
-
+        
         public AjusteEstoque build() {
-            return new AjusteEstoque(produto, estoque, contagem, diferenca);
+            return new AjusteEstoque(titulo, status, ajusteEstoqueItens);
         }
     }
 
-    public Produto getProduto() {
-        return produto;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public Estoque getEstoque() {
-        return estoque;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public BigDecimal getContagem() {
-        return contagem;
-    }
-
-    public BigDecimal getDiferenca() {
-        return diferenca;
+    public Status getStatus() {
+        return status;
     }
 }
