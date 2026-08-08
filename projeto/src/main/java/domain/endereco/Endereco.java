@@ -1,6 +1,5 @@
 package domain.endereco;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -20,8 +19,7 @@ public class Endereco {
         this.cidade = cidade;
         this.uf = validaUF(uf);
         this.bairro = bairro;
-        this.numero = numero;
-        cep = cep.replaceAll("\\D", "");
+        this.numero = validaNumero(numero);
         validaCep(cep);
         this.cep = cep;
         this.idPessoa = idPessoa;
@@ -87,18 +85,35 @@ public class Endereco {
     }
 
     private void validaCep(String cep) {
+        if (cep == null) {
+            throw new IllegalArgumentException("Cep Não pode ser vazio");
+        }
+
+        cep = cep.replaceAll("\\D", "");
+
         if (cep.length() != 8) {
             throw new IllegalArgumentException("Cep Inválido!");
         }
     }
 
     private String validaUF(String uf) {
+        if (uf == null) {
+            throw new IllegalArgumentException("UF Não pode ser vazio");
+        }
+
         uf = uf.trim().toUpperCase();
 
         if (!UFs().contains(uf)) {
             throw new IllegalArgumentException("Estado inválido.");
         }
         return uf;
+    }
+
+    private String validaNumero(String numero) {
+        if (numero != null) {
+            return numero.replaceAll("\\D", "");
+        }
+        return null;
     }
 
     public int getId() {

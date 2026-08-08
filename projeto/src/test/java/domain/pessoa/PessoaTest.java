@@ -3,6 +3,7 @@ package domain.pessoa;
 import domain.documento.CNPJ;
 import domain.documento.CPF;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class PessoaTest {
