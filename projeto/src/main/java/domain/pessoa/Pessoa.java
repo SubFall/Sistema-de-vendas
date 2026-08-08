@@ -71,6 +71,15 @@ public class Pessoa {
         }
 
         public Pessoa build() {
+
+            if (nome == null || nome.isBlank()) {
+                throw new IllegalArgumentException("Nome não pode ser vázio");
+            }
+
+            if (documento == null || documento.getValor().isBlank()) {
+                throw new IllegalArgumentException("Documento não pode ser vázio");
+            }
+
             return new Pessoa(id, nome, documento, papeis, ativo, endereco);
         }
     }
