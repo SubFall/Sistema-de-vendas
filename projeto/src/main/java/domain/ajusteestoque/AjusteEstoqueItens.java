@@ -68,4 +68,14 @@ public class AjusteEstoqueItens {
     public BigDecimal getDiferenca() {
         return diferenca;
     }
+
+    @Override
+    public String toString() {
+        return "AjusteEstoqueItens{" +
+                "produto=" + produto.getId() +
+                ", estoque=" + estoque.getQuantidade() +
+                ", contagem=" + contagem +
+                ", diferenca=" + diferenca +
+                '}';
+    }
 }

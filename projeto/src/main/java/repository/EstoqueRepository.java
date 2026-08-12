@@ -1,5 +1,6 @@
 package repository;
 
+import conn.ConnectionFactory;
 import domain.estoque.Estoque;
 
 import java.math.BigDecimal;
@@ -41,6 +42,27 @@ public class EstoqueRepository {
         String sql = "SELECT id_estoque, id_produto, quantidade FROM estoque WHERE id_produto = ?;";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idProduto);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Estoque.builder()
+                            .idProduto(rs.getInt("id_produto"))
+                            .quantidade(rs.getBigDecimal("quantidade"))
+                            .build();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public Estoque buscarPorIdProduto(int idProduto) {
+        String sql = "SELECT id_estoque, id_produto, quantidade FROM estoque WHERE id_produto = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idProduto);
 
             try (ResultSet rs = ps.executeQuery()) {

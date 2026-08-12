@@ -26,4 +26,12 @@ public class EstoqueService {
         }
         return Estoque.builder().idProduto(idProduto).quantidade(BigDecimal.ZERO).build();
     }
+
+    public Estoque buscarPorIdProduto(int idProduto) {
+        Estoque estoque = estoqueRepository.buscarPorIdProduto(idProduto);
+        if (estoque != null) {
+            return estoque;
+        }
+        return Estoque.builder().idProduto(idProduto).quantidade(BigDecimal.ZERO).build();
+    }
 }
