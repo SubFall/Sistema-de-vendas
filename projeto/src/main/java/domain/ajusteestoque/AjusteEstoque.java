@@ -1,25 +1,24 @@
 package domain.ajusteestoque;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AjusteEstoque {
     private Long id;
     private String titulo;
-    private LocalDateTime dateTime;
+    private LocalDateTime dateHora;
     private Status status;
     private List<AjusteEstoqueItens> ajusteEstoqueItens;
 
     private AjusteEstoque(Long id, String titulo, Status status, List<AjusteEstoqueItens> ajusteEstoqueItens) {
         this.id = id;
         this.titulo = titulo;
-        this.dateTime = LocalDateTime.now();
+        this.dateHora = LocalDateTime.now();
         this.status = status;
         this.ajusteEstoqueItens = ajusteEstoqueItens;
     }
 
-    public static AjusteEstoqueBuilder Builder() {
+    public static AjusteEstoqueBuilder builder() {
         return new AjusteEstoqueBuilder();
     }
 
@@ -44,11 +43,11 @@ public class AjusteEstoque {
             return this;
         }
 
-        public AjusteEstoqueBuilder ajusteEstoqueItens(List<AjusteEstoqueItens> ajusteEstoqueItens ) {
+        public AjusteEstoqueBuilder ajusteEstoqueItens(List<AjusteEstoqueItens> ajusteEstoqueItens) {
             this.ajusteEstoqueItens = ajusteEstoqueItens;
             return this;
         }
-        
+
         public AjusteEstoque build() {
             return new AjusteEstoque(id, titulo, status, ajusteEstoqueItens);
         }
@@ -58,8 +57,8 @@ public class AjusteEstoque {
         return titulo;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public LocalDateTime getDateHora() {
+        return dateHora;
     }
 
     public Status getStatus() {
@@ -70,11 +69,15 @@ public class AjusteEstoque {
         return ajusteEstoqueItens;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "AjusteEstoque{" +
                 "titulo='" + titulo + '\'' +
-                ", dateTime=" + dateTime +
+                ", dateTime=" + dateHora +
                 ", status=" + status +
                 ", ajusteEstoqueItens=" + ajusteEstoqueItens +
                 '}';

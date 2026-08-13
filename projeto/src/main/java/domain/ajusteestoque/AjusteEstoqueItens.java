@@ -9,16 +9,14 @@ public class AjusteEstoqueItens {
     private Produto produto;
     private Estoque estoque;
     private BigDecimal contagem;
-    private BigDecimal diferenca;
 
-    private AjusteEstoqueItens(Produto produto, Estoque estoque, BigDecimal contagem, BigDecimal diferenca) {
+    private AjusteEstoqueItens(Produto produto, Estoque estoque, BigDecimal contagem) {
         this.produto = produto;
         this.estoque = estoque;
         this.contagem = contagem;
-        this.diferenca = diferenca;
     }
 
-    public static AjusteEstoqueBuilder Builder() {
+    public static AjusteEstoqueBuilder builder() {
         return new AjusteEstoqueBuilder();
     }
 
@@ -26,7 +24,6 @@ public class AjusteEstoqueItens {
         private Produto produto;
         private Estoque estoque;
         private BigDecimal contagem;
-        private BigDecimal diferenca;
 
         public AjusteEstoqueBuilder produto(Produto produto) {
             this.produto = produto;
@@ -43,13 +40,8 @@ public class AjusteEstoqueItens {
             return this;
         }
 
-        public AjusteEstoqueBuilder diferenca(BigDecimal diferenca) {
-            this.diferenca = diferenca;
-            return this;
-        }
-
         public AjusteEstoqueItens build() {
-            return new AjusteEstoqueItens(produto, estoque, contagem, diferenca);
+            return new AjusteEstoqueItens(produto, estoque, contagem);
         }
     }
 
@@ -66,7 +58,7 @@ public class AjusteEstoqueItens {
     }
 
     public BigDecimal getDiferenca() {
-        return diferenca;
+        return this.contagem.subtract(estoque.getQuantidade());
     }
 
     @Override
@@ -75,7 +67,6 @@ public class AjusteEstoqueItens {
                 "produto=" + produto.getId() +
                 ", estoque=" + estoque.getQuantidade() +
                 ", contagem=" + contagem +
-                ", diferenca=" + diferenca +
                 '}';
     }
 }

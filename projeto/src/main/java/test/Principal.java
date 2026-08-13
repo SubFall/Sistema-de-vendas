@@ -1,9 +1,6 @@
 package test;
 
-import service.CategoriaService;
-import service.MovimentoService;
-import service.PessoaService;
-import service.ProdutoService;
+import service.*;
 import ui.ajusteestoque.AjusteEstoqueMenu;
 import ui.categoria.CategoriaMenu;
 import ui.movimento.MovimentoMenu;
@@ -20,11 +17,20 @@ public class Principal {
     private final CategoriaService categoriaService = new CategoriaService();
     private final ProdutoService produtoService = new ProdutoService();
     private final MovimentoService movimentoService = new MovimentoService();
+    private final EstoqueService estoqueService = new EstoqueService();
+    private final AjusteEstoqueService ajusteEstoqueService = new AjusteEstoqueService();
 
     private final PessoaMenu pessoaMenu = new PessoaMenu(scanner, pessoaService);
     private final CategoriaMenu categoriaMenu = new CategoriaMenu(scanner, categoriaService);
     private final ProdutoMenu produtoMenu = new ProdutoMenu(scanner, produtoService, categoriaService, categoriaMenu);
-    private final AjusteEstoqueMenu ajusteEstoqueMenu = new AjusteEstoqueMenu(scanner, produtoMenu, produtoService);
+    private final AjusteEstoqueMenu ajusteEstoqueMenu =
+            new AjusteEstoqueMenu(
+                    scanner,
+                    produtoService,
+                    estoqueService,
+                    ajusteEstoqueService,
+                    produtoMenu
+            );
     private final MovimentoMenu movimentoMenu =
             new MovimentoMenu(
                     scanner,

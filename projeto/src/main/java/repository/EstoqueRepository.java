@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class EstoqueRepository {
-//    ProdutoRepository produtoRepository = new ProdutoRepository();
 
     public boolean inserirEstoque(Connection conn, int idProduto, BigDecimal saldo) {
         String sql = "INSERT INTO estoque (id_produto, quantidade) VALUES (?, ?);";
