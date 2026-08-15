@@ -2,12 +2,15 @@ package repository;
 
 import conn.ConnectionFactory;
 import domain.estoque.Estoque;
+import dto.ProdutoEstoqueDTO;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EstoqueRepository {
 
@@ -76,5 +79,32 @@ public class EstoqueRepository {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    public List<ProdutoEstoqueDTO> buscarProdutosEstoque() {
+        List<ProdutoEstoqueDTO> produtoEstoque = new ArrayList<>();
+        String sql = """
+                SELECT
+                	p.id_produto, p.descricao, COALESCE(e.quantidade, 0) AS quantidade
+                FROM produtos p LEFT JOIN estoque e ON e.id_produto = p.id_produto;
+                """;
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                produtoEstoque.add(mapearProdutosEstoque(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return produtoEstoque;
+    }
+
+    private ProdutoEstoqueDTO mapearProdutosEstoque(ResultSet rs) throws SQLException {
+        return ProdutoEstoqueDTO.builder()
+                .idProduto(rs.getLong("id_produto"))
+                .descricao(rs.getString("descricao"))
+                .quantidade(rs.getBigDecimal("quantidade"))
+                .build();
     }
 }

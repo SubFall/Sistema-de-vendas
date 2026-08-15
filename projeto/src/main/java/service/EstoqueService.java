@@ -1,10 +1,12 @@
 package service;
 
 import domain.estoque.Estoque;
+import dto.ProdutoEstoqueDTO;
 import repository.EstoqueRepository;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.util.List;
 
 public class EstoqueService {
     private final EstoqueRepository estoqueRepository = new EstoqueRepository();
@@ -33,5 +35,9 @@ public class EstoqueService {
             return estoque;
         }
         return Estoque.builder().idProduto(idProduto).quantidade(BigDecimal.ZERO).build();
+    }
+
+    public List<ProdutoEstoqueDTO> buscarProdutosEstoque() {
+        return estoqueRepository.buscarProdutosEstoque();
     }
 }

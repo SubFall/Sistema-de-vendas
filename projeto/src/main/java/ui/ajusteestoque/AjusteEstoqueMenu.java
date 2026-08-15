@@ -9,6 +9,7 @@ import domain.movimento.StatusMovimento;
 import domain.movimento.Tipo;
 import domain.pessoa.Pessoa;
 import domain.produto.Produto;
+import dto.ProdutoEstoqueDTO;
 import service.AjusteEstoqueService;
 import service.EstoqueService;
 import service.ProdutoService;
@@ -18,6 +19,9 @@ import util.ConsoleUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import static ui.grid.ProdutoEstoqueGrid.exibirGridItens;
+import static ui.grid.ProdutoEstoqueGrid.exibirtGirdProdutoEstoque;
 
 public class AjusteEstoqueMenu {
     private final Scanner scanner;
@@ -109,7 +113,7 @@ public class AjusteEstoqueMenu {
     }
 
     private AjusteEstoqueItens criarAjusteEstoqueItem() {
-        produtoMenu.listar(4);//todos ativos
+        exibirtGirdProdutoEstoque(estoqueService.buscarProdutosEstoque());
 
         System.out.print("Digite o ID do produto: ");
         Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
@@ -152,40 +156,5 @@ public class AjusteEstoqueMenu {
         ajusteEstoqueService.inserirAjusteEstoque(ajuste);
         System.out.println("Ajuste criado com sucesso!");
         return true;
-    }
-
-    private void exibirCabecalhoGridItens() {
-        System.out.printf(
-                "%-3s | %-15s | %-10s | %-11s | %-11s%n",
-                "ID", "PRODUTO", "SALDO", "CONTAGEM", "DIFERENCA"
-        );
-    }
-
-    private void exibirGridItens(List<AjusteEstoqueItens> itens) {
-        String id;
-        String produto;
-        String saldoAtual;
-        String contagem;
-        String diferenca;
-
-
-        if (itens.isEmpty()) {
-            System.out.println("Nenhum produto encontrado.");
-            return;
-        }
-
-        exibirCabecalhoGridItens();
-
-        for (AjusteEstoqueItens i : itens) {
-            id = ConsoleUtils.formatarColuna(String.valueOf(i.getProduto().getId()), 3);
-            produto = ConsoleUtils.formatarColuna(String.valueOf(i.getProduto().getDescricao()), 15);
-            saldoAtual = ConsoleUtils.formatarColuna(i.getEstoque().getQuantidade().toString(), 10);
-            contagem = ConsoleUtils.formatarColuna(i.getContagem().toString(), 11);
-            diferenca = ConsoleUtils.formatarColuna(i.getDiferenca().toString(), 11);
-
-
-            System.out.printf("%s | %s | %s | %s | %s %n", id, produto, saldoAtual, contagem, diferenca);
-
-        }
     }
 }
