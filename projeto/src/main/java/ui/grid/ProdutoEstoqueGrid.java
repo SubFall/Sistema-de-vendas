@@ -11,6 +11,16 @@ public final class ProdutoEstoqueGrid {
 
     }
 
+    public static void menu() {
+        System.out.println("\n|****** Ajuste  Estoque ******|");
+        System.out.println("|1 - Novo               - [] X|");
+        System.out.println("|2 - Remover                  |");
+        System.out.println("|3 - Atualizar                |");
+        System.out.println("|4 - Listar                   |");
+        System.out.println("|0 - Voltar                   |");
+        System.out.println("|*****************************|");
+    }
+
     public static void exibiCabecalhoGirdProdutoEstoque() {
         System.out.println("=======================================");
         System.out.println("                PRODUTOS               ");

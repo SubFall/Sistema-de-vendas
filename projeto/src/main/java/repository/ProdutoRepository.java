@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.categoria.Categoria;
 import domain.produto.Produto;
 
@@ -12,11 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProdutoRepository {
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
 
     public boolean inserirProduto(Produto produto) {
         String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo, id_categoria) VALUES (?, ?, ?, ?, ?);";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, produto.getDescricao());
@@ -35,7 +37,7 @@ public class ProdutoRepository {
     public boolean atualizarStatusProduto(boolean ativo, int idProduto) {
         String sql = "UPDATE produtos SET ativo = ? WHERE (`id_produto` = ?);";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, ativo);
@@ -53,7 +55,7 @@ public class ProdutoRepository {
                     WHERE id_produto = ?;
                 """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, produto.getDescricao());
@@ -77,7 +79,7 @@ public class ProdutoRepository {
                     """;
         List<Produto> produtos = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -100,7 +102,7 @@ public class ProdutoRepository {
                     """;
         List<Produto> produtos = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -123,7 +125,7 @@ public class ProdutoRepository {
                 """;
         List<Produto> produtos = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, "%" + descricao.trim() + "%");
@@ -148,7 +150,7 @@ public class ProdutoRepository {
                             WHERE id_produto = ?;
                 """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idProduto);

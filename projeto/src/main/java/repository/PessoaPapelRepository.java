@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.pessoa.PessoaPapel;
 
 import java.sql.Connection;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PessoaPapelRepository {
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+
     public void inserirPessoaPapel(Connection conn, int idPessoa, int idPapel) {
         String sql = "INSERT INTO pessoa_papel (id_pessoa, id_papel) VALUES (?, ?);";
 
@@ -48,7 +51,7 @@ public class PessoaPapelRepository {
 
         List<PessoaPapel> pessoaPapels = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idPessoa);

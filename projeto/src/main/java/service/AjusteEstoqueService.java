@@ -1,6 +1,6 @@
 package service;
 
-import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
 import repository.AjusteEstoqueItemRepository;
@@ -10,14 +10,23 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class AjusteEstoqueService {
-    private final AjusteEstoqueRepository estoqueRepository = new AjusteEstoqueRepository();
-    private final AjusteEstoqueItemRepository ajusteEstoqueItemRepository = new AjusteEstoqueItemRepository();
+    private final AjusteEstoqueRepository estoqueRepository;
+    private final AjusteEstoqueItemRepository ajusteEstoqueItemRepository;
+    private final ConnectionProvider connectionProvider;
+
+    public AjusteEstoqueService(AjusteEstoqueRepository estoqueRepository,
+                                AjusteEstoqueItemRepository ajusteEstoqueItemRepository,
+                                ConnectionProvider connectionProvider) {
+        this.estoqueRepository = estoqueRepository;
+        this.ajusteEstoqueItemRepository = ajusteEstoqueItemRepository;
+        this.connectionProvider = connectionProvider;
+    }
 
     public void inserirAjusteEstoque(AjusteEstoque estoque) {
         Connection conn = null;
 
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
             Long idAjusteEstoque = estoqueRepository.inserirAjusteEstoque(conn, estoque);
@@ -32,16 +41,14 @@ public class AjusteEstoqueService {
 
             conn.commit();
         } catch (SQLException e) {
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new RuntimeException("Erro ao realizar rollback", ex);
-            }
+            rollback(conn);
 
             throw new RuntimeException("Erro ao inserir movimento", e);
-        } finally {
+        } catch (IllegalArgumentException e) {
+            rollback(conn);
+
+            throw e;
+        }finally {
             try {
                 if (conn != null) {
                     conn.close();
@@ -49,6 +56,16 @@ public class AjusteEstoqueService {
             } catch (SQLException e) {
                 throw new RuntimeException("Erro ao fechar a conexão", e);
             }
+        }
+    }
+
+    private void rollback(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.rollback();
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Erro ao realizar rollback", ex);
         }
     }
 }

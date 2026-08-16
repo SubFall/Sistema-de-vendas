@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.estoque.Estoque;
 import dto.ProdutoEstoqueDTO;
 
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EstoqueRepository {
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
 
     public boolean inserirEstoque(Connection conn, int idProduto, BigDecimal saldo) {
         String sql = "INSERT INTO estoque (id_produto, quantidade) VALUES (?, ?);";
@@ -63,7 +65,7 @@ public class EstoqueRepository {
     public Estoque buscarPorIdProduto(int idProduto) {
         String sql = "SELECT id_estoque, id_produto, quantidade FROM estoque WHERE id_produto = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idProduto);
 
@@ -88,7 +90,7 @@ public class EstoqueRepository {
                 	p.id_produto, p.descricao, COALESCE(e.quantidade, 0) AS quantidade
                 FROM produtos p LEFT JOIN estoque e ON e.id_produto = p.id_produto;
                 """;
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {

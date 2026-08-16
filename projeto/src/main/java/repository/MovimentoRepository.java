@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.movimento.Movimento;
 import domain.movimento.StatusMovimento;
 import domain.movimento.Tipo;
@@ -12,6 +13,7 @@ import java.util.List;
 public class MovimentoRepository {
     PessoaRepository pessoaRepository = new PessoaRepository();
     MovimentoItemRepository movimentoItemRepository = new MovimentoItemRepository();
+    ConnectionProvider connectionProvider = new ConnectionFactory();
 
     public int inserirMovimento(Connection conn, Movimento movimento) {
         String sql = """
@@ -67,7 +69,7 @@ public class MovimentoRepository {
     public boolean reabrirMovimento(int idMovimento) {
         String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, StatusMovimento.ABERTO.getCodigo());
@@ -81,7 +83,7 @@ public class MovimentoRepository {
     public boolean cancelarMovimento(int idMovimento) {
         String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, StatusMovimento.CANCELADO.getCodigo());
@@ -95,7 +97,7 @@ public class MovimentoRepository {
     public boolean finalizarMovimento(int idMovimento) {
         String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, StatusMovimento.FINALIZADO.getCodigo());
@@ -109,7 +111,7 @@ public class MovimentoRepository {
     public boolean recuperarMovimento(int idMovimento) {
         String sql = "UPDATE movimento SET status = ? WHERE id_movimento = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, StatusMovimento.ABERTO.getCodigo());
@@ -126,7 +128,7 @@ public class MovimentoRepository {
                 FROM movimento WHERE id_movimento = ?;
                 """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idMovimento);
@@ -148,7 +150,7 @@ public class MovimentoRepository {
                 FROM movimento WHERE id_movimento = ? AND status = ?;
                 """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idMovimento);
@@ -172,7 +174,7 @@ public class MovimentoRepository {
                 FROM movimento;
                 """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -193,7 +195,7 @@ public class MovimentoRepository {
                 FROM movimento WHERE status = ?;
                 """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, statusMovimento.getCodigo());

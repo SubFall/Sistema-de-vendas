@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.documento.CNPJ;
 import domain.documento.CPF;
 import domain.documento.Documento;
@@ -14,6 +15,7 @@ import java.util.List;
 
 public class PessoaRepository {
     PessoaPapelRepository pessoaPapelRepository = new PessoaPapelRepository();
+    ConnectionProvider connectionProvider = new ConnectionFactory();
 
     public int inserirPessoa(Connection conn, Pessoa pessoa) {
         String sql = "INSERT INTO pessoa (`descricao`, `documento`, `tipo`, `ativo`) VALUES (?, ?, ?, ?);";
@@ -55,7 +57,7 @@ public class PessoaRepository {
     public boolean inativarPessoa(boolean ativo, int idPessoa) {
         String sql = "UPDATE pessoa SET ativo = ? WHERE id_pessoa = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, ativo);
@@ -71,7 +73,7 @@ public class PessoaRepository {
     public int atualizarPessoa(Pessoa pessoa) {
         String sql = "UPDATE pessoa SET descricao = ?, documento = ?, tipo = ? WHERE id_pessoa = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, pessoa.getNome());
@@ -105,7 +107,7 @@ public class PessoaRepository {
     public Pessoa buscarPorDocumento(String documentoBusca) {
         String sql = "SELECT id_pessoa, descricao, documento, tipo, ativo FROM pessoa WHERE documento = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);) {
 
             ps.setString(1, documentoBusca);
@@ -124,7 +126,7 @@ public class PessoaRepository {
     public Pessoa buscarPorId(int id) {
         String sql = "SELECT id_pessoa, descricao, documento, tipo, ativo FROM pessoa WHERE id_pessoa = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);) {
 
             ps.setInt(1, id);
@@ -145,7 +147,7 @@ public class PessoaRepository {
         String sql = "SELECT id_pessoa, descricao, documento, tipo, ativo FROM pessoa WHERE descricao LIKE ?;";
         List<Pessoa> pessoaList = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, "%" + nome + "%");
@@ -165,7 +167,7 @@ public class PessoaRepository {
         String sql = "SELECT id_pessoa, descricao, documento, tipo, ativo FROM pessoa;";
         List<Pessoa> pessoasList = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery();) {
 
@@ -182,7 +184,7 @@ public class PessoaRepository {
         String sql = "SELECT id_pessoa, descricao, documento, tipo, ativo FROM pessoa WHERE ativo = 1;";
         List<Pessoa> pessoasList = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery();) {
 
@@ -204,7 +206,7 @@ public class PessoaRepository {
                 """;
         List<Pessoa> pessoasList = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);) {
 
             ps.setInt(1, pessoaPapel.getCodigo());
@@ -243,7 +245,7 @@ public class PessoaRepository {
     public boolean existeDocumento(String documento) {
         String sql = "SELECT 1 FROM pessoa WHERE documento = ? LIMIT 1;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, documento);
@@ -260,7 +262,7 @@ public class PessoaRepository {
     public boolean existeDocumentoPorOutroId(String documento, int id) {
         String sql = "SELECT 1 FROM pessoa WHERE documento = ? AND id_pessoa <> ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, documento);

@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.movimento.Movimento;
 import domain.movimento.MovimentoItem;
 
@@ -9,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovimentoItemRepository {
-    ProdutoRepository produtoRepository = new ProdutoRepository();
+    private final ProdutoRepository produtoRepository = new ProdutoRepository();
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
 
     public boolean inserirMovimentoItem(Connection conn, int idMovimento, MovimentoItem item) {
         String sql = """
@@ -53,7 +55,7 @@ public class MovimentoItemRepository {
                 FROM movimento_item WHERE id_movimento = ?;
                 """;
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idMovimento);

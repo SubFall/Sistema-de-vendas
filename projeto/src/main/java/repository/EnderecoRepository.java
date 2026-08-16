@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.endereco.Endereco;
 
 import java.sql.*;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnderecoRepository {
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+
     public void inserirEndereco(Connection conn, int idPessoa, Endereco endereco) {
         String sql = "INSERT INTO endereco (logradouro, cidade, uf, bairro, numero, cep, id_pessoa) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
@@ -31,7 +34,7 @@ public class EnderecoRepository {
     public int atualizarEndereco(Endereco endereco) {
         String sql = "UPDATE endereco SET logradouro = ?, cidade = ?, uf = ?, bairro = ?, numero = ?, cep = ? WHERE id_endereco = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, endereco.getLogradouro());
@@ -70,7 +73,7 @@ public class EnderecoRepository {
     public int deletarEndereco(int id) {
         String sql = "DELETE FROM endereco WHERE id_endereco = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -96,7 +99,7 @@ public class EnderecoRepository {
         String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco;";
         List<Endereco> enderecoList = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -113,7 +116,7 @@ public class EnderecoRepository {
     public Endereco buscarPorId(int id) {
         String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco WHERE id_endereco = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -131,7 +134,7 @@ public class EnderecoRepository {
     public Endereco buscarPoridPessoa(int id) {
         String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco WHERE id_pessoa = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -150,7 +153,7 @@ public class EnderecoRepository {
         String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco WHERE cidade LIKE ?;";
         List<Endereco> enderecoList = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, "%" + cidade + "%");
@@ -169,7 +172,7 @@ public class EnderecoRepository {
         String sql = "SELECT id_endereco, logradouro, cidade, uf, bairro, numero, cep FROM endereco WHERE cep = ?;";
         List<Endereco> enderecoList = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cep);

@@ -1,6 +1,7 @@
 package repository;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.categoria.Categoria;
 
 import java.sql.Connection;
@@ -11,10 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoriaRepository {
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+
     public boolean inserirCategoria(Categoria categoria) {
         String sql = "INSERT INTO categoria (descricao) VALUES (?);";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, categoria.getDescricao());
@@ -28,7 +31,7 @@ public class CategoriaRepository {
     public boolean deletarCategoria(int idCategoria) {
         String sql = "DELETE FROM categoria WHERE id_categoria = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idCategoria);
@@ -42,7 +45,7 @@ public class CategoriaRepository {
     public boolean atualizarStatusCategoria(boolean ativo, int idCategoria) {
         String sql = "UPDATE categoria SET ativo = ? WHERE id_categoria = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, ativo);
@@ -57,7 +60,7 @@ public class CategoriaRepository {
     public boolean atualizarCategoria(Categoria categoria) {
         String sql = "UPDATE categoria SET descricao = ?, ativo = ? WHERE id_categoria = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, categoria.getDescricao());
@@ -73,7 +76,7 @@ public class CategoriaRepository {
     public boolean categoriaPossuiProdutos(String categoria) {
         String sql = "SELECT 1 FROM categoria WHERE descricao = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, categoria);
@@ -92,7 +95,7 @@ public class CategoriaRepository {
     public boolean categoriaPossuiProdutos(int idCategoria) {
         String sql = "SELECT 1 FROM produtos WHERE id_categoria = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idCategoria);
@@ -108,7 +111,7 @@ public class CategoriaRepository {
     public Categoria buscarPorId(int idCategoria) {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria WHERE id_categoria = ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idCategoria);
@@ -128,7 +131,7 @@ public class CategoriaRepository {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria WHERE descricao LIKE ? ORDER BY descricao;";
         List<Categoria> categorias = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, "%" + descricao + "%");
@@ -148,7 +151,7 @@ public class CategoriaRepository {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria ORDER BY descricao;";
         List<Categoria> categorias = new ArrayList<>();
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -165,7 +168,7 @@ public class CategoriaRepository {
     public boolean existeOutraCategoriaComDescricao(String descricao, int idCategoria) {
         String sql = "SELECT 1 FROM categoria WHERE descricao = ? AND id_categoria <> ?;";
 
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, descricao);

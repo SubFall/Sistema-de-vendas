@@ -1,6 +1,7 @@
 package service;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
 import repository.EnderecoRepository;
@@ -15,6 +16,7 @@ public class PessoaService {
     PessoaRepository pessoaRepository = new PessoaRepository();
     PessoaPapelRepository pessoaPapelRepository = new PessoaPapelRepository();
     EnderecoRepository enderecoRepository = new EnderecoRepository();
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
 
     public void inserirPessoa(Pessoa pessoa) {
 
@@ -26,7 +28,7 @@ public class PessoaService {
         Connection conn = null;
 
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = connectionProvider.getConnection();
 
             conn.setAutoCommit(false);
 
@@ -71,7 +73,7 @@ public class PessoaService {
         Connection conn = null;
 
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = connectionProvider.getConnection();
 
             conn.setAutoCommit(false);
 
@@ -122,7 +124,7 @@ public class PessoaService {
         Connection conn = null;
 
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = connectionProvider.getConnection();
 
             conn.setAutoCommit(false);
 

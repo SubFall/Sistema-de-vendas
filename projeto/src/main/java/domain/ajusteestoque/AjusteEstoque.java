@@ -49,6 +49,15 @@ public class AjusteEstoque {
         }
 
         public AjusteEstoque build() {
+
+            if (titulo == null || titulo.isEmpty()) {
+                throw new IllegalArgumentException("Título obrigatório");
+            }
+
+            if (status == null) {
+                throw new IllegalArgumentException("Status obrigatório");
+            }
+
             return new AjusteEstoque(id, titulo, status, ajusteEstoqueItens);
         }
     }

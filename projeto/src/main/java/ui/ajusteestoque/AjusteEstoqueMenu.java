@@ -3,25 +3,19 @@ package ui.ajusteestoque;
 import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
 import domain.ajusteestoque.Status;
-import domain.movimento.Movimento;
-import domain.movimento.MovimentoItem;
-import domain.movimento.StatusMovimento;
-import domain.movimento.Tipo;
-import domain.pessoa.Pessoa;
 import domain.produto.Produto;
-import dto.ProdutoEstoqueDTO;
 import service.AjusteEstoqueService;
 import service.EstoqueService;
 import service.ProdutoService;
 import ui.produto.ProdutoMenu;
 import util.ConsoleUtils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import static ui.grid.ProdutoEstoqueGrid.exibirGridItens;
-import static ui.grid.ProdutoEstoqueGrid.exibirtGirdProdutoEstoque;
+import static ui.grid.ProdutoEstoqueGrid.*;
 
 public class AjusteEstoqueMenu {
     private final Scanner scanner;
@@ -47,13 +41,7 @@ public class AjusteEstoqueMenu {
         int opcao;
 
         do {
-            System.out.println("\n|****** Ajuste  Estoque ******|");
-            System.out.println("|1 - Novo               - [] X|");
-            System.out.println("|2 - Remover                  |");
-            System.out.println("|3 - Atualizar                |");
-            System.out.println("|4 - Listar                   |");
-            System.out.println("|0 - Voltar                   |");
-            System.out.println("|*****************************|");
+            menu();
 
             System.out.print("Opção: ");
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
@@ -107,22 +95,24 @@ public class AjusteEstoqueMenu {
         }
     }
 
-    private void criarAjusteEstoqueItem(List<AjusteEstoqueItens> itens) {
-        itens.add(criarAjusteEstoqueItem());
-        exibirGridItens(itens);
-    }
-
-    private AjusteEstoqueItens criarAjusteEstoqueItem() {
+    private void criarAjusteEstoqueItem(List<AjusteEstoqueItens> ajusteEstoqueItens) {
         exibirtGirdProdutoEstoque(estoqueService.buscarProdutosEstoque());
 
-        System.out.print("Digite o ID do produto: ");
-        Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+        try {
+            System.out.print("Digite o ID do produto: ");
+            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
 
-        return AjusteEstoqueItens.builder()
-                .produto(produto)
-                .estoque(estoqueService.buscarPorIdProduto(produto.getId()))
-                .contagem(ConsoleUtils.lerBigDecimal(scanner, "Contagem"))
-                .build();
+            AjusteEstoqueItens item = AjusteEstoqueItens.builder()
+                    .produto(produto)
+                    .estoque(estoqueService.buscarPorIdProduto(produto.getId()))
+                    .contagem(ConsoleUtils.lerBigDecimal(scanner, "Contagem"))
+                    .build();
+
+            ajusteEstoqueItens.add(item);
+            exibirGridItens(ajusteEstoqueItens);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private boolean concluirAjuste(String titulo, List<AjusteEstoqueItens> itens) {

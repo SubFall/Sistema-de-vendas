@@ -1,6 +1,7 @@
 package service;
 
 import conn.ConnectionFactory;
+import conn.ConnectionProvider;
 import domain.movimento.Movimento;
 import domain.movimento.MovimentoItem;
 import domain.movimento.StatusMovimento;
@@ -17,6 +18,7 @@ public class MovimentoService {
     MovimentoRepository movimentoRepository = new MovimentoRepository();
     MovimentoItemRepository movimentoItemRepository = new MovimentoItemRepository();
     HistoricoEstoqueService historicoEstoqueService = new HistoricoEstoqueService();
+    private final ConnectionProvider connectionProvider = new ConnectionFactory();
 
     public void inserirMovimento(Movimento movimento) {
         Connection conn = null;
@@ -24,7 +26,7 @@ public class MovimentoService {
         validarMovimentoParaGravacao(movimento);
 
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
             int idMovimento = movimentoRepository.inserirMovimento(conn, movimento);
@@ -74,7 +76,7 @@ public class MovimentoService {
 
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
             movimentoRepository.editarMovimento(conn, movimento);
@@ -133,7 +135,7 @@ public class MovimentoService {
 
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
             for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
