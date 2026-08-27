@@ -85,12 +85,19 @@ public class Movimento {
             if (funcionario == null) {
                 throw new IllegalArgumentException("Funcionário obrigatório");
             }
+            if (this.dataMovimento == null) {
+                this.dataMovimento = LocalDateTime.now();
+            }
 
             if (movimentoItens.isEmpty()) {
                 throw new IllegalArgumentException("Movimento sem itens");
             }
             return new Movimento(id, pessoa, funcionario, statusMovimento, tipo, dataMovimento, movimentoItens);
         }
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {

@@ -14,6 +14,7 @@ public class Pessoa {
     private List<PessoaPapel> papeis;
     private boolean ativo;
 
+    public static  final int ID_PESSOA_PADRAO = 1;
 
     private Pessoa(int id, String nome, Documento documento, List<PessoaPapel> papeis, boolean ativo) {
         this.id = id;

@@ -3,22 +3,46 @@ package service;
 import conn.ConnectionProvider;
 import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
-import repository.AjusteEstoqueItemRepository;
-import repository.AjusteEstoqueRepository;
+import domain.ajusteestoque.Status;
+import domain.ajusteestoque.StatusMovimentoCriado;
+import domain.movimento.Movimento;
+import domain.movimento.MovimentoItem;
+import domain.movimento.StatusMovimento;
+import domain.movimento.Tipo;
+import domain.pessoa.Pessoa;
+import repository.*;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AjusteEstoqueService {
-    private final AjusteEstoqueRepository estoqueRepository;
+    private final AjusteEstoqueRepository ajusteEstoqueRepository;
     private final AjusteEstoqueItemRepository ajusteEstoqueItemRepository;
+    private final ProdutoRepository produtoRepository;
+    private final MovimentoRepository movimentoRepository;
+    private final MovimentoItemRepository movimentoItemRepository;
+    private final HistoricoEstoqueService historicoEstoqueService;
+    private final PessoaRepository pessoaRepository;
     private final ConnectionProvider connectionProvider;
 
     public AjusteEstoqueService(AjusteEstoqueRepository estoqueRepository,
                                 AjusteEstoqueItemRepository ajusteEstoqueItemRepository,
+                                ProdutoRepository produtoRepository,
+                                MovimentoRepository movimentoRepository,
+                                MovimentoItemRepository movimentoItemRepository,
+                                HistoricoEstoqueService historicoEstoqueService,
+                                PessoaRepository pessoaRepository,
                                 ConnectionProvider connectionProvider) {
-        this.estoqueRepository = estoqueRepository;
+        this.ajusteEstoqueRepository = estoqueRepository;
         this.ajusteEstoqueItemRepository = ajusteEstoqueItemRepository;
+        this.produtoRepository = produtoRepository;
+        this.movimentoRepository = movimentoRepository;
+        this.movimentoItemRepository = movimentoItemRepository;
+        this.historicoEstoqueService = historicoEstoqueService;
+        this.pessoaRepository = pessoaRepository;
         this.connectionProvider = connectionProvider;
     }
 
@@ -29,7 +53,7 @@ public class AjusteEstoqueService {
             conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
-            Long idAjusteEstoque = estoqueRepository.inserirAjusteEstoque(conn, estoque);
+            Long idAjusteEstoque = ajusteEstoqueRepository.inserirAjusteEstoque(conn, estoque);
 
             for (AjusteEstoqueItens item : estoque.getAjusteEstoqueItens()) {
                 boolean isInseriu = ajusteEstoqueItemRepository.inserirAjusteEstoqueItem(conn, idAjusteEstoque, item);
@@ -48,7 +72,7 @@ public class AjusteEstoqueService {
             rollback(conn);
 
             throw e;
-        }finally {
+        } finally {
             try {
                 if (conn != null) {
                     conn.close();
@@ -68,4 +92,94 @@ public class AjusteEstoqueService {
             throw new RuntimeException("Erro ao realizar rollback", ex);
         }
     }
+
+    public List<AjusteEstoque> buscarAjustePorStatus(Status status) {
+        return ajusteEstoqueRepository.buscarAjustePorStatus(status);
+    }
+
+    public AjusteEstoque buscarAjustePorId(int idAjuste) {
+        return ajusteEstoqueRepository.buscarAjustePorId(idAjuste);
+    }
+
+    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
+        return ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(idAjuste);
+    }
+
+    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensSaida(Long idAjuste) {
+        return ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(idAjuste);
+    }
+
+    public void criarMovimentoAjusteEstoque(Long idAjuste) {
+        Connection conn = null;
+
+        List<AjusteEstoqueItens> ajusteEstoqueItensEntrada = buscarAjusteEstoqueItensEntrada(idAjuste);
+
+        List<AjusteEstoqueItens> ajusteEstoqueItensSaida = buscarAjusteEstoqueItensSaida(idAjuste);
+
+        try {
+            if (!ajusteEstoqueItensEntrada.isEmpty()) {
+                List<MovimentoItem> movimentoItems = new ArrayList<>();
+                for (AjusteEstoqueItens ajusteEstoqueItens : ajusteEstoqueItensEntrada) {
+                    movimentoItems.add(MovimentoItem.builder()
+                            .produto(produtoRepository.buscarPorId(ajusteEstoqueItens.getProduto().getId()))
+                            .quantidade(ajusteEstoqueItens.getContagem())
+                            .valorUnitario(new BigDecimal("10.00"))
+                            .build());
+                }
+
+
+                Movimento movimento = Movimento.builder()
+                        .pessoa(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
+                        .funcionario(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
+                        .tipo(Tipo.ENTRADA)
+                        .statusMovimento(StatusMovimento.FINALIZADO)
+                        .movimentoItens(movimentoItems)
+                        .build();
+
+                conn = connectionProvider.getConnection();
+                conn.setAutoCommit(false);
+
+                int idMovimento = movimentoRepository.inserirMovimento(conn, movimento);
+                movimento.setId(idMovimento);
+
+                for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
+                    boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
+
+                    if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
+                        historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(), movimento,
+                                movimentoItem.getQuantidade(), movimento.getTipo());
+                    }
+
+                    if (!isInseriu) {
+                        throw new IllegalArgumentException("Erro ao inserir item do movimento");
+                    }
+                }
+
+                ajusteEstoqueRepository.mudarStatusMovimento(conn, StatusMovimentoCriado.FINALIZADO_CRIADO, idAjuste);
+
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Erro ao realizar rollback", ex);
+            }
+
+            throw new RuntimeException("Erro ao inserir movimento", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro ao fechar a conexão", e);
+            }
+        }
+
+
+    }
+
 }

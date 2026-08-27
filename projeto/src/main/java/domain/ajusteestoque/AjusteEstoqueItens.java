@@ -6,43 +6,55 @@ import domain.produto.Produto;
 import java.math.BigDecimal;
 
 public class AjusteEstoqueItens {
+    private Long id;
     private Produto produto;
     private Estoque estoque;
     private BigDecimal contagem;
 
-    private AjusteEstoqueItens(Produto produto, Estoque estoque, BigDecimal contagem) {
+    private AjusteEstoqueItens(Long id, Produto produto, Estoque estoque, BigDecimal contagem) {
+        this.id = id;
         this.produto = produto;
         this.estoque = estoque;
         this.contagem = contagem;
     }
 
-    public static AjusteEstoqueBuilder builder() {
-        return new AjusteEstoqueBuilder();
+    public static AjusteEstoqueItensBuilder builder() {
+        return new AjusteEstoqueItensBuilder();
     }
 
-    public static class AjusteEstoqueBuilder {
+    public static class AjusteEstoqueItensBuilder {
+        private Long id;
         private Produto produto;
         private Estoque estoque;
         private BigDecimal contagem;
 
-        public AjusteEstoqueBuilder produto(Produto produto) {
+        public AjusteEstoqueItensBuilder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public AjusteEstoqueItensBuilder produto(Produto produto) {
             this.produto = produto;
             return this;
         }
 
-        public AjusteEstoqueBuilder estoque(Estoque estoque) {
+        public AjusteEstoqueItensBuilder estoque(Estoque estoque) {
             this.estoque = estoque;
             return this;
         }
 
-        public AjusteEstoqueBuilder contagem(BigDecimal contagem) {
+        public AjusteEstoqueItensBuilder contagem(BigDecimal contagem) {
             this.contagem = contagem;
             return this;
         }
 
         public AjusteEstoqueItens build() {
-            return new AjusteEstoqueItens(produto, estoque, contagem);
+            return new AjusteEstoqueItens(id, produto, estoque, contagem);
         }
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Produto getProduto() {

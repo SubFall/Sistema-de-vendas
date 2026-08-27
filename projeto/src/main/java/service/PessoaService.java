@@ -72,6 +72,10 @@ public class PessoaService {
         int row = 0;
         Connection conn = null;
 
+        if (id == Pessoa.ID_PESSOA_PADRAO) {
+            throw new IllegalArgumentException("A Pessoa padrão não pode ser alterada/deletada.");
+        }
+
         try {
             conn = connectionProvider.getConnection();
 

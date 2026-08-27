@@ -1,5 +1,6 @@
 package ui.grid;
 
+import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
 import dto.ProdutoEstoqueDTO;
 import util.ConsoleUtils;
@@ -16,7 +17,8 @@ public final class ProdutoEstoqueGrid {
         System.out.println("|1 - Novo               - [] X|");
         System.out.println("|2 - Remover                  |");
         System.out.println("|3 - Atualizar                |");
-        System.out.println("|4 - Listar                   |");
+        System.out.println("|4 - Criar Movimento          |");
+        System.out.println("|5 - Listar                   |");
         System.out.println("|0 - Voltar                   |");
         System.out.println("|*****************************|");
     }
@@ -93,5 +95,40 @@ public final class ProdutoEstoqueGrid {
 
         }
         System.out.println("----------------------------------------------------");
+    }
+
+    public static void exibirGridAjusteEstoqueCabecalho() {
+        System.out.println("========================================");
+        System.out.println("            AJUSTE DE ESTOQUE           ");
+        System.out.println("========================================");
+        System.out.printf(
+                "%-3s | %-15s | %-5s | %-8s%n",
+                "ID", "TÍTULO", "DATA", "STATUS"
+        );
+    }
+
+    public static void exibirGridAjusteEstoque(List<AjusteEstoque> ajusteEstoques) {
+        String id;
+        String titulo;
+        String data;
+        String status;
+
+        if (ajusteEstoques.isEmpty()) {
+            System.out.println("Nenhum Ajuste de Estoque encontrado.");
+            return;
+        }
+
+        exibirGridAjusteEstoqueCabecalho();
+
+        for (AjusteEstoque ajuste : ajusteEstoques) {
+            id = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getId()), 3);
+            titulo = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getTitulo()), 15);
+            data = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getDateHora()), 5);
+            status = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getStatus()), 8);
+
+            System.out.printf("%s | %s | %s | %s %n", id, titulo, data, status);
+        }
+        System.out.println("-----------------------------------------");
+
     }
 }

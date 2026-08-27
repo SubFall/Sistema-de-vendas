@@ -8,13 +8,21 @@ public class AjusteEstoque {
     private String titulo;
     private LocalDateTime dateHora;
     private Status status;
+    private StatusMovimentoCriado statusMovimentoCriado;
     private List<AjusteEstoqueItens> ajusteEstoqueItens;
 
-    private AjusteEstoque(Long id, String titulo, Status status, List<AjusteEstoqueItens> ajusteEstoqueItens) {
+    private AjusteEstoque(
+            Long id,
+            String titulo,
+            LocalDateTime dateHora,
+            Status status,
+            StatusMovimentoCriado statusMovimentoCriado,
+            List<AjusteEstoqueItens> ajusteEstoqueItens) {
         this.id = id;
         this.titulo = titulo;
-        this.dateHora = LocalDateTime.now();
+        this.dateHora = dateHora;
         this.status = status;
+        this.statusMovimentoCriado = statusMovimentoCriado;
         this.ajusteEstoqueItens = ajusteEstoqueItens;
     }
 
@@ -25,7 +33,9 @@ public class AjusteEstoque {
     public static class AjusteEstoqueBuilder {
         private Long id;
         private String titulo;
+        private LocalDateTime dateHora;
         private Status status;
+        private StatusMovimentoCriado statusMovimentoCriado;
         private List<AjusteEstoqueItens> ajusteEstoqueItens;
 
         public AjusteEstoqueBuilder id(Long id) {
@@ -38,8 +48,18 @@ public class AjusteEstoque {
             return this;
         }
 
+        public AjusteEstoqueBuilder dateHora(LocalDateTime dateHora) {
+            this.dateHora = dateHora;
+            return this;
+        }
+
         public AjusteEstoqueBuilder status(Status status) {
             this.status = status;
+            return this;
+        }
+
+        public AjusteEstoqueBuilder statusMovimentoCriado(StatusMovimentoCriado statusMovimentoCriado) {
+            this.statusMovimentoCriado = statusMovimentoCriado;
             return this;
         }
 
@@ -58,8 +78,20 @@ public class AjusteEstoque {
                 throw new IllegalArgumentException("Status obrigatório");
             }
 
-            return new AjusteEstoque(id, titulo, status, ajusteEstoqueItens);
+            if (dateHora == null) {
+                dateHora = LocalDateTime.now();
+            }
+
+            if (statusMovimentoCriado == null) {
+                statusMovimentoCriado = StatusMovimentoCriado.MOVIMENTO_NAO_CRIADO;
+            }
+
+            return new AjusteEstoque(id, titulo, dateHora, status, statusMovimentoCriado, ajusteEstoqueItens);
         }
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getTitulo() {

@@ -1,9 +1,7 @@
 package test;
 
 import conn.ConnectionFactory;
-import conn.ConnectionProvider;
-import repository.AjusteEstoqueItemRepository;
-import repository.AjusteEstoqueRepository;
+import repository.*;
 import service.*;
 import ui.ajusteestoque.AjusteEstoqueMenu;
 import ui.categoria.CategoriaMenu;
@@ -26,9 +24,22 @@ public class Principal {
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
     private final AjusteEstoqueRepository estoqueRepository = new AjusteEstoqueRepository();
     private final AjusteEstoqueItemRepository ajusteEstoqueItemRepository = new AjusteEstoqueItemRepository();
+    private final MovimentoRepository movimentoRepository = new MovimentoRepository();
+    private final MovimentoItemRepository movimentoItemRepository = new MovimentoItemRepository();
+    private final HistoricoEstoqueService historicoEstoqueService = new HistoricoEstoqueService();
+    private final ProdutoRepository produtoRepository = new ProdutoRepository();
+    private final PessoaRepository pessoaRepository = new PessoaRepository();
 
     private final AjusteEstoqueService ajusteEstoqueService =
-            new AjusteEstoqueService(estoqueRepository, ajusteEstoqueItemRepository, connectionFactory);
+            new AjusteEstoqueService(
+                    estoqueRepository,
+                    ajusteEstoqueItemRepository,
+                    produtoRepository,
+                    movimentoRepository,
+                    movimentoItemRepository,
+                    historicoEstoqueService,
+                    pessoaRepository,
+                    connectionFactory);
 
     private final PessoaMenu pessoaMenu = new PessoaMenu(scanner, pessoaService);
     private final CategoriaMenu categoriaMenu = new CategoriaMenu(scanner, categoriaService);

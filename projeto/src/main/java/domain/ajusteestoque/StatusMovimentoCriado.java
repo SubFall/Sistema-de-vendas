@@ -1,12 +1,12 @@
 package domain.ajusteestoque;
 
-public enum Status {
-    ABERTO(0),
-    FINALIZADO(1);
+public enum StatusMovimentoCriado {
+    MOVIMENTO_NAO_CRIADO(0),
+    FINALIZADO_CRIADO(1);
 
     private final int codigo;
 
-    Status(int codigo) {
+    StatusMovimentoCriado(int codigo) {
         this.codigo = codigo;
     }
 
@@ -14,8 +14,8 @@ public enum Status {
         return codigo;
     }
 
-    public static Status porCodigo(int codigo) {
-        for (Status status : Status.values()) {
+    public static StatusMovimentoCriado porCodigo(int codigo) {
+        for (StatusMovimentoCriado status : StatusMovimentoCriado.values()) {
             if (status.codigo == codigo) {
                 return status;
             }

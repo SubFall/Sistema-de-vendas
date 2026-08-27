@@ -10,7 +10,6 @@ import service.ProdutoService;
 import ui.produto.ProdutoMenu;
 import util.ConsoleUtils;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -47,10 +46,11 @@ public class AjusteEstoqueMenu {
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
-                case 1 -> novo();
+                case 1 -> novoAjuste();
 //                case 2 -> remover();
 //                case 3 -> atualizar();
-                case 4 -> {
+                case 4 -> criarMovimento();
+                case 5 -> {
                     int op;
                     do {
                         System.out.println("1 - Listar todas categoriras");
@@ -59,7 +59,7 @@ public class AjusteEstoqueMenu {
 
                         op = ConsoleUtils.lerInteiro(scanner, "Opção");
 
-                    } while (op != 1 && op != 2 && op != 3);
+                    } while (op != 0);
 
 //                    listar(op);
                 }
@@ -69,7 +69,7 @@ public class AjusteEstoqueMenu {
         } while (opcao != 0);
     }
 
-    private void novo() {
+    private void novoAjuste() {
 
         System.out.println("Título:");
         String titulo = scanner.nextLine();
@@ -147,4 +147,22 @@ public class AjusteEstoqueMenu {
         System.out.println("Ajuste criado com sucesso!");
         return true;
     }
+
+    private void criarMovimento() {
+        List<AjusteEstoque> ajusteEstoques = ajusteEstoqueService.buscarAjustePorStatus(Status.FINALIZADO);
+        exibirGridAjusteEstoque(ajusteEstoques);
+
+        try {
+            System.out.print("Digite o ID do Ajuste: ");
+            AjusteEstoque ajuste = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+
+
+            ajusteEstoqueService.criarMovimentoAjusteEstoque(ajuste.getId());
+
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 }

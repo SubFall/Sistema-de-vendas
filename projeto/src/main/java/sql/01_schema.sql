@@ -10,6 +10,9 @@ CREATE TABLE `eclipse_net`.`pessoas`
     UNIQUE INDEX `documento_UNIQUE` (`documento` ASC) VISIBLE
 );
 
+INSERT INTO `eclipse_net`.`pessoa` (`id_pessoa`, `descricao`, `documento`, `tipo`, `ativo`)
+VALUES ('1', 'Pessoa Padrão', '00000000000', '0', '1');
+
 CREATE TABLE `eclipse_net`.`endereco`
 (
     `id_endereco` INT          NOT NULL AUTO_INCREMENT,
@@ -37,6 +40,11 @@ CREATE TABLE `eclipse_net`.`papel`
     PRIMARY KEY (`id_papel`)
 );
 
+INSERT INTO papel
+VALUES (1, 'CLIENTE');
+INSERT INTO papel
+VALUES (2, 'FUNCIONARIO');
+
 CREATE TABLE `eclipse_net`.`pessoa_papel`
 (
     `id_pessoa` INT NOT NULL,
@@ -55,10 +63,11 @@ CREATE TABLE `eclipse_net`.`pessoa_papel`
             ON UPDATE NO ACTION
 );
 
-INSERT INTO papel
-VALUES (1, 'CLIENTE');
-INSERT INTO papel
-VALUES (2, 'FUNCIONARIO');
+INSERT INTO `eclipse_net`.`pessoa_papel` (`id_pessoa`, `id_papel`)
+VALUES ('1', '1');
+INSERT INTO `eclipse_net`.`pessoa_papel` (`id_pessoa`, `id_papel`)
+VALUES ('1', '2');
+
 
 CREATE TABLE `eclipse_net`.`categoria`
 (
@@ -164,6 +173,7 @@ CREATE TABLE `eclipse_net`.`ajuste_estoque`
     `titulo`            VARCHAR(60) NOT NULL,
     `data`              DATETIME    NOT NULL,
     `status`            INT         NOT NULL,
+    `status_movimento`  INT         NOT NULL,
     PRIMARY KEY (`id_ajuste_estoque`)
 );
 
