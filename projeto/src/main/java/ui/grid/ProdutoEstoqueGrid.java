@@ -98,11 +98,11 @@ public final class ProdutoEstoqueGrid {
     }
 
     public static void exibirGridAjusteEstoqueCabecalho() {
-        System.out.println("========================================");
-        System.out.println("            AJUSTE DE ESTOQUE           ");
-        System.out.println("========================================");
+        System.out.println("===============================================");
+        System.out.println("                AJUSTE DE ESTOQUE              ");
+        System.out.println("===============================================");
         System.out.printf(
-                "%-3s | %-15s | %-5s | %-8s%n",
+                "%-3s | %-15s | %-10s | %-10s%n",
                 "ID", "TÍTULO", "DATA", "STATUS"
         );
     }
@@ -123,12 +123,12 @@ public final class ProdutoEstoqueGrid {
         for (AjusteEstoque ajuste : ajusteEstoques) {
             id = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getId()), 3);
             titulo = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getTitulo()), 15);
-            data = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getDateHora()), 5);
-            status = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getStatus()), 8);
+            data = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getDateHora()), 10);
+            status = ConsoleUtils.formatarColuna(String.valueOf(ajuste.getStatus()), 10);
 
             System.out.printf("%s | %s | %s | %s %n", id, titulo, data, status);
         }
-        System.out.println("-----------------------------------------");
+        System.out.println("-----------------------------------------------");
 
     }
 }

@@ -152,6 +152,10 @@ public class AjusteEstoqueMenu {
         List<AjusteEstoque> ajusteEstoques = ajusteEstoqueService.buscarAjustePorStatus(Status.FINALIZADO);
         exibirGridAjusteEstoque(ajusteEstoques);
 
+        if (ajusteEstoques.isEmpty()) {
+            return;
+        }
+
         try {
             System.out.print("Digite o ID do Ajuste: ");
             AjusteEstoque ajuste = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerInteiro(scanner, "ID"));

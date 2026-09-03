@@ -106,6 +106,10 @@ public class AjusteEstoque {
         return status;
     }
 
+    public StatusMovimentoCriado getStatusMovimentoCriado() {
+        return statusMovimentoCriado;
+    }
+
     public List<AjusteEstoqueItens> getAjusteEstoqueItens() {
         return ajusteEstoqueItens;
     }

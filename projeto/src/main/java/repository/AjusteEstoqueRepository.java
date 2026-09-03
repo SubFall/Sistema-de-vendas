@@ -17,13 +17,14 @@ public class AjusteEstoqueRepository {
     private final EstoqueRepository estoqueRepository = new EstoqueRepository();
 
     public Long inserirAjusteEstoque(Connection conn, AjusteEstoque estoque) {
-        String sql = "INSERT INTO ajuste_estoque (titulo, data, status) VALUES (?, ?, ?);";
+        String sql = "INSERT INTO ajuste_estoque (titulo, data, status, status_movimento) VALUES (?, ?, ?, ?);";
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, estoque.getTitulo());
             ps.setTimestamp(2, Timestamp.valueOf(estoque.getDateHora()));
             ps.setInt(3, estoque.getStatus().getCodigo());
+            ps.setInt(4, estoque.getStatusMovimentoCriado().getCodigo());
 
             ps.executeUpdate();
 
@@ -40,7 +41,10 @@ public class AjusteEstoqueRepository {
 
     public List<AjusteEstoque> buscarAjustePorStatus(Status status) {
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
-        String sql = "SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque WHERE status = ?;";
+        String sql = """
+                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
+                WHERE status = ? AND status_movimento <> 1;
+                """;
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

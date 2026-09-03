@@ -98,7 +98,13 @@ public class AjusteEstoqueService {
     }
 
     public AjusteEstoque buscarAjustePorId(int idAjuste) {
-        return ajusteEstoqueRepository.buscarAjustePorId(idAjuste);
+        AjusteEstoque ajusteEstoque = ajusteEstoqueRepository.buscarAjustePorId(idAjuste);
+
+        if (ajusteEstoque == null) {
+            throw new IllegalArgumentException("Ajuste de Estoque não localizado");
+        }
+
+        return ajusteEstoque;
     }
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
@@ -117,47 +123,21 @@ public class AjusteEstoqueService {
         List<AjusteEstoqueItens> ajusteEstoqueItensSaida = buscarAjusteEstoqueItensSaida(idAjuste);
 
         try {
-            if (!ajusteEstoqueItensEntrada.isEmpty()) {
-                List<MovimentoItem> movimentoItems = new ArrayList<>();
-                for (AjusteEstoqueItens ajusteEstoqueItens : ajusteEstoqueItensEntrada) {
-                    movimentoItems.add(MovimentoItem.builder()
-                            .produto(produtoRepository.buscarPorId(ajusteEstoqueItens.getProduto().getId()))
-                            .quantidade(ajusteEstoqueItens.getContagem())
-                            .valorUnitario(new BigDecimal("10.00"))
-                            .build());
-                }
+            conn = connectionProvider.getConnection();
+            conn.setAutoCommit(false);
 
-
-                Movimento movimento = Movimento.builder()
-                        .pessoa(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
-                        .funcionario(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
-                        .tipo(Tipo.ENTRADA)
-                        .statusMovimento(StatusMovimento.FINALIZADO)
-                        .movimentoItens(movimentoItems)
-                        .build();
-
-                conn = connectionProvider.getConnection();
-                conn.setAutoCommit(false);
-
-                int idMovimento = movimentoRepository.inserirMovimento(conn, movimento);
-                movimento.setId(idMovimento);
-
-                for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
-                    boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
-
-                    if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
-                        historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(), movimento,
-                                movimentoItem.getQuantidade(), movimento.getTipo());
-                    }
-
-                    if (!isInseriu) {
-                        throw new IllegalArgumentException("Erro ao inserir item do movimento");
-                    }
-                }
-
-                ajusteEstoqueRepository.mudarStatusMovimento(conn, StatusMovimentoCriado.FINALIZADO_CRIADO, idAjuste);
-
+            if (!ajusteEstoqueItensEntrada.isEmpty()) {;
+                criarMovimento(conn, ajusteEstoqueItensEntrada, Tipo.ENTRADA);
             }
+
+            if (!ajusteEstoqueItensSaida.isEmpty()) {
+                criarMovimento(conn, ajusteEstoqueItensSaida, Tipo.SAIDA);
+            }
+
+            if (!ajusteEstoqueItensEntrada.isEmpty() || !ajusteEstoqueItensSaida.isEmpty()) {
+                ajusteEstoqueRepository.mudarStatusMovimento(conn, StatusMovimentoCriado.FINALIZADO_CRIADO, idAjuste);
+            }
+
             conn.commit();
         } catch (SQLException e) {
             try {
@@ -178,8 +158,41 @@ public class AjusteEstoqueService {
                 throw new RuntimeException("Erro ao fechar a conexão", e);
             }
         }
+    }
 
+    private void criarMovimento(Connection conn, List<AjusteEstoqueItens> ajusteEstoqueItens, Tipo tipo) {
+        List<MovimentoItem> movimentoItems = new ArrayList<>();
+        for (AjusteEstoqueItens estoqueItens : ajusteEstoqueItens) {
+            movimentoItems.add(MovimentoItem.builder()
+                    .produto(produtoRepository.buscarPorId(estoqueItens.getProduto().getId()))
+                    .quantidade(estoqueItens.getContagem())
+                    .valorUnitario(new BigDecimal("10.00"))
+                    .build());
+        }
 
+        Movimento movimento = Movimento.builder()
+                .pessoa(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
+                .funcionario(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
+                .tipo(tipo)
+                .statusMovimento(StatusMovimento.FINALIZADO)
+                .movimentoItens(movimentoItems)
+                .build();
+
+        int idMovimento = movimentoRepository.inserirMovimento(conn, movimento);
+        movimento.setId(idMovimento);
+
+        for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
+            boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
+
+            if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
+                historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(), movimento,
+                        movimentoItem.getQuantidade(), movimento.getTipo());
+            }
+
+            if (!isInseriu) {
+                throw new IllegalArgumentException("Erro ao inserir item do movimento");
+            }
+        }
     }
 
 }
