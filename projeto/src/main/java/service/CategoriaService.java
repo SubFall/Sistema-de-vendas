@@ -6,7 +6,11 @@ import repository.CategoriaRepository;
 import java.util.List;
 
 public class CategoriaService {
-    CategoriaRepository categoriaRepository = new CategoriaRepository();
+    private final CategoriaRepository categoriaRepository;
+
+    public CategoriaService(CategoriaRepository categoriaRepository) {
+        this.categoriaRepository = categoriaRepository;
+    }
 
     public boolean inserirCategoria(Categoria categoria) {
         if (categoriaRepository.categoriaPossuiProdutos(categoria.getDescricao())) {

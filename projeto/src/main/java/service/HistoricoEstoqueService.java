@@ -5,22 +5,26 @@ import domain.estoque.HistoricoEstoque;
 import domain.movimento.Movimento;
 import domain.movimento.Tipo;
 import domain.produto.Produto;
-import repository.EstoqueRepository;
 import repository.HistoricoEstoqueRepository;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 
 public class HistoricoEstoqueService {
-    private final HistoricoEstoqueRepository historicoEstoqueRepository = new HistoricoEstoqueRepository();
-    private final EstoqueRepository estoqueRepository = new EstoqueRepository();
-    private final EstoqueService estoqueService = new EstoqueService();
+    private final HistoricoEstoqueRepository historicoEstoqueRepository;
+    private final EstoqueService estoqueService;
+
+    public HistoricoEstoqueService(HistoricoEstoqueRepository historicoEstoqueRepository, EstoqueService estoqueService) {
+        this.historicoEstoqueRepository = historicoEstoqueRepository;
+        this.estoqueService = estoqueService;
+
+    }
 
     public void movimentar(
             Connection conn, Produto produto, Movimento movimento, BigDecimal quantidade, Tipo tipo
     ) {
 
-        Estoque estoque = estoqueRepository.buscarPorIdProduto(conn, produto.getId());
+        Estoque estoque = estoqueService.buscarPorIdProduto(conn, produto.getId());
 
         if (tipo == Tipo.SAIDA && estoque.getQuantidade().compareTo(quantidade) < 0) {
             throw new IllegalArgumentException("Não permititdo! saldo insuficiente para a operação.");

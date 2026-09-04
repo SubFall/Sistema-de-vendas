@@ -1,6 +1,5 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.movimento.Movimento;
 import domain.movimento.StatusMovimento;
@@ -11,9 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovimentoRepository {
-    PessoaRepository pessoaRepository = new PessoaRepository();
-    MovimentoItemRepository movimentoItemRepository = new MovimentoItemRepository();
-    ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
+    private final PessoaRepository pessoaRepository;
+    private final MovimentoItemRepository movimentoItemRepository;
+
+    public MovimentoRepository(
+            ConnectionProvider connectionProvider,
+            PessoaRepository pessoaRepository,
+            MovimentoItemRepository movimentoItemRepository
+    ) {
+        this.connectionProvider = connectionProvider;
+        this.pessoaRepository = pessoaRepository;
+        this.movimentoItemRepository = movimentoItemRepository;
+    }
 
     public int inserirMovimento(Connection conn, Movimento movimento) {
         String sql = """

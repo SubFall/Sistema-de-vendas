@@ -1,6 +1,5 @@
 package service;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.movimento.Movimento;
 import domain.movimento.MovimentoItem;
@@ -15,10 +14,22 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class MovimentoService {
-    MovimentoRepository movimentoRepository = new MovimentoRepository();
-    MovimentoItemRepository movimentoItemRepository = new MovimentoItemRepository();
-    HistoricoEstoqueService historicoEstoqueService = new HistoricoEstoqueService();
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final MovimentoRepository movimentoRepository;
+    private final MovimentoItemRepository movimentoItemRepository;
+    private final HistoricoEstoqueService historicoEstoqueService;
+    private final ConnectionProvider connectionProvider;
+
+    public MovimentoService(
+            MovimentoRepository movimentoRepository,
+            MovimentoItemRepository movimentoItemRepository,
+            HistoricoEstoqueService historicoEstoqueService,
+            ConnectionProvider connectionProvider
+    ) {
+        this.movimentoRepository = movimentoRepository;
+        this.movimentoItemRepository = movimentoItemRepository;
+        this.historicoEstoqueService = historicoEstoqueService;
+        this.connectionProvider = connectionProvider;
+    }
 
     public void inserirMovimento(Movimento movimento) {
         Connection conn = null;

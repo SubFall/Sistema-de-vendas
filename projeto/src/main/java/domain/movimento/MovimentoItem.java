@@ -14,6 +14,7 @@ public class MovimentoItem {
         this.id = id;
         this.produto = produto;
         this.quantidade = quantidade;
+        this.valorUnitario = produto.getPrecoVenda();
     }
 
     public static BuilderMovimentoItem builder() {

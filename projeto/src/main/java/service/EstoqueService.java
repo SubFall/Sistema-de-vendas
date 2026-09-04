@@ -9,7 +9,11 @@ import java.sql.Connection;
 import java.util.List;
 
 public class EstoqueService {
-    private final EstoqueRepository estoqueRepository = new EstoqueRepository();
+    private final EstoqueRepository estoqueRepository;
+
+    public EstoqueService(EstoqueRepository estoqueRepository) {
+        this.estoqueRepository = estoqueRepository;
+    }
 
     public void salvarEstoque(Connection conn, int idProduto, BigDecimal saldo) {
         Estoque estoque = estoqueRepository.buscarPorIdProduto(conn, idProduto);

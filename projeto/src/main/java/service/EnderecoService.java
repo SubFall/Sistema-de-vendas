@@ -6,7 +6,11 @@ import repository.EnderecoRepository;
 import java.util.List;
 
 public class EnderecoService {
-    EnderecoRepository enderecoRepository = new EnderecoRepository();
+    private final EnderecoRepository enderecoRepository;
+
+    public EnderecoService(EnderecoRepository enderecoRepository) {
+        this.enderecoRepository = enderecoRepository;
+    }
 
     public int atualizarEndereco(Endereco endereco) {
         return enderecoRepository.atualizarEndereco(endereco);

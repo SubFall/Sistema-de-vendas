@@ -7,7 +7,6 @@ import domain.produto.Produto;
 import service.AjusteEstoqueService;
 import service.EstoqueService;
 import service.ProdutoService;
-import ui.produto.ProdutoMenu;
 import util.ConsoleUtils;
 
 import java.util.ArrayList;
@@ -20,20 +19,17 @@ public class AjusteEstoqueMenu {
     private final Scanner scanner;
     private final ProdutoService produtoService;
     private final EstoqueService estoqueService;
-    private final ProdutoMenu produtoMenu;
     private final AjusteEstoqueService ajusteEstoqueService;
 
     public AjusteEstoqueMenu(
             Scanner scanner,
             ProdutoService produtoService,
             EstoqueService estoqueService,
-            AjusteEstoqueService ajusteEstoqueService,
-            ProdutoMenu produtoMenu) {
+            AjusteEstoqueService ajusteEstoqueService) {
         this.scanner = scanner;
         this.produtoService = produtoService;
         this.estoqueService = estoqueService;
         this.ajusteEstoqueService = ajusteEstoqueService;
-        this.produtoMenu = produtoMenu;
     }
 
     public void iniciar() {

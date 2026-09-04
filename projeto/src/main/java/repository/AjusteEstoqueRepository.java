@@ -1,6 +1,5 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
@@ -12,9 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AjusteEstoqueRepository {
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
-    private final ProdutoRepository produtoRepository = new ProdutoRepository();
-    private final EstoqueRepository estoqueRepository = new EstoqueRepository();
+    private final ConnectionProvider connectionProvider;
+    private final ProdutoRepository produtoRepository;
+    private final EstoqueRepository estoqueRepository;
+
+    public AjusteEstoqueRepository(
+            ConnectionProvider connectionProvider,
+            ProdutoRepository produtoRepository,
+            EstoqueRepository estoqueRepository
+    ) {
+        this.connectionProvider = connectionProvider;
+        this.produtoRepository = produtoRepository;
+        this.estoqueRepository = estoqueRepository;
+    }
 
     public Long inserirAjusteEstoque(Connection conn, AjusteEstoque estoque) {
         String sql = "INSERT INTO ajuste_estoque (titulo, data, status, status_movimento) VALUES (?, ?, ?, ?);";

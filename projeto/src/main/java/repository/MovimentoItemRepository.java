@@ -1,17 +1,23 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
-import domain.movimento.Movimento;
 import domain.movimento.MovimentoItem;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MovimentoItemRepository {
-    private final ProdutoRepository produtoRepository = new ProdutoRepository();
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
+    private final ProdutoRepository produtoRepository;
+
+    public MovimentoItemRepository(ConnectionProvider connectionProvider, ProdutoRepository produtoRepository) {
+        this.connectionProvider = connectionProvider;
+        this.produtoRepository = produtoRepository;
+    }
 
     public boolean inserirMovimentoItem(Connection conn, int idMovimento, MovimentoItem item) {
         String sql = """

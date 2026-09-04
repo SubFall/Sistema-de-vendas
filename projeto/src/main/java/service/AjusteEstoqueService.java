@@ -12,7 +12,6 @@ import domain.movimento.Tipo;
 import domain.pessoa.Pessoa;
 import repository.*;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -126,7 +125,8 @@ public class AjusteEstoqueService {
             conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
-            if (!ajusteEstoqueItensEntrada.isEmpty()) {;
+            if (!ajusteEstoqueItensEntrada.isEmpty()) {
+                ;
                 criarMovimento(conn, ajusteEstoqueItensEntrada, Tipo.ENTRADA);
             }
 

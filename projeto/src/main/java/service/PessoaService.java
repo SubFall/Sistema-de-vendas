@@ -1,6 +1,5 @@
 package service;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
@@ -13,10 +12,22 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class PessoaService {
-    PessoaRepository pessoaRepository = new PessoaRepository();
-    PessoaPapelRepository pessoaPapelRepository = new PessoaPapelRepository();
-    EnderecoRepository enderecoRepository = new EnderecoRepository();
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
+    private final PessoaRepository pessoaRepository;
+    private final PessoaPapelRepository pessoaPapelRepository;
+    private final EnderecoRepository enderecoRepository;
+
+    public PessoaService(
+            ConnectionProvider connectionProvider,
+            PessoaRepository pessoaRepository,
+            PessoaPapelRepository pessoaPapelRepository,
+            EnderecoRepository enderecoRepository
+    ) {
+        this.connectionProvider = connectionProvider;
+        this.pessoaRepository = pessoaRepository;
+        this.pessoaPapelRepository = pessoaPapelRepository;
+        this.enderecoRepository = enderecoRepository;
+    }
 
     public void inserirPessoa(Pessoa pessoa) {
 
@@ -146,7 +157,7 @@ public class PessoaService {
 
                 if (existeEndereco) {
                     enderecoRepository.atualizarEndereco(conn, pessoa.getEndereco());
-                }else {
+                } else {
                     enderecoRepository.inserirEndereco(conn, pessoa.getId(), pessoa.getEndereco());
                 }
 

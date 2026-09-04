@@ -9,8 +9,13 @@ import java.util.List;
 
 public class ProdutoService {
 
-    ProdutoRepository produtoRepository = new ProdutoRepository();
-    CategoriaRepository categoriaRepository = new CategoriaRepository();
+    private final ProdutoRepository produtoRepository;
+    private final CategoriaRepository categoriaRepository;
+
+    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository) {
+        this.produtoRepository = produtoRepository;
+        this.categoriaRepository = categoriaRepository;
+    }
 
     public boolean inserirProduto(Produto produto) {
 

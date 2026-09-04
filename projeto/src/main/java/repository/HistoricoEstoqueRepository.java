@@ -5,15 +5,19 @@ import domain.movimento.Movimento;
 import domain.movimento.Tipo;
 import domain.produto.Produto;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class HistoricoEstoqueRepository {
-    private ProdutoRepository produtoRepository = new ProdutoRepository();
-    private MovimentoRepository movimentoRepository = new MovimentoRepository();
+    private final ProdutoRepository produtoRepository;
+    private final MovimentoRepository movimentoRepository;
+
+    public HistoricoEstoqueRepository(ProdutoRepository produtoRepository, MovimentoRepository movimentoRepository) {
+        this.produtoRepository = produtoRepository;
+        this.movimentoRepository = movimentoRepository;
+    }
 
     public boolean inserirHistoricoEstoque(Connection conn, HistoricoEstoque historicoEstoque) {
         String sql = """
@@ -30,16 +34,16 @@ public class HistoricoEstoqueRepository {
             ps.setBigDecimal(6, historicoEstoque.getSaldoAtual());
 
             return ps.executeUpdate() > 0;
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public HistoricoEstoque buscarPorId(Connection conn, int idProduto) {
         String sql = """
-                SELECT id_produto, id_movimento, tipo, quantidade, saldo_anterior, saldo_atual 
-                FROM historico_estoque WHERE id_produto = ?;
-    """;
+                            SELECT id_produto, id_movimento, tipo, quantidade, saldo_anterior, saldo_atual 
+                            FROM historico_estoque WHERE id_produto = ?;
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idProduto);

@@ -1,6 +1,5 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.estoque.Estoque;
 import dto.ProdutoEstoqueDTO;
@@ -14,7 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EstoqueRepository {
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
+
+    public EstoqueRepository(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
 
     public boolean inserirEstoque(Connection conn, int idProduto, BigDecimal saldo) {
         String sql = "INSERT INTO estoque (id_produto, quantidade) VALUES (?, ?);";
