@@ -17,10 +17,10 @@ public class Principal {
     private final Scanner scanner = new Scanner(System.in);
 
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
-    private final CategoriaRepository categoriaRepository = new CategoriaRepository();
-    private final ProdutoRepository produtoRepository = new ProdutoRepository();
-    private final PessoaPapelRepository pessoaPapelRepository = new PessoaPapelRepository();
-    private final EnderecoRepository enderecoRepository = new EnderecoRepository();
+    private final CategoriaRepository categoriaRepository = new CategoriaRepository(connectionFactory);
+    private final ProdutoRepository produtoRepository = new ProdutoRepository(connectionFactory);
+    private final PessoaPapelRepository pessoaPapelRepository = new PessoaPapelRepository(connectionFactory);
+    private final EnderecoRepository enderecoRepository = new EnderecoRepository(connectionFactory);
     private final PessoaRepository pessoaRepository = new PessoaRepository(connectionFactory, pessoaPapelRepository);
     private final MovimentoItemRepository movimentoItemRepository = new MovimentoItemRepository(connectionFactory, produtoRepository);
     private final MovimentoRepository movimentoRepository =

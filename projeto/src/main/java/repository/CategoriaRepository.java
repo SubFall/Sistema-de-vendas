@@ -1,6 +1,5 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.categoria.Categoria;
 
@@ -12,7 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoriaRepository {
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
+
+    public CategoriaRepository(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
 
     public boolean inserirCategoria(Categoria categoria) {
         String sql = "INSERT INTO categoria (descricao) VALUES (?);";

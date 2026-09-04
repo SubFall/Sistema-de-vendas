@@ -1,15 +1,21 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.endereco.Endereco;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EnderecoRepository {
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
+
+    public EnderecoRepository(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
 
     public void inserirEndereco(Connection conn, int idPessoa, Endereco endereco) {
         String sql = "INSERT INTO endereco (logradouro, cidade, uf, bairro, numero, cep, id_pessoa) VALUES (?, ?, ?, ?, ?, ?, ?);";

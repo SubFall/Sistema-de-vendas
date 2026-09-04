@@ -1,6 +1,5 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.categoria.Categoria;
 import domain.produto.Produto;
@@ -13,8 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProdutoRepository {
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
 
+    public ProdutoRepository(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
     public boolean inserirProduto(Produto produto) {
         String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo, id_categoria) VALUES (?, ?, ?, ?, ?);";
 

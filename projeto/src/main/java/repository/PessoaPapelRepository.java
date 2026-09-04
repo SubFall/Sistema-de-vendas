@@ -1,6 +1,5 @@
 package repository;
 
-import conn.ConnectionFactory;
 import conn.ConnectionProvider;
 import domain.pessoa.PessoaPapel;
 
@@ -12,7 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PessoaPapelRepository {
-    private final ConnectionProvider connectionProvider = new ConnectionFactory();
+    private final ConnectionProvider connectionProvider;
+
+    public PessoaPapelRepository(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
 
     public void inserirPessoaPapel(Connection conn, int idPessoa, int idPapel) {
         String sql = "INSERT INTO pessoa_papel (id_pessoa, id_papel) VALUES (?, ?);";
