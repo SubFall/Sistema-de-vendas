@@ -75,7 +75,6 @@ public class MovimentoItemRepository {
                 .id(rs.getInt("id_movimento_item"))
                 .produto(produtoRepository.buscarPorId(rs.getInt("id_produto")))
                 .quantidade(rs.getBigDecimal("quantidade"))
-                .valorUnitario(rs.getBigDecimal("valor_unitario"))
                 .build();
     }
 }

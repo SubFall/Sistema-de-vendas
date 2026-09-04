@@ -10,11 +10,10 @@ public class MovimentoItem {
     private BigDecimal quantidade;
     private BigDecimal valorUnitario;
 
-    public MovimentoItem(int id, Produto produto, BigDecimal quantidade, BigDecimal valorUnitario) {
+    public MovimentoItem(int id, Produto produto, BigDecimal quantidade) {
         this.id = id;
         this.produto = produto;
         this.quantidade = quantidade;
-        this.valorUnitario = valorUnitario;
     }
 
     public static BuilderMovimentoItem builder() {
@@ -25,7 +24,6 @@ public class MovimentoItem {
         private int id;
         private Produto produto;
         private BigDecimal quantidade;
-        private BigDecimal valorUnitario;
 
         public BuilderMovimentoItem id(int id) {
             this.id = id;
@@ -42,11 +40,6 @@ public class MovimentoItem {
             return this;
         }
 
-        public BuilderMovimentoItem valorUnitario(BigDecimal valorUnitario) {
-            this.valorUnitario = valorUnitario;
-            return this;
-        }
-
         public MovimentoItem build() {
             if (produto == null) {
                 throw new IllegalArgumentException("Produto obrigatório");
@@ -56,11 +49,7 @@ public class MovimentoItem {
                 throw new IllegalArgumentException("Quantidade inválida");
             }
 
-            if (valorUnitario == null || valorUnitario.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalArgumentException("Valor unitário inválido");
-            }
-
-            return new MovimentoItem(id, produto, quantidade, valorUnitario);
+            return new MovimentoItem(id, produto, quantidade);
         }
     }
 

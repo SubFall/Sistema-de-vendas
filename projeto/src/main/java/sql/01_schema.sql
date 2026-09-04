@@ -10,7 +10,7 @@ CREATE TABLE `eclipse_net`.`pessoas`
     UNIQUE INDEX `documento_UNIQUE` (`documento` ASC) VISIBLE
 );
 
-INSERT INTO `eclipse_net`.`pessoa` (`id_pessoa`, `descricao`, `documento`, `tipo`, `ativo`)
+INSERT INTO `eclipse_net`.`pessoas` (`id_pessoa`, `descricao`, `documento`, `tipo`, `ativo`)
 VALUES ('1', 'Pessoa Padrão', '00000000000', '0', '1');
 
 CREATE TABLE `eclipse_net`.`endereco`
@@ -113,12 +113,12 @@ CREATE TABLE `eclipse_net`.`movimento`
     INDEX              `id_funcionario_idx` (`id_funcionario` ASC) VISIBLE,
     CONSTRAINT `fk_movimento_pessoa`
         FOREIGN KEY (`id_pessoa`)
-            REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
+            REFERENCES `eclipse_net`.`pessoas` (`id_pessoa`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
     CONSTRAINT `fk_movimento_funcionario`
         FOREIGN KEY (`id_funcionario`)
-            REFERENCES `eclipse_net`.`pessoa` (`id_pessoa`)
+            REFERENCES `eclipse_net`.`pessoas` (`id_pessoa`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );

@@ -324,7 +324,6 @@ public class MovimentoMenu {
         MovimentoItem item = MovimentoItem.builder()
                 .produto(produto)
                 .quantidade(ConsoleUtils.lerBigDecimal(scanner, "Quantidade"))
-                .valorUnitario(produto.getPrecoVenda())
                 .build();
         movimentoItems.add(item);
     }
@@ -343,7 +342,6 @@ public class MovimentoMenu {
         return MovimentoItem.builder()
                 .produto(produto)
                 .quantidade(ConsoleUtils.lerBigDecimal(scanner, "Quantidade"))
-                .valorUnitario(produto.getPrecoVenda())
                 .build();
     }
 

@@ -166,7 +166,6 @@ public class AjusteEstoqueService {
             movimentoItems.add(MovimentoItem.builder()
                     .produto(produtoRepository.buscarPorId(estoqueItens.getProduto().getId()))
                     .quantidade(estoqueItens.getContagem())
-                    .valorUnitario(new BigDecimal("10.00"))
                     .build());
         }
 
