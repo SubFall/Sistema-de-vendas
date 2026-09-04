@@ -43,7 +43,7 @@ public class AjusteEstoqueMenu {
 
             switch (opcao) {
                 case 1 -> novoAjuste();
-//                case 2 -> remover();
+                case 2 -> removerAjuste();
 //                case 3 -> atualizar();
                 case 4 -> criarMovimento();
                 case 5 -> {
@@ -156,13 +156,16 @@ public class AjusteEstoqueMenu {
             System.out.print("Digite o ID do Ajuste: ");
             AjusteEstoque ajuste = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerInteiro(scanner, "ID"));
 
-
             ajusteEstoqueService.criarMovimentoAjusteEstoque(ajuste.getId());
 
-
+            System.out.println("Movimento criado com Sucesso!");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void removerAjuste() {
+
     }
 
 }

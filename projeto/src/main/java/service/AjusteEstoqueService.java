@@ -126,7 +126,6 @@ public class AjusteEstoqueService {
             conn.setAutoCommit(false);
 
             if (!ajusteEstoqueItensEntrada.isEmpty()) {
-                ;
                 criarMovimento(conn, ajusteEstoqueItensEntrada, Tipo.ENTRADA);
             }
 
