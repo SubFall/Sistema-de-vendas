@@ -81,7 +81,7 @@ public class AjusteEstoqueMenu {
 
             switch (ConsoleUtils.lerInteiro(scanner, "Opção")) {
                 case 1 -> criarAjusteEstoqueItem(itens);
-//                case 2 -> removerItem(movimentoItens);
+                case 2 -> removerAjusteEstoqueItem(itens);
                 case 3 -> {
                     if (concluirAjuste(titulo, itens)) {
                         repeticao = false;
@@ -109,6 +109,18 @@ public class AjusteEstoqueMenu {
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void removerAjusteEstoqueItem(List<AjusteEstoqueItens> ajusteEstoqueItens) {
+        exibirGridItens(ajusteEstoqueItens);
+
+        System.out.print("Digite o ID do produto: ");
+        AjusteEstoqueItens estoqueItem = ajusteEstoqueService.buscarAjusteEstoqueItemPorId(ConsoleUtils.lerLong(scanner, "ID"));
+
+        ajusteEstoqueItens.remove(estoqueItem);
+
+        System.out.println("Item removido");
+        exibirGridItens(ajusteEstoqueItens);
     }
 
     private boolean concluirAjuste(String titulo, List<AjusteEstoqueItens> itens) {

@@ -110,6 +110,16 @@ public class AjusteEstoqueService {
         return ajusteEstoque;
     }
 
+    public AjusteEstoqueItens buscarAjusteEstoqueItemPorId(Long idAjuste) {
+        AjusteEstoqueItens ajusteEstoqueItem = ajusteEstoqueRepository.buscarAjusteEstoqueItem(idAjuste);
+
+        if (ajusteEstoqueItem == null) {
+            throw new IllegalArgumentException("Ajuste Item não localizado");
+        }
+
+        return ajusteEstoqueItem;
+    }
+
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
         return ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(idAjuste);
     }

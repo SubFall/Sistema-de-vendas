@@ -4,6 +4,7 @@ import domain.estoque.Estoque;
 import domain.produto.Produto;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class AjusteEstoqueItens {
     private Long id;
@@ -80,5 +81,17 @@ public class AjusteEstoqueItens {
                 ", estoque=" + estoque.getQuantidade() +
                 ", contagem=" + contagem +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        AjusteEstoqueItens that = (AjusteEstoqueItens) o;
+        return Objects.equals(id, that.id) && Objects.equals(produto, that.produto) && Objects.equals(estoque, that.estoque) && Objects.equals(contagem, that.contagem);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, produto, estoque, contagem);
     }
 }

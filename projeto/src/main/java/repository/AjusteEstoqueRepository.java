@@ -156,6 +156,28 @@ public class AjusteEstoqueRepository {
         return ajusteEstoqueItens;
     }
 
+    public AjusteEstoqueItens buscarAjusteEstoqueItem(Long idAjuste) {
+        String sql = """
+                SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
+                WHERE id_ajuste_estoque_itens = ?;
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idAjuste);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearAjusteEstoqueItens(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
     public void mudarStatusMovimento(Connection conn, StatusMovimentoCriado statusMovimentoCriado, Long idAjuste) {
         String sql = "UPDATE ajuste_estoque SET status_movimento = ? WHERE (id_ajuste_estoque = ?);";
 
