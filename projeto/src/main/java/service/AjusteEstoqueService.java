@@ -96,6 +96,10 @@ public class AjusteEstoqueService {
         return ajusteEstoqueRepository.buscarAjustePorStatus(status);
     }
 
+    public List<AjusteEstoque> buscarTodosAjuste() {
+        return ajusteEstoqueRepository.buscarTodosAjuste();
+    }
+
     public AjusteEstoque buscarAjustePorId(int idAjuste) {
         AjusteEstoque ajusteEstoque = ajusteEstoqueRepository.buscarAjustePorId(idAjuste);
 
@@ -193,4 +197,37 @@ public class AjusteEstoqueService {
         }
     }
 
+    public void removerAjusteEstoque(AjusteEstoque ajusteEstoque) {
+        Connection conn = null;
+
+        try {
+            conn = connectionProvider.getConnection();
+            conn.setAutoCommit(false);
+
+            boolean isRemoveAjusteItem = ajusteEstoqueRepository.removerAjusteEstoqueItem(conn, ajusteEstoque);
+            boolean isRemoveAjuste = ajusteEstoqueRepository.removerAjusteEstoque(conn, ajusteEstoque);
+
+            if (!isRemoveAjusteItem || !isRemoveAjuste) {
+                throw new SQLException();
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Erro ao realizar rollback", ex);
+            }
+            throw new RuntimeException("Erro ao inserir movimento", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro ao fechar a conexão", e);
+            }
+        }
+    }
 }

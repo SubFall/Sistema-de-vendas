@@ -145,10 +145,10 @@ public class AjusteEstoqueMenu {
     }
 
     private void criarMovimento() {
-        List<AjusteEstoque> ajusteEstoques = ajusteEstoqueService.buscarAjustePorStatus(Status.FINALIZADO);
-        exibirGridAjusteEstoque(ajusteEstoques);
+        List<AjusteEstoque> ajusteEstoqueList = ajusteEstoqueService.buscarAjustePorStatus(Status.FINALIZADO);
+        exibirGridAjusteEstoque(ajusteEstoqueList);
 
-        if (ajusteEstoques.isEmpty()) {
+        if (ajusteEstoqueList.isEmpty()) {
             return;
         }
 
@@ -165,7 +165,23 @@ public class AjusteEstoqueMenu {
     }
 
     private void removerAjuste() {
+        List<AjusteEstoque> ajusteEstoqueList = ajusteEstoqueService.buscarTodosAjuste();
+        exibirGridAjusteEstoque(ajusteEstoqueList);
 
+        if (ajusteEstoqueList.isEmpty()) {
+            return;
+        }
+
+        try {
+            System.out.print("Digite o ID do Ajuste: ");
+            AjusteEstoque ajusteEstoque = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+
+            ajusteEstoqueService.removerAjusteEstoque(ajusteEstoque);
+
+            System.out.println("Ajuste Estoque removido com Sucesso!");
+        } catch (IllegalAccessError e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 }
