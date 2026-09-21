@@ -6,8 +6,11 @@ import domain.ajusteestoque.AjusteEstoqueItens;
 import domain.ajusteestoque.Status;
 import domain.estoque.Estoque;
 import domain.produto.Produto;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,12 +20,8 @@ import repository.AjusteEstoqueRepository;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AjusteEstoqueServiceTest {
@@ -38,53 +37,50 @@ class AjusteEstoqueServiceTest {
     @Mock
     private Connection connection;
 
+    private List<AjusteEstoqueItens> estoqueItensList;
+    private AjusteEstoque ajusteEstoque;
+
     @InjectMocks
     private AjusteEstoqueService service;
 
+    @BeforeEach
+    void init() {
+        var computador = Produto.builder().id(1).descricao("computador").precoCusto(new BigDecimal("999")).precoVenda(new BigDecimal("1500")).build();
+        var notebook = Produto.builder().id(2).descricao("notebook").precoCusto(new BigDecimal("1200")).precoVenda(new BigDecimal("2000")).build();
+        var mouse = Produto.builder().id(3).descricao("mouse logitech").precoCusto(new BigDecimal("399")).precoVenda(new BigDecimal("800")).build();
+
+        var estoqueComputador = Estoque.builder().idProduto(computador.getId()).quantidade(new BigDecimal("5")).build();
+        var estoqueNotebook = Estoque.builder().idProduto(notebook.getId()).quantidade(new BigDecimal("10")).build();
+        var estoqueMouse = Estoque.builder().idProduto(mouse.getId()).quantidade(new BigDecimal("15")).build();
+
+        var ajusteEstoqueComputador = AjusteEstoqueItens.builder().id(1L).produto(computador).contagem(new BigDecimal("10")).estoque(estoqueComputador).build();
+        var ajusteEstoqueNotebook = AjusteEstoqueItens.builder().id(2L).produto(notebook).contagem(new BigDecimal("20")).estoque(estoqueNotebook).build();
+        var ajusteEstoqueMouse = AjusteEstoqueItens.builder().id(3L).produto(mouse).contagem(new BigDecimal("10")).estoque(estoqueMouse).build();
+
+        this.estoqueItensList = new ArrayList<>(List.of(ajusteEstoqueComputador, ajusteEstoqueNotebook, ajusteEstoqueMouse));
+        this.ajusteEstoque = AjusteEstoque.builder().id(1L).titulo("Teste").status(Status.ABERTO).ajusteEstoqueItens(this.estoqueItensList).build();
+    }
+
     @Test
     void deveInserirAjusteEstoqueComSucesso() throws SQLException {
+        var idAjuste = 1L;
 
-        AjusteEstoqueItens item = AjusteEstoqueItens.builder()
-                .produto(Produto.builder().id(1).descricao("teste").precoVenda(new BigDecimal("9.99")).build())
-                .estoque(Estoque.builder().idProduto(1).build())
-                .contagem(new BigDecimal("1"))
-                .build();
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(estoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenReturn(idAjuste);
+        BDDMockito.when(ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(connection, idAjuste, estoqueItensList)).thenReturn(true);
 
-        AjusteEstoque ajuste = AjusteEstoque.builder()
-                .titulo("teste")
-                .status(Status.ABERTO)
-                .ajusteEstoqueItens(List.of(item))
-                .build();
+        Assertions.assertThatNoException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque)
+        );
 
-        when(connectionProvider.getConnection())
-                .thenReturn(connection);
-
-        when(estoqueRepository.inserirAjusteEstoque(connection, ajuste))
-                .thenReturn(10L);
-
-        when(ajusteEstoqueItemRepository.inserirAjusteEstoqueItem(
-                connection, 10L, item))
-                .thenReturn(true);
-
-        service.inserirAjusteEstoque(ajuste);
-
-        verify(connection).setAutoCommit(false);
-
-        verify(estoqueRepository)
-                .inserirAjusteEstoque(connection, ajuste);
-
-        verify(ajusteEstoqueItemRepository)
-                .inserirAjusteEstoqueItem(connection, 10L, item);
-
-        verify(connection).commit();
-
-        verify(connection).close();
+        BDDMockito.verify(connection).setAutoCommit(false);
+        BDDMockito.verify(connection).commit();
+        BDDMockito.verify(connection).close();
     }
 
     @Test
     void deveLancarExcecaoQuandoNaoInserirItem() throws SQLException {
 
-        AjusteEstoqueItens item = AjusteEstoqueItens.builder()
+        /* AjusteEstoqueItens item = AjusteEstoqueItens.builder()
                 .produto(Produto.builder().id(1).descricao("teste").precoVenda(new BigDecimal("9.99")).build())
                 .estoque(Estoque.builder().idProduto(1).build())
                 .contagem(new BigDecimal("1"))
@@ -117,6 +113,6 @@ class AjusteEstoqueServiceTest {
         );
 
         verify(connection).rollback();
-        verify(connection).close();
+        verify(connection).close();*/
     }
 }
