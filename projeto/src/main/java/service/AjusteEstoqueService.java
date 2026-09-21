@@ -54,12 +54,10 @@ public class AjusteEstoqueService {
 
             Long idAjusteEstoque = ajusteEstoqueRepository.inserirAjusteEstoque(conn, estoque);
 
-            for (AjusteEstoqueItens item : estoque.getAjusteEstoqueItens()) {
-                boolean isInseriu = ajusteEstoqueItemRepository.inserirAjusteEstoqueItem(conn, idAjusteEstoque, item);
+            boolean isInseriu = ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(conn, idAjusteEstoque, estoque.getAjusteEstoqueItens());
 
-                if (!isInseriu) {
-                    throw new IllegalArgumentException("Erro ao inserir item do Ajuste Estoque");
-                }
+            if (!isInseriu) {
+                throw new IllegalArgumentException("Erro ao inserir item do Ajuste Estoque");
             }
 
             conn.commit();
