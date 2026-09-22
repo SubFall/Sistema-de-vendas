@@ -7,8 +7,7 @@ import domain.ajusteestoque.Status;
 import domain.estoque.Estoque;
 import domain.produto.Produto;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class AjusteEstoqueServiceTest {
     @Mock
     private AjusteEstoqueRepository estoqueRepository;
@@ -62,6 +62,7 @@ class AjusteEstoqueServiceTest {
     }
 
     @Test
+    @Order(1)
     void deveInserirAjusteEstoqueComSucesso() throws SQLException {
         var idAjuste = 1L;
 
@@ -69,8 +70,7 @@ class AjusteEstoqueServiceTest {
         BDDMockito.when(estoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenReturn(idAjuste);
         BDDMockito.when(ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(connection, idAjuste, estoqueItensList)).thenReturn(true);
 
-        Assertions.assertThatNoException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque)
-        );
+        Assertions.assertThatNoException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque));
 
         BDDMockito.verify(connection).setAutoCommit(false);
         BDDMockito.verify(connection).commit();
@@ -78,41 +78,20 @@ class AjusteEstoqueServiceTest {
     }
 
     @Test
+    @Order(2)
     void deveLancarExcecaoQuandoNaoInserirItem() throws SQLException {
+        var idAjuste = 1L;
 
-        /* AjusteEstoqueItens item = AjusteEstoqueItens.builder()
-                .produto(Produto.builder().id(1).descricao("teste").precoVenda(new BigDecimal("9.99")).build())
-                .estoque(Estoque.builder().idProduto(1).build())
-                .contagem(new BigDecimal("1"))
-                .build();
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(estoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenReturn(idAjuste);
+        BDDMockito.when(ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(connection, idAjuste, estoqueItensList)).thenReturn(false);
 
-        AjusteEstoque ajuste = AjusteEstoque.builder()
-                .titulo("teste")
-                .status(Status.ABERTO)
-                .ajusteEstoqueItens(List.of(item))
-                .build();
+        Assertions.assertThatException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque))
+                .isInstanceOf(IllegalArgumentException.class)
+                .withMessage("Erro ao inserir item do Ajuste Estoque");
 
-        when(connectionProvider.getConnection())
-                .thenReturn(connection);
-
-        when(estoqueRepository.inserirAjusteEstoque(connection, ajuste))
-                .thenReturn(10L);
-
-        when(ajusteEstoqueItemRepository.inserirAjusteEstoqueItem(
-                connection, 10L, item))
-                .thenReturn(false);
-
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> service.inserirAjusteEstoque(ajuste)
-        );
-
-        assertEquals(
-                "Erro ao inserir item do Ajuste Estoque",
-                exception.getMessage()
-        );
-
-        verify(connection).rollback();
-        verify(connection).close();*/
+        BDDMockito.verify(connection).rollback();
+        BDDMockito.verify(connection).close();
+        BDDMockito.verify(connection, BDDMockito.never()).commit();
     }
 }
