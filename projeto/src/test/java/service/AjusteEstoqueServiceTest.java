@@ -94,4 +94,18 @@ class AjusteEstoqueServiceTest {
         BDDMockito.verify(connection).close();
         BDDMockito.verify(connection, BDDMockito.never()).commit();
     }
+
+    @Test
+    @Order(3)
+    void deveLancarExcecaoSQLException() throws SQLException {
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(estoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenThrow(SQLException.class);
+
+        Assertions.assertThatException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque))
+                .isInstanceOf(RuntimeException.class);
+
+        BDDMockito.verify(connection).rollback();
+        BDDMockito.verify(connection).close();
+        BDDMockito.verify(connection, BDDMockito.never()).commit();
+    }
 }

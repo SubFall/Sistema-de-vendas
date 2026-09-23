@@ -25,7 +25,7 @@ public class AjusteEstoqueRepository {
         this.estoqueRepository = estoqueRepository;
     }
 
-    public Long inserirAjusteEstoque(Connection conn, AjusteEstoque estoque) {
+    public Long inserirAjusteEstoque(Connection conn, AjusteEstoque estoque) throws SQLException {
         String sql = "INSERT INTO ajuste_estoque (titulo, data, status, status_movimento) VALUES (?, ?, ?, ?);";
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -42,9 +42,7 @@ public class AjusteEstoqueRepository {
                     return rs.getLong(1);
                 }
             }
-            throw new IllegalArgumentException("Erro ao obter ID do Ajuste Estoque");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao obter ID do Ajuste Estoque");
         }
     }
 
