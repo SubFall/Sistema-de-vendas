@@ -94,6 +94,10 @@ public class AjusteEstoqueService {
         return ajusteEstoqueRepository.buscarAjustePorStatus(status);
     }
 
+    public List<AjusteEstoque> buscarTodosAjuste() {
+        return ajusteEstoqueRepository.buscarTodosAjuste();
+    }
+
     public AjusteEstoque buscarAjustePorId(int idAjuste) {
         AjusteEstoque ajusteEstoque = ajusteEstoqueRepository.buscarAjustePorId(idAjuste);
 
@@ -102,6 +106,16 @@ public class AjusteEstoqueService {
         }
 
         return ajusteEstoque;
+    }
+
+    public AjusteEstoqueItens buscarAjusteEstoqueItemPorId(Long idAjuste) {
+        AjusteEstoqueItens ajusteEstoqueItem = ajusteEstoqueRepository.buscarAjusteEstoqueItem(idAjuste);
+
+        if (ajusteEstoqueItem == null) {
+            throw new IllegalArgumentException("Ajuste Item não localizado");
+        }
+
+        return ajusteEstoqueItem;
     }
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
@@ -124,7 +138,6 @@ public class AjusteEstoqueService {
             conn.setAutoCommit(false);
 
             if (!ajusteEstoqueItensEntrada.isEmpty()) {
-                ;
                 criarMovimento(conn, ajusteEstoqueItensEntrada, Tipo.ENTRADA);
             }
 
@@ -192,4 +205,37 @@ public class AjusteEstoqueService {
         }
     }
 
+    public void removerAjusteEstoque(AjusteEstoque ajusteEstoque) {
+        Connection conn = null;
+
+        try {
+            conn = connectionProvider.getConnection();
+            conn.setAutoCommit(false);
+
+            boolean isRemoveAjusteItem = ajusteEstoqueRepository.removerAjusteEstoqueItem(conn, ajusteEstoque);
+            boolean isRemoveAjuste = ajusteEstoqueRepository.removerAjusteEstoque(conn, ajusteEstoque);
+
+            if (!isRemoveAjusteItem || !isRemoveAjuste) {
+                throw new SQLException();
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Erro ao realizar rollback", ex);
+            }
+            throw new RuntimeException("Erro ao inserir movimento", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Erro ao fechar a conexão", e);
+            }
+        }
+    }
 }

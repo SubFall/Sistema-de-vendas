@@ -31,6 +31,16 @@ public final class ConsoleUtils {
         }
     }
 
+    public static Long lerLong(Scanner scanner, String label) {
+        while (true) {
+            try {
+                return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Digite um " + label + " válido");
+            }
+        }
+    }
+
     public static BigDecimal lerBigDecimal(Scanner scanner, String label) {
         while (true) {
             try {

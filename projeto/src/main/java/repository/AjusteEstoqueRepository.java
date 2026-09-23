@@ -71,6 +71,26 @@ public class AjusteEstoqueRepository {
         return ajusteEstoques;
     }
 
+    public List<AjusteEstoque> buscarTodosAjuste() {
+        List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
+        String sql = """
+                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
+                WHERE status_movimento <> 1;
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ajusteEstoques.add(mapearAjusteEstoque(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ajusteEstoques;
+    }
+
     public AjusteEstoque buscarAjustePorId(int idAjuste) {
         String sql = "SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
 
@@ -136,6 +156,28 @@ public class AjusteEstoqueRepository {
         return ajusteEstoqueItens;
     }
 
+    public AjusteEstoqueItens buscarAjusteEstoqueItem(Long idAjuste) {
+        String sql = """
+                SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
+                WHERE id_ajuste_estoque_itens = ?;
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idAjuste);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearAjusteEstoqueItens(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
     public void mudarStatusMovimento(Connection conn, StatusMovimentoCriado statusMovimentoCriado, Long idAjuste) {
         String sql = "UPDATE ajuste_estoque SET status_movimento = ? WHERE (id_ajuste_estoque = ?);";
 
@@ -144,6 +186,30 @@ public class AjusteEstoqueRepository {
             ps.setLong(2, idAjuste);
 
             ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean removerAjusteEstoque(Connection conn, AjusteEstoque ajusteEstoque) {
+        String sql = "DELETE FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, ajusteEstoque.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean removerAjusteEstoqueItem(Connection conn, AjusteEstoque ajusteEstoque) {
+        String sql = "DELETE FROM ajuste_estoque_itens WHERE id_ajuste_estoque = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, ajusteEstoque.getId());
+
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
