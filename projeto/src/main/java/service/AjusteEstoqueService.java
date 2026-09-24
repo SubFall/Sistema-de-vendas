@@ -98,7 +98,7 @@ public class AjusteEstoqueService {
         return ajusteEstoqueRepository.buscarTodosAjuste();
     }
 
-    public AjusteEstoque buscarAjustePorId(int idAjuste) {
+    public AjusteEstoque buscarAjustePorId(Long idAjuste) {
         AjusteEstoque ajusteEstoque = ajusteEstoqueRepository.buscarAjustePorId(idAjuste);
 
         if (ajusteEstoque == null) {

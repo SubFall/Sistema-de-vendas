@@ -166,7 +166,7 @@ public class AjusteEstoqueMenu {
 
         try {
             System.out.print("Digite o ID do Ajuste: ");
-            AjusteEstoque ajuste = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+            AjusteEstoque ajuste = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerLong(scanner, "ID"));
 
             ajusteEstoqueService.criarMovimentoAjusteEstoque(ajuste.getId());
 
@@ -186,7 +186,7 @@ public class AjusteEstoqueMenu {
 
         try {
             System.out.print("Digite o ID do Ajuste: ");
-            AjusteEstoque ajusteEstoque = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+            AjusteEstoque ajusteEstoque = ajusteEstoqueService.buscarAjustePorId(ConsoleUtils.lerLong(scanner, "ID"));
 
             ajusteEstoqueService.removerAjusteEstoque(ajusteEstoque);
 

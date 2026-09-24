@@ -89,12 +89,12 @@ public class AjusteEstoqueRepository {
         return ajusteEstoques;
     }
 
-    public AjusteEstoque buscarAjustePorId(int idAjuste) {
+    public AjusteEstoque buscarAjustePorId(Long idAjuste) {
         String sql = "SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idAjuste);
+            ps.setLong(1, idAjuste);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
