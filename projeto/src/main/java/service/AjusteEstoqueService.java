@@ -126,6 +126,41 @@ public class AjusteEstoqueService {
         return ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(idAjuste);
     }
 
+    private void criarMovimento(Connection conn, List<AjusteEstoqueItens> ajusteEstoqueItens, Tipo tipo) {
+        List<MovimentoItem> movimentoItems = new ArrayList<>();
+        for (AjusteEstoqueItens estoqueItens : ajusteEstoqueItens) {
+            movimentoItems.add(MovimentoItem.builder()
+                    .produto(produtoRepository.buscarPorId(estoqueItens.getProduto().getId()))
+                    .quantidade(estoqueItens.getContagem())
+                    .build());
+        }
+
+        Movimento movimento = Movimento.builder()
+                .pessoa(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
+                .funcionario(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
+                .tipo(tipo)
+                .statusMovimento(StatusMovimento.FINALIZADO)
+                .movimentoItens(movimentoItems)
+                .build();
+
+        int idMovimento = movimentoRepository.inserirMovimento(conn, movimento);
+        movimento.setId(idMovimento);
+
+        for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
+            boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
+
+            if (!isInseriu) {
+                throw new IllegalArgumentException("Erro ao inserir item do movimento");
+            }
+
+            if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
+                historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(), movimento,
+                        movimentoItem.getQuantidade(), movimento.getTipo());
+            }
+
+        }
+    }
+
     public void criarMovimentoAjusteEstoque(Long idAjuste) {
         Connection conn = null;
 
@@ -171,39 +206,6 @@ public class AjusteEstoqueService {
         }
     }
 
-    private void criarMovimento(Connection conn, List<AjusteEstoqueItens> ajusteEstoqueItens, Tipo tipo) {
-        List<MovimentoItem> movimentoItems = new ArrayList<>();
-        for (AjusteEstoqueItens estoqueItens : ajusteEstoqueItens) {
-            movimentoItems.add(MovimentoItem.builder()
-                    .produto(produtoRepository.buscarPorId(estoqueItens.getProduto().getId()))
-                    .quantidade(estoqueItens.getContagem())
-                    .build());
-        }
-
-        Movimento movimento = Movimento.builder()
-                .pessoa(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
-                .funcionario(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO))
-                .tipo(tipo)
-                .statusMovimento(StatusMovimento.FINALIZADO)
-                .movimentoItens(movimentoItems)
-                .build();
-
-        int idMovimento = movimentoRepository.inserirMovimento(conn, movimento);
-        movimento.setId(idMovimento);
-
-        for (MovimentoItem movimentoItem : movimento.getMovimentoItens()) {
-            boolean isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
-
-            if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
-                historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(), movimento,
-                        movimentoItem.getQuantidade(), movimento.getTipo());
-            }
-
-            if (!isInseriu) {
-                throw new IllegalArgumentException("Erro ao inserir item do movimento");
-            }
-        }
-    }
 
     public void removerAjusteEstoque(AjusteEstoque ajusteEstoque) {
         Connection conn = null;

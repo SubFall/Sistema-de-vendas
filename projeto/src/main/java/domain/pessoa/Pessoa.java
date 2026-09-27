@@ -1,5 +1,6 @@
 package domain.pessoa;
 
+import domain.documento.CPF;
 import domain.documento.Documento;
 import domain.endereco.Endereco;
 
@@ -72,6 +73,11 @@ public class Pessoa {
         }
 
         public Pessoa build() {
+
+            if (this.id == 1) {
+                this.nome = "PADRAO";
+                this.documento = new CPF("00000000000");
+            }
 
             if (nome == null || nome.isBlank()) {
                 throw new IllegalArgumentException("Nome não pode ser vázio");

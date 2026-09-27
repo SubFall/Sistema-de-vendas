@@ -5,6 +5,10 @@ import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
 import domain.ajusteestoque.Status;
 import domain.estoque.Estoque;
+import domain.movimento.Movimento;
+import domain.movimento.MovimentoItem;
+import domain.movimento.Tipo;
+import domain.pessoa.Pessoa;
 import domain.produto.Produto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -13,8 +17,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import repository.AjusteEstoqueItemRepository;
-import repository.AjusteEstoqueRepository;
+import repository.*;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -26,16 +29,31 @@ import java.util.List;
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class AjusteEstoqueServiceTest {
     @Mock
-    private AjusteEstoqueRepository estoqueRepository;
+    private AjusteEstoqueRepository ajusteEstoqueRepository;
 
     @Mock
-    private AjusteEstoqueItemRepository estoqueItemRepository;
+    private AjusteEstoqueItemRepository ajusteEstoqueItemRepository;
 
     @Mock
     private ConnectionProvider connectionProvider;
 
     @Mock
     private Connection connection;
+
+    @Mock
+    private ProdutoRepository produtoRepository;
+
+    @Mock
+    private PessoaRepository pessoaRepository;
+
+    @Mock
+    private MovimentoRepository movimentoRepository;
+
+    @Mock
+    private MovimentoItemRepository movimentoItemRepository;
+
+    @Mock
+    private HistoricoEstoqueService historicoEstoqueService;
 
     private List<AjusteEstoqueItens> estoqueItensList;
     private AjusteEstoque ajusteEstoque;
@@ -67,8 +85,8 @@ class AjusteEstoqueServiceTest {
         var idAjuste = 1L;
 
         BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
-        BDDMockito.when(estoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenReturn(idAjuste);
-        BDDMockito.when(estoqueItemRepository.inserirAjusteEstoqueItens(connection, idAjuste, estoqueItensList)).thenReturn(true);
+        BDDMockito.when(ajusteEstoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenReturn(idAjuste);
+        BDDMockito.when(ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(connection, idAjuste, estoqueItensList)).thenReturn(true);
 
         Assertions.assertThatNoException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque));
 
@@ -83,8 +101,8 @@ class AjusteEstoqueServiceTest {
         var idAjuste = 1L;
 
         BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
-        BDDMockito.when(estoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenReturn(idAjuste);
-        BDDMockito.when(estoqueItemRepository.inserirAjusteEstoqueItens(connection, idAjuste, estoqueItensList)).thenReturn(false);
+        BDDMockito.when(ajusteEstoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenReturn(idAjuste);
+        BDDMockito.when(ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(connection, idAjuste, estoqueItensList)).thenReturn(false);
 
         Assertions.assertThatException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -99,7 +117,7 @@ class AjusteEstoqueServiceTest {
     @Order(3)
     void inserirAjusteEstoque_LancarExcecaoSQLException() throws SQLException {
         BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
-        BDDMockito.when(estoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenThrow(SQLException.class);
+        BDDMockito.when(ajusteEstoqueRepository.inserirAjusteEstoque(connection, ajusteEstoque)).thenThrow(SQLException.class);
 
         Assertions.assertThatException().isThrownBy(() -> service.inserirAjusteEstoque(ajusteEstoque))
                 .isInstanceOf(RuntimeException.class);
@@ -114,7 +132,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjustePorStatus_RetornaListaAjusteEstoque_QuandoForBemSucedido() {
         var status = Status.ABERTO;
 
-        BDDMockito.when(estoqueRepository.buscarAjustePorStatus(status)).thenReturn(List.of(ajusteEstoque));
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjustePorStatus(status)).thenReturn(List.of(ajusteEstoque));
 
         var ajusteEstoquesList = service.buscarAjustePorStatus(status);
 
@@ -126,7 +144,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjustePorStatus_RetornaListaAjusteEstoqueVazia() {
         var status = Status.ABERTO;
 
-        BDDMockito.when(estoqueRepository.buscarAjustePorStatus(status)).thenReturn(List.of());
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjustePorStatus(status)).thenReturn(List.of());
 
         var ajusteEstoquesList = service.buscarAjustePorStatus(status);
 
@@ -136,7 +154,7 @@ class AjusteEstoqueServiceTest {
     @Test
     @Order(6)
     void buscarTodosAjuste_RetornaListaAjusteEstoque_QuandoForBemSucedido() {
-        BDDMockito.when(estoqueRepository.buscarTodosAjuste()).thenReturn(List.of(ajusteEstoque));
+        BDDMockito.when(ajusteEstoqueRepository.buscarTodosAjuste()).thenReturn(List.of(ajusteEstoque));
 
         var ajusteEstoqueList = service.buscarTodosAjuste();
 
@@ -146,19 +164,19 @@ class AjusteEstoqueServiceTest {
     @Test
     @Order(7)
     void buscarTodosAjuste_RetornaListaVaziaAjusteEstoque() {
-        BDDMockito.when(estoqueRepository.buscarTodosAjuste()).thenReturn(List.of());
+        BDDMockito.when(ajusteEstoqueRepository.buscarTodosAjuste()).thenReturn(List.of());
 
         var ajusteEstoqueList = service.buscarTodosAjuste();
 
         Assertions.assertThat(ajusteEstoqueList).isEmpty();
     }
-    
+
     @Test
     @Order(8)
     void buscarAjustePorId_RetornaAjusteEstoque_QuandoForBemSucedido() {
         var ajusteEstoqueId = ajusteEstoque.getId();
-        
-        BDDMockito.when(estoqueRepository.buscarAjustePorId(ajusteEstoqueId)).thenReturn(ajusteEstoque);
+
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjustePorId(ajusteEstoqueId)).thenReturn(ajusteEstoque);
 
         var ajusteEstoqueEsperado = service.buscarAjustePorId(ajusteEstoqueId);
 
@@ -170,7 +188,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjustePorId_LancaExcecaoIllegalArgumentException_QuandoIdNaoEncontrado() {
         var ajusteEstoqueId = ajusteEstoque.getId();
 
-        BDDMockito.when(estoqueRepository.buscarAjustePorId(ajusteEstoqueId)).thenThrow(IllegalArgumentException.class);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjustePorId(ajusteEstoqueId)).thenThrow(IllegalArgumentException.class);
 
         Assertions.assertThatException()
                 .isThrownBy(() -> service.buscarAjustePorId(ajusteEstoqueId))
@@ -182,7 +200,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjusteEstoqueItemPorId_RetornaAjusteEstoqueItens_QuandoForBemSucedido() {
         var ajusteEstoqueItem = estoqueItensList.getFirst();
 
-        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItem(ajusteEstoqueItem.getId())).thenReturn(ajusteEstoqueItem);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItem(ajusteEstoqueItem.getId())).thenReturn(ajusteEstoqueItem);
 
         var ajusteEstoqueItemEsperado = service.buscarAjusteEstoqueItemPorId(ajusteEstoqueItem.getId());
 
@@ -194,7 +212,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjusteEstoqueItemPorId_LancaExcecaoIllegalArgumentException_QuandoIdNaoEncontrado() {
         var ajusteEstoqueItem = estoqueItensList.getFirst();
 
-        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItem(ajusteEstoqueItem.getId())).thenThrow(IllegalArgumentException.class);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItem(ajusteEstoqueItem.getId())).thenThrow(IllegalArgumentException.class);
 
         Assertions.assertThatException()
                 .isThrownBy(() -> service.buscarAjusteEstoqueItemPorId(ajusteEstoqueItem.getId()))
@@ -206,7 +224,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjusteEstoqueItensEntrada_RetornaListaAjusteEstoqueItens_QuandoForBemSucedido() {
         var ajusteEstoqueId = ajusteEstoque.getId();
 
-        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensEntrada(ajusteEstoqueId)).thenReturn(estoqueItensList);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(ajusteEstoqueId)).thenReturn(estoqueItensList);
 
         var ajusteEstoqueItensList = service.buscarAjusteEstoqueItensEntrada(ajusteEstoqueId);
 
@@ -218,7 +236,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjusteEstoqueItensEntrada_RetornaListaVaziaAjusteEstoqueItens() {
         var ajusteEstoqueId = ajusteEstoque.getId();
 
-        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensEntrada(ajusteEstoqueId)).thenReturn(List.of());
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(ajusteEstoqueId)).thenReturn(List.of());
 
         var ajusteEstoqueItensList = service.buscarAjusteEstoqueItensEntrada(ajusteEstoqueId);
 
@@ -230,7 +248,7 @@ class AjusteEstoqueServiceTest {
     void buscarAjusteEstoqueItensSaida_RetornaListaAjusteEstoqueItens_QuandoForBemSucedido() {
         var ajusteEstoqueId = ajusteEstoque.getId();
 
-        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensSaida(ajusteEstoqueId)).thenReturn(estoqueItensList);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(ajusteEstoqueId)).thenReturn(estoqueItensList);
 
         var ajusteEstoqueItensList = service.buscarAjusteEstoqueItensSaida(ajusteEstoqueId);
 
@@ -242,10 +260,66 @@ class AjusteEstoqueServiceTest {
     void buscarAjusteEstoqueItensSaida_RetornaListaVaziaAjusteEstoqueItens() {
         var ajusteEstoqueId = ajusteEstoque.getId();
 
-        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensSaida(ajusteEstoqueId)).thenReturn(List.of());
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(ajusteEstoqueId)).thenReturn(List.of());
 
         var ajusteEstoqueItensList = service.buscarAjusteEstoqueItensSaida(ajusteEstoqueId);
 
         Assertions.assertThat(ajusteEstoqueItensList).isEmpty();
     }
+
+    @Test
+    @Order(15)
+    void criarMovimentoAjusteEstoque_QuandoForBemSucedido() throws SQLException {
+        var computador = estoqueItensList.get(0).getProduto();
+        var notebook = estoqueItensList.get(1).getProduto();
+        var mouse = estoqueItensList.get(2).getProduto();
+        var pessoaPadrao = Pessoa.builder().id(Pessoa.ID_PESSOA_PADRAO).build();
+        var id = 1L;
+
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(id)).thenReturn(estoqueItensList);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(id)).thenReturn(List.of());
+
+        BDDMockito.when(produtoRepository.buscarPorId(1)).thenReturn(computador);
+        BDDMockito.when(produtoRepository.buscarPorId(2)).thenReturn(notebook);
+        BDDMockito.when(produtoRepository.buscarPorId(3)).thenReturn(mouse);
+
+        BDDMockito.when(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO)).thenReturn(pessoaPadrao);
+
+        BDDMockito.when(movimentoRepository
+                .inserirMovimento(BDDMockito.eq(connection), BDDMockito.any(Movimento.class))).thenReturn(100);
+
+        BDDMockito.when(movimentoItemRepository
+                        .inserirMovimentoItem(BDDMockito.eq(connection), BDDMockito.eq(100), BDDMockito.any(MovimentoItem.class)))
+                .thenReturn(true);
+
+        service.criarMovimentoAjusteEstoque(id);
+
+        BDDMockito.verify(movimentoRepository).inserirMovimento(BDDMockito.eq(connection), BDDMockito.any(Movimento.class));
+
+        BDDMockito.verify(movimentoItemRepository, BDDMockito.times(3))
+                .inserirMovimentoItem(BDDMockito.eq(connection), BDDMockito.eq(100), BDDMockito.any(MovimentoItem.class));
+
+        BDDMockito.verify(historicoEstoqueService, BDDMockito.times(3))
+                .movimentar(BDDMockito.eq(connection),
+                        BDDMockito.any(Produto.class),
+                        BDDMockito.any(Movimento.class),
+                        BDDMockito.any(BigDecimal.class),
+                        BDDMockito.any(Tipo.class));
+
+        BDDMockito.verify(connection).commit();
+        BDDMockito.verify(connection).close();
+        BDDMockito.verify(connection, BDDMockito.never()).rollback();
+    }
+//    @Test
+//    @Order(15)
+//    void criarMovimentoAjusteEstoque_QuandoForBemSucedido() throws SQLException {
+//        var ajusteEstoque = this.ajusteEstoque;
+//
+//        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensEntrada(ajusteEstoque.getId())).thenReturn(estoqueItensList);
+//        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensSaida(ajusteEstoque.getId())).thenReturn(estoqueItensList);
+//        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+//
+//
+//    }
 }
