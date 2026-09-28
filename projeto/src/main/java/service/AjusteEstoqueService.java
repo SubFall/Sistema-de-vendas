@@ -80,16 +80,6 @@ public class AjusteEstoqueService {
         }
     }
 
-    private void rollback(Connection conn) {
-        try {
-            if (conn != null) {
-                conn.rollback();
-            }
-        } catch (SQLException ex) {
-            throw new RuntimeException("Erro ao realizar rollback", ex);
-        }
-    }
-
     public List<AjusteEstoque> buscarAjustePorStatus(Status status) {
         return ajusteEstoqueRepository.buscarAjustePorStatus(status);
     }
@@ -157,44 +147,40 @@ public class AjusteEstoqueService {
                 historicoEstoqueService.movimentar(conn, movimentoItem.getProduto(), movimento,
                         movimentoItem.getQuantidade(), movimento.getTipo());
             }
-
         }
     }
 
     public void criarMovimentoAjusteEstoque(Long idAjuste) {
         Connection conn = null;
 
-        List<AjusteEstoqueItens> ajusteEstoqueItensEntrada = buscarAjusteEstoqueItensEntrada(idAjuste);
-
-        List<AjusteEstoqueItens> ajusteEstoqueItensSaida = buscarAjusteEstoqueItensSaida(idAjuste);
+        var ajusteEstoqueItensEntradaList = buscarAjusteEstoqueItensEntrada(idAjuste);
+        var ajusteEstoqueItensSaidaList = buscarAjusteEstoqueItensSaida(idAjuste);
 
         try {
             conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
-            if (!ajusteEstoqueItensEntrada.isEmpty()) {
-                criarMovimento(conn, ajusteEstoqueItensEntrada, Tipo.ENTRADA);
+            if (!ajusteEstoqueItensEntradaList.isEmpty()) {
+                criarMovimento(conn, ajusteEstoqueItensEntradaList, Tipo.ENTRADA);
             }
 
-            if (!ajusteEstoqueItensSaida.isEmpty()) {
-                criarMovimento(conn, ajusteEstoqueItensSaida, Tipo.SAIDA);
+            if (!ajusteEstoqueItensSaidaList.isEmpty()) {
+                criarMovimento(conn, ajusteEstoqueItensSaidaList, Tipo.SAIDA);
             }
 
-            if (!ajusteEstoqueItensEntrada.isEmpty() || !ajusteEstoqueItensSaida.isEmpty()) {
+            if (!ajusteEstoqueItensEntradaList.isEmpty() || !ajusteEstoqueItensSaidaList.isEmpty()) {
                 ajusteEstoqueRepository.mudarStatusMovimento(conn, StatusMovimentoCriado.FINALIZADO_CRIADO, idAjuste);
             }
 
             conn.commit();
         } catch (SQLException e) {
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new RuntimeException("Erro ao realizar rollback", ex);
-            }
+            rollback(conn);
 
             throw new RuntimeException("Erro ao inserir movimento", e);
+        } catch (IllegalArgumentException e) {
+            rollback(conn);
+
+            throw e;
         } finally {
             try {
                 if (conn != null) {
@@ -205,7 +191,6 @@ public class AjusteEstoqueService {
             }
         }
     }
-
 
     public void removerAjusteEstoque(AjusteEstoque ajusteEstoque) {
         Connection conn = null;
@@ -238,6 +223,16 @@ public class AjusteEstoqueService {
             } catch (SQLException e) {
                 throw new RuntimeException("Erro ao fechar a conexão", e);
             }
+        }
+    }
+
+    private void rollback(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.rollback();
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Erro ao realizar rollback", ex);
         }
     }
 }

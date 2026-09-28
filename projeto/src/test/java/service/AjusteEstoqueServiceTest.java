@@ -311,15 +311,59 @@ class AjusteEstoqueServiceTest {
         BDDMockito.verify(connection).close();
         BDDMockito.verify(connection, BDDMockito.never()).rollback();
     }
-//    @Test
-//    @Order(15)
-//    void criarMovimentoAjusteEstoque_QuandoForBemSucedido() throws SQLException {
-//        var ajusteEstoque = this.ajusteEstoque;
-//
-//        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensEntrada(ajusteEstoque.getId())).thenReturn(estoqueItensList);
-//        BDDMockito.when(estoqueRepository.buscarAjusteEstoqueItensSaida(ajusteEstoque.getId())).thenReturn(estoqueItensList);
-//        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
-//
-//
-//    }
+
+    @Test
+    @Order(16)
+    void criarMovimentoAjusteEstoque_QuandoAjusteEstoqueItensListForVazio() throws SQLException {
+        var id = 1L;
+
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(id)).thenReturn(List.of());
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(id)).thenReturn(List.of());
+
+        service.criarMovimentoAjusteEstoque(id);
+
+
+        BDDMockito.verify(connection).commit();
+        BDDMockito.verify(connection).close();
+        BDDMockito.verify(connection, BDDMockito.never()).rollback();
+    }
+
+    @Test
+    @Order(17)
+    void criarMovimentoAjusteEstoque_DeveLancarExcecao() throws SQLException {
+        var computador = estoqueItensList.get(0).getProduto();
+        var notebook = estoqueItensList.get(1).getProduto();
+        var mouse = estoqueItensList.get(2).getProduto();
+        var pessoaPadrao = Pessoa.builder().id(Pessoa.ID_PESSOA_PADRAO).build();
+        var id = 1L;
+
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(id)).thenReturn(estoqueItensList);
+        BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(id)).thenReturn(List.of());
+
+        BDDMockito.when(produtoRepository.buscarPorId(1)).thenReturn(computador);
+        BDDMockito.when(produtoRepository.buscarPorId(2)).thenReturn(notebook);
+        BDDMockito.when(produtoRepository.buscarPorId(3)).thenReturn(mouse);
+
+        BDDMockito.when(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO)).thenReturn(pessoaPadrao);
+
+        BDDMockito.when(movimentoRepository
+                .inserirMovimento(BDDMockito.eq(connection), BDDMockito.any(Movimento.class))).thenReturn(100);
+
+        BDDMockito.when(movimentoItemRepository
+                        .inserirMovimentoItem(BDDMockito.eq(connection), BDDMockito.eq(100), BDDMockito.any(MovimentoItem.class)))
+                .thenReturn(false);
+
+        Assertions.assertThatException()
+                        .isThrownBy(() -> service.criarMovimentoAjusteEstoque(id))
+                                .isInstanceOf(IllegalArgumentException.class);
+
+        BDDMockito.verify(movimentoRepository).inserirMovimento(BDDMockito.eq(connection), BDDMockito.any(Movimento.class));
+
+        BDDMockito.verify(connection, BDDMockito.never()).commit();
+        BDDMockito.verify(connection).rollback();
+        BDDMockito.verify(connection).close();
+    }
+
 }
