@@ -21,7 +21,7 @@ public class PessoaRepository {
         this.pessoaPapelRepository = pessoaPapelRepository;
     }
 
-    public int inserirPessoa(Connection conn, Pessoa pessoa) {
+    public int inserirPessoa(Connection conn, Pessoa pessoa) throws SQLException {
         String sql = "INSERT INTO pessoas (`descricao`, `documento`, `tipo`, `ativo`) VALUES (?, ?, ?, ?);";
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -38,9 +38,7 @@ public class PessoaRepository {
                     return rs.getInt(1);
                 }
             }
-            throw new IllegalArgumentException("Erro ao obter ID da pessoa");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao obter ID da pessoa");
         }
     }
 

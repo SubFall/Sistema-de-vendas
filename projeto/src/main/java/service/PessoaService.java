@@ -31,7 +31,7 @@ public class PessoaService {
 
     public void inserirPessoa(Pessoa pessoa) {
 
-        String documento = pessoa.getDocumento().getValor();
+        var documento = pessoa.getDocumento().getValor();
 
         if (pessoaRepository.existeDocumento(documento)) {
             throw new IllegalArgumentException("Documento " + pessoa.getDocumento().getValor() + " já cadastrado");
@@ -43,7 +43,7 @@ public class PessoaService {
 
             conn.setAutoCommit(false);
 
-            int idPessoa = pessoaRepository.inserirPessoa(conn, pessoa);
+            var idPessoa = pessoaRepository.inserirPessoa(conn, pessoa);
 
             for (PessoaPapel pessoaPapel : pessoa.getPessoaPapel()) {
                 pessoaPapelRepository.inserirPessoaPapel(conn, idPessoa, pessoaPapel.getCodigo());
@@ -55,26 +55,11 @@ public class PessoaService {
 
             conn.commit();
         } catch (SQLException e) {
-
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new RuntimeException("Erro ao realizar rollback", ex);
-            }
+            rollback(conn);
 
             throw new RuntimeException("Erro ao inserir pessoa com endereço", e);
         } finally {
-            try {
-
-                if (conn != null) {
-                    conn.close();
-                }
-
-            } catch (SQLException e) {
-                throw new RuntimeException("Erro ao fechar conexão", e);
-            }
+            fechar(conn);
         }
     }
 
@@ -176,13 +161,7 @@ public class PessoaService {
             }
             throw new RuntimeException("Erro ao atualizar pessoa", e);
         } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Erro ao fechar a conexão", e);
-            }
+            fechar(conn);
         }
         return row > 0;
     }
@@ -245,5 +224,25 @@ public class PessoaService {
             throw new IllegalArgumentException("Pessoa inativa!");
         }
         return pessoa;
+    }
+
+    private void fechar(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao fechar a conexão", e);
+        }
+    }
+
+    private void rollback(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.rollback();
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Erro ao realizar rollback", ex);
+        }
     }
 }
