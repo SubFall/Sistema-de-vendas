@@ -70,13 +70,7 @@ public class AjusteEstoqueService {
 
             throw e;
         } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Erro ao fechar a conexão", e);
-            }
+            fechar(conn);
         }
     }
 
@@ -182,13 +176,7 @@ public class AjusteEstoqueService {
 
             throw e;
         } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Erro ao fechar a conexão", e);
-            }
+            fechar(conn);
         }
     }
 
@@ -199,30 +187,20 @@ public class AjusteEstoqueService {
             conn = connectionProvider.getConnection();
             conn.setAutoCommit(false);
 
-            boolean isRemoveAjusteItem = ajusteEstoqueRepository.removerAjusteEstoqueItem(conn, ajusteEstoque);
-            boolean isRemoveAjuste = ajusteEstoqueRepository.removerAjusteEstoque(conn, ajusteEstoque);
+            ajusteEstoqueRepository.removerAjusteEstoqueItem(conn, ajusteEstoque);
+            ajusteEstoqueRepository.removerAjusteEstoque(conn, ajusteEstoque);
 
-            if (!isRemoveAjusteItem || !isRemoveAjuste) {
-                throw new SQLException();
-            }
             conn.commit();
         } catch (SQLException e) {
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new RuntimeException("Erro ao realizar rollback", ex);
-            }
+            rollback(conn);
+
             throw new RuntimeException("Erro ao inserir movimento", e);
+        } catch (IllegalArgumentException e) {
+            rollback(conn);
+
+            throw e;
         } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Erro ao fechar a conexão", e);
-            }
+            fechar(conn);
         }
     }
 
@@ -233,6 +211,16 @@ public class AjusteEstoqueService {
             }
         } catch (SQLException ex) {
             throw new RuntimeException("Erro ao realizar rollback", ex);
+        }
+    }
+
+    private void fechar(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao fechar a conexão", e);
         }
     }
 }

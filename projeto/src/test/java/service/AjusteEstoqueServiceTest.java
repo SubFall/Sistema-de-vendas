@@ -366,4 +366,53 @@ class AjusteEstoqueServiceTest {
         BDDMockito.verify(connection).close();
     }
 
+    @Test
+    @Order(18)
+    void removerAjusteEstoque_QuandoForBemSucedido() throws SQLException{
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+
+        Assertions.assertThatNoException()
+                .isThrownBy(() -> service.removerAjusteEstoque(ajusteEstoque));
+
+        BDDMockito.verify(ajusteEstoqueRepository).removerAjusteEstoqueItem(connection, ajusteEstoque);
+        BDDMockito.verify(ajusteEstoqueRepository).removerAjusteEstoque(connection, ajusteEstoque);
+
+        BDDMockito.verify(connection).commit();
+        BDDMockito.verify(connection).close();
+    }
+
+    @Test
+    @Order(19)
+    void removerAjusteEstoque_removerAjusteEstoqueItem_LancaExcecaoRuntimeException() throws SQLException{
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+
+        BDDMockito.doThrow(SQLException.class).when(ajusteEstoqueRepository).removerAjusteEstoqueItem(connection, ajusteEstoque);;
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.removerAjusteEstoque(ajusteEstoque))
+                .isInstanceOf(RuntimeException.class)
+                .withMessage("Erro ao inserir movimento");
+
+
+        BDDMockito.verify(connection).rollback();
+        BDDMockito.verify(connection).close();
+    }
+
+    @Test
+    @Order(20)
+    void removerAjusteEstoque_removerAjusteEstoque_LancaExcecaoRuntimeException() throws SQLException{
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+
+        BDDMockito.doThrow(SQLException.class).when(ajusteEstoqueRepository).removerAjusteEstoque(connection, ajusteEstoque);;
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.removerAjusteEstoque(ajusteEstoque))
+                .isInstanceOf(RuntimeException.class)
+                .withMessage("Erro ao inserir movimento");
+
+
+        BDDMockito.verify(connection).rollback();
+        BDDMockito.verify(connection).close();
+    }
+
 }

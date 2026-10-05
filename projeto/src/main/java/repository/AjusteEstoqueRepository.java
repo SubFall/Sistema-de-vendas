@@ -189,27 +189,27 @@ public class AjusteEstoqueRepository {
         }
     }
 
-    public boolean removerAjusteEstoque(Connection conn, AjusteEstoque ajusteEstoque) {
+    public void removerAjusteEstoque(Connection conn, AjusteEstoque ajusteEstoque) throws SQLException {
         String sql = "DELETE FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, ajusteEstoque.getId());
 
-            return ps.executeUpdate() > 0;
+            ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
         }
     }
 
-    public boolean removerAjusteEstoqueItem(Connection conn, AjusteEstoque ajusteEstoque) {
+    public void removerAjusteEstoqueItem(Connection conn, AjusteEstoque ajusteEstoque) throws SQLException {
         String sql = "DELETE FROM ajuste_estoque_itens WHERE id_ajuste_estoque = ?;";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, ajusteEstoque.getId());
 
-            return ps.executeUpdate() > 0;
+            ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
         }
     }
 
