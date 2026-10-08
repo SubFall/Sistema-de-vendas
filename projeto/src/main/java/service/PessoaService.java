@@ -45,7 +45,7 @@ public class PessoaService {
 
             var idPessoa = pessoaRepository.inserirPessoa(conn, pessoa);
 
-            for (PessoaPapel pessoaPapel : pessoa.getPessoaPapel()) {
+            for (PessoaPapel pessoaPapel : pessoa.getPapeis()) {
                 pessoaPapelRepository.inserirPessoaPapel(conn, idPessoa, pessoaPapel.getCodigo());
             }
 
@@ -54,10 +54,10 @@ public class PessoaService {
             }
 
             conn.commit();
-        } catch (SQLException e) {
+        } catch (SQLException | RuntimeException e) {
             rollback(conn);
 
-            throw new RuntimeException("Erro ao inserir pessoa com endereço", e);
+            throw new RuntimeException("Erro ao inserir Pessoa", e);
         } finally {
             fechar(conn);
         }
@@ -84,24 +84,12 @@ public class PessoaService {
             row = pessoaRepository.deletarPessoa(conn, id);
 
             conn.commit();
-        } catch (SQLException e) {
+        } catch (SQLException | RuntimeException e) {
+            rollback(conn);
 
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new RuntimeException("Erro ao realizar rollback", ex);
-            }
             throw new RuntimeException("Erro ao deletar Pessoa", e);
         } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Erro ao fechar conexão", e);
-            }
+            fechar(conn);
         }
         return row > 0;
     }
@@ -132,7 +120,7 @@ public class PessoaService {
 
             pessoaPapelRepository.deletarPessoaPapel(conn, pessoa.getId());
 
-            for (PessoaPapel p : pessoa.getPessoaPapel()) {
+            for (PessoaPapel p : pessoa.getPapeis()) {
                 pessoaPapelRepository.inserirPessoaPapel(conn, pessoa.getId(), p.getCodigo());
             }
 

@@ -230,7 +230,7 @@ public class MovimentoService {
             throw new IllegalArgumentException("Cliente informado está inativo");
         }
 
-        if (!movimento.getPessoa().getPessoaPapel().contains(PessoaPapel.CLIENTE)) {
+        if (!movimento.getPessoa().getPapeis().contains(PessoaPapel.CLIENTE)) {
             throw new IllegalArgumentException("Pessoa informada não é um cliente");
         }
 
@@ -238,7 +238,7 @@ public class MovimentoService {
             throw new IllegalArgumentException("Funcionário informado está inativo");
         }
 
-        if (!movimento.getFuncionario().getPessoaPapel().contains(PessoaPapel.FUNCIONARIO)) {
+        if (!movimento.getFuncionario().getPapeis().contains(PessoaPapel.FUNCIONARIO)) {
             throw new IllegalArgumentException("Pessoa informada não é um funcionário");
         }
 

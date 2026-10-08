@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import repository.EnderecoRepository;
 import repository.PessoaPapelRepository;
@@ -50,7 +51,7 @@ class PessoaServiceTest {
 
     @Test
     @Order(1)
-    void inserirAjusteEstoque_QuandoForBemSucedido() throws SQLException {
+    void inserirPessoa_QuandoForBemSucedido() throws SQLException {
         BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
         BDDMockito.when(pessoaRepository.existeDocumento(pessoa.getDocumento().getValor())).thenReturn(false);
 
@@ -77,7 +78,7 @@ class PessoaServiceTest {
 
     @Test
     @Order(2)
-    void inserirAjusteEstoque_inserirPessoa_DeveLancarExcecao() throws SQLException {
+    void inserirPessoa_DeveLancarExcecao() throws SQLException {
         BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
         BDDMockito.when(pessoaRepository.existeDocumento(pessoa.getDocumento().getValor())).thenReturn(false);
 
@@ -86,7 +87,7 @@ class PessoaServiceTest {
         Assertions.assertThatException()
                 .isThrownBy(() -> service.inserirPessoa(pessoa))
                 .isInstanceOf(RuntimeException.class)
-                .withMessage("Erro ao inserir pessoa com endereço");
+                .withMessage("Erro ao inserir Pessoa");
 
         BDDMockito.verify(pessoaPapelRepository, BDDMockito.never()).inserirPessoaPapel(
                 BDDMockito.eq(connection),
@@ -106,34 +107,102 @@ class PessoaServiceTest {
 
     }
 
-//    @Test
-//    @Order(3)
-//    void inserirAjusteEstoque_inserirPessoaPapel_DeveLancarExcecao() throws SQLException {
-//        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
-//        BDDMockito.when(pessoaRepository.existeDocumento(pessoa.getDocumento().getValor())).thenReturn(false);
-//
-//        BDDMockito.when(pessoaRepository.inserirPessoa(BDDMockito.eq(connection), BDDMockito.eq(pessoa))).thenReturn(1);
-//
-//        Assertions.assertThatException()
-//                .isThrownBy(() -> service.inserirPessoa(pessoa))
-//                .isInstanceOf(RuntimeException.class)
-//                .withMessage("Erro ao inserir pessoa com endereço");
-//
-//        BDDMockito.verify(pessoaPapelRepository, BDDMockito.never()).inserirPessoaPapel(
-//                BDDMockito.eq(connection),
-//                BDDMockito.anyInt(),
-//                BDDMockito.anyInt()
-//        );
-//
-//        BDDMockito.verify(enderecoRepository, BDDMockito.never()).inserirEndereco(
-//                BDDMockito.eq(connection),
-//                BDDMockito.anyInt(),
-//                BDDMockito.eq(pessoa.getEndereco())
-//        );
-//
-//        BDDMockito.verify(connection, BDDMockito.never()).commit();
-//        BDDMockito.verify(connection).rollback();
-//        BDDMockito.verify(connection).close();
-//
-//    }
+    @Test
+    @Order(3)
+    void inserirPessoa_inserirPessoaPapel_DeveLancarExcecao() throws SQLException {
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(pessoaRepository.existeDocumento(pessoa.getDocumento().getValor())).thenReturn(false);
+
+        BDDMockito.when(pessoaRepository.inserirPessoa(BDDMockito.eq(connection), BDDMockito.eq(pessoa))).thenReturn(1);
+
+        BDDMockito.doThrow(RuntimeException.class).when(pessoaPapelRepository)
+                .inserirPessoaPapel(
+                        BDDMockito.eq(connection),
+                        BDDMockito.anyInt(),
+                        BDDMockito.anyInt());
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.inserirPessoa(pessoa))
+                .isInstanceOf(RuntimeException.class)
+                .withMessage("Erro ao inserir Pessoa");
+
+        BDDMockito.verify(enderecoRepository, BDDMockito.never()).inserirEndereco(
+                BDDMockito.eq(connection),
+                BDDMockito.anyInt(),
+                BDDMockito.eq(pessoa.getEndereco())
+        );
+
+        BDDMockito.verify(connection, BDDMockito.never()).commit();
+        BDDMockito.verify(connection).rollback();
+        BDDMockito.verify(connection).close();
+    }
+
+    @Test
+    @Order(4)
+    void inserirPessoa_inserirEndereco_DeveLancarExcecao() throws SQLException {
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+        BDDMockito.when(pessoaRepository.existeDocumento(pessoa.getDocumento().getValor())).thenReturn(false);
+
+        BDDMockito.when(pessoaRepository.inserirPessoa(BDDMockito.eq(connection), BDDMockito.eq(pessoa))).thenReturn(1);
+
+        BDDMockito.doNothing().when(pessoaPapelRepository)
+                .inserirPessoaPapel(
+                        BDDMockito.eq(connection),
+                        BDDMockito.anyInt(),
+                        BDDMockito.anyInt()
+                );
+
+        BDDMockito.doThrow(RuntimeException.class).when(enderecoRepository)
+                .inserirEndereco(
+                        BDDMockito.eq(connection),
+                        BDDMockito.anyInt(),
+                        BDDMockito.any());
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.inserirPessoa(pessoa))
+                .isInstanceOf(RuntimeException.class)
+                .withMessage("Erro ao inserir Pessoa");
+
+        BDDMockito.verify(connection, BDDMockito.never()).commit();
+        BDDMockito.verify(connection).rollback();
+        BDDMockito.verify(connection).close();
+    }
+
+    @Test
+    @Order(5)
+    void deletarPessoa_QuandoForBemSucedido() throws SQLException {
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+
+        service.deletarPessoa(2);
+
+        BDDMockito.verify(enderecoRepository).deletarEndereco(BDDMockito.eq(connection), BDDMockito.anyInt());
+        BDDMockito.verify(pessoaPapelRepository).deletarPessoaPapel(BDDMockito.eq(connection), BDDMockito.anyInt());
+        BDDMockito.verify(pessoaRepository).deletarPessoa(BDDMockito.eq(connection), BDDMockito.anyInt());
+
+        BDDMockito.verify(connection).commit();
+        BDDMockito.verify(connection).close();
+    }
+
+    @Test
+    @Order(6)
+    void deletarPessoa_deletarEndereco_DeveLancarExcecao() throws SQLException {
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+
+        BDDMockito.doThrow(RuntimeException.class).when(enderecoRepository)
+                .deletarEndereco(BDDMockito.eq(connection), BDDMockito.anyInt());
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.deletarPessoa(pessoa.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .withMessage("Erro ao deletar Pessoa");
+
+        BDDMockito.verify(pessoaPapelRepository, Mockito.never())
+                .deletarPessoaPapel(BDDMockito.eq(connection), BDDMockito.anyInt());
+
+        BDDMockito.verify(pessoaRepository, Mockito.never())
+                .deletarPessoa(BDDMockito.eq(connection), BDDMockito.anyInt());
+
+        BDDMockito.verify(connection, Mockito.never()).commit();
+        BDDMockito.verify(connection).close();
+    }
 }

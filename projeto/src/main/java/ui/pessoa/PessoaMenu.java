@@ -347,7 +347,7 @@ public class PessoaMenu {
         System.out.println();
 
         System.out.println("Papéis:");
-        for (PessoaPapel pessoaPapel : pessoa.getPessoaPapel()) {
+        for (PessoaPapel pessoaPapel : pessoa.getPapeis()) {
             System.out.println("- " + pessoaPapel.getDescricao());
         }
 
