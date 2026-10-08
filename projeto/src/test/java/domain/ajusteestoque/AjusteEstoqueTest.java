@@ -1,10 +1,7 @@
 package domain.ajusteestoque;
 
-import domain.endereco.Endereco;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class AjusteEstoqueTest {
     @Test
@@ -27,7 +24,6 @@ class AjusteEstoqueTest {
                 () -> AjusteEstoque.builder().titulo("teste").build()
         );
     }
-
 
 
 }
