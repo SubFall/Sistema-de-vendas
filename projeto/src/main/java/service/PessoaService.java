@@ -63,25 +63,23 @@ public class PessoaService {
         }
     }
 
-    public boolean deletarPessoa(int id) {
+    public boolean deletarPessoa(int idPessoa) {
 
         int row = 0;
         Connection conn = null;
 
-        if (id == Pessoa.ID_PESSOA_PADRAO) {
-            throw new IllegalArgumentException("A Pessoa padrão não pode ser alterada/deletada.");
-        }
+        verificarPessoaPadrao(idPessoa);
 
         try {
             conn = connectionProvider.getConnection();
 
             conn.setAutoCommit(false);
 
-            enderecoRepository.deletarEndereco(conn, id);
+            enderecoRepository.deletarEndereco(conn, idPessoa);
 
-            pessoaPapelRepository.deletarPessoaPapel(conn, id);
+            pessoaPapelRepository.deletarPessoaPapel(conn, idPessoa);
 
-            row = pessoaRepository.deletarPessoa(conn, id);
+            row = pessoaRepository.deletarPessoa(conn, idPessoa);
 
             conn.commit();
         } catch (SQLException | RuntimeException e) {
@@ -94,19 +92,18 @@ public class PessoaService {
         return row > 0;
     }
 
-    public boolean inativarPessoa(int idPessoa) {
-        Pessoa pessoa = validarPessoaAtivo(pessoaRepository.buscarPorId(idPessoa));
+    public boolean inativarAtivarPessoa(int idPessoa) {
+
+        verificarPessoaPadrao(idPessoa);
+
+        var pessoa = validarPessoaAtivo(pessoaRepository.buscarPorId(idPessoa));
 
         return pessoaRepository.inativarPessoa(!pessoa.isAtivo(), idPessoa);
     }
 
     public boolean atualizarPessoa(Pessoa pessoa) {
 
-        boolean existeDocumento = pessoaRepository.existeDocumentoPorOutroId(pessoa.getDocumento().getValor(), pessoa.getId());
-
-        if (existeDocumento) {
-            throw new IllegalArgumentException("Documento já cadastrado");
-        }
+        verificarDocumentoJaCadastrado(pessoa);
 
         int row;
         Connection conn = null;
@@ -126,9 +123,9 @@ public class PessoaService {
 
             if (pessoa.getEndereco() != null) {
 
-                boolean existeEndereco = enderecoRepository.existePessoaEndereco(conn, pessoa.getId());
+                var isExisteEndereco = enderecoRepository.existePessoaEndereco(conn, pessoa.getId());
 
-                if (existeEndereco) {
+                if (isExisteEndereco) {
                     enderecoRepository.atualizarEndereco(conn, pessoa.getEndereco());
                 } else {
                     enderecoRepository.inserirEndereco(conn, pessoa.getId(), pessoa.getEndereco());
@@ -140,13 +137,8 @@ public class PessoaService {
 
             conn.commit();
         } catch (SQLException e) {
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new RuntimeException("Erro ao realizar o rollback", ex);
-            }
+            rollback(conn);
+
             throw new RuntimeException("Erro ao atualizar pessoa", e);
         } finally {
             fechar(conn);
@@ -155,7 +147,7 @@ public class PessoaService {
     }
 
     public Pessoa buscarPorDocumento(String documento) {
-        Pessoa pessoa = pessoaRepository.buscarPorDocumento(documento);
+        var pessoa = pessoaRepository.buscarPorDocumento(documento);
         if (pessoa == null) {
             throw new IllegalArgumentException("Documento não existe");
         }
@@ -163,7 +155,7 @@ public class PessoaService {
     }
 
     public Pessoa buscarPorId(int id) {
-        Pessoa pessoa = validarPessoaExiste(pessoaRepository.buscarPorId(id));
+        var pessoa = validarPessoaExiste(pessoaRepository.buscarPorId(id));
 
         pessoa.setPapeis(pessoaPapelRepository.buscarPorIdPessoa(id));
 
@@ -173,7 +165,7 @@ public class PessoaService {
     }
 
     public Pessoa buscarPorIdAtivo(int id) {
-        Pessoa pessoa = validarPessoaAtivo(pessoaRepository.buscarPorId(id));
+        var pessoa = validarPessoaAtivo(pessoaRepository.buscarPorId(id));
 
         pessoa.setPapeis(pessoaPapelRepository.buscarPorIdPessoa(id));
 
@@ -196,6 +188,20 @@ public class PessoaService {
 
     public List<Pessoa> buscarPessoaPorPapelAtivo(PessoaPapel pessoaPapel) {
         return pessoaRepository.buscarPessoaPorPapelAtivo(pessoaPapel);
+    }
+
+    private void verificarDocumentoJaCadastrado(Pessoa pessoa) {
+        var isExisteDocumento = pessoaRepository.existeDocumentoPorOutroId(pessoa.getDocumento().getValor(), pessoa.getId());
+
+        if (isExisteDocumento) {
+            throw new IllegalArgumentException("Documento já cadastrado");
+        }
+    }
+
+    private void verificarPessoaPadrao(int idPessoa) {
+        if (idPessoa == Pessoa.ID_PESSOA_PADRAO) {
+            throw new IllegalArgumentException("A Pessoa padrão não pode ser alterada/deletada.");
+        }
     }
 
     private Pessoa validarPessoaExiste(Pessoa pessoa) {

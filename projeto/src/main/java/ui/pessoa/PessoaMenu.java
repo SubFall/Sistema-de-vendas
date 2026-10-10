@@ -218,10 +218,12 @@ public class PessoaMenu {
             if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja Inativar " + pessoa.getNome() + " ?")) {
                 return;
             }
-            boolean inativar = pessoaService.inativarPessoa(pessoa.getId());
+            boolean inativar = pessoaService.inativarAtivarPessoa(pessoa.getId());
 
             if (inativar) {
                 System.out.printf("Pessoa %s inativado com sucesso!", pessoa.getNome());
+            } else {
+                System.out.printf("Erro ao inativar Pessoa %s!", pessoa.getNome());
             }
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());

@@ -36,6 +36,7 @@ class PessoaServiceTest {
     private EnderecoRepository enderecoRepository;
 
     private Pessoa pessoa;
+    private Pessoa pessoaPadrao;
 
     @InjectMocks
     private PessoaService service;
@@ -46,7 +47,8 @@ class PessoaServiceTest {
         var pessoaPapelList = List.of(PessoaPapel.CLIENTE, PessoaPapel.FUNCIONARIO);
         var endereco = Endereco.builder().id(1).logradouro("Rua Brasil").bairro("Centro").numero("10")
                 .cep("78000000").cidade("Várzea Grande").uf("MT").build();
-        pessoa = Pessoa.builder().id(1).nome("Thalysom").documento(cpf).papeis(pessoaPapelList).endereco(endereco).ativo(true).build();
+        pessoa = Pessoa.builder().id(2).nome("Thalysom").documento(cpf).papeis(pessoaPapelList).endereco(endereco).ativo(true).build();
+        pessoaPadrao = Pessoa.builder().id(Pessoa.ID_PESSOA_PADRAO).nome("PADRAO").documento(new CPF("00000000000")).build();
     }
 
     @Test
@@ -173,7 +175,7 @@ class PessoaServiceTest {
     void deletarPessoa_QuandoForBemSucedido() throws SQLException {
         BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
 
-        service.deletarPessoa(2);
+        service.deletarPessoa(pessoa.getId());
 
         BDDMockito.verify(enderecoRepository).deletarEndereco(BDDMockito.eq(connection), BDDMockito.anyInt());
         BDDMockito.verify(pessoaPapelRepository).deletarPessoaPapel(BDDMockito.eq(connection), BDDMockito.anyInt());
@@ -205,4 +207,59 @@ class PessoaServiceTest {
         BDDMockito.verify(connection, Mockito.never()).commit();
         BDDMockito.verify(connection).close();
     }
+
+    @Test
+    @Order(7)
+    void deletarPessoa_deletarPessoaPapel_DeveLancarExcecao() throws SQLException {
+        BDDMockito.when(connectionProvider.getConnection()).thenReturn(connection);
+
+        BDDMockito.doThrow(RuntimeException.class).when(pessoaPapelRepository)
+                .deletarPessoaPapel(BDDMockito.eq(connection), BDDMockito.anyInt());
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.deletarPessoa(pessoa.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .withMessage("Erro ao deletar Pessoa");
+
+        BDDMockito.verify(pessoaRepository, Mockito.never())
+                .deletarPessoa(BDDMockito.eq(connection), BDDMockito.anyInt());
+
+        BDDMockito.verify(connection, Mockito.never()).commit();
+        BDDMockito.verify(connection).close();
+    }
+
+    @Test
+    @Order(7)
+    void deletarPessoa_deletarPessoaPadrao_DeveLancarExcecao() throws SQLException {
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.deletarPessoa(pessoaPadrao.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .withMessage("A Pessoa padrão não pode ser alterada/deletada.");
+    }
+
+    @Test
+    @Order(8)
+    void inativarAtivarPessoa_inativar_QuandoFoBemSucedido() {
+        BDDMockito.when(pessoaRepository.buscarPorId(pessoa.getId())).thenReturn(pessoa);
+        BDDMockito.when(pessoaRepository.inativarPessoa(true, pessoa.getId())).thenReturn(true);
+        service.inativarAtivarPessoa(pessoa.getId());
+    }
+
+    @Test
+    @Order(9)
+    void inativarAtivarPessoa_ativar_QuandoFoBemSucedido() {
+        BDDMockito.when(pessoaRepository.buscarPorId(pessoa.getId())).thenReturn(pessoa);
+        BDDMockito.when(pessoaRepository.inativarPessoa(false, pessoa.getId())).thenReturn(true);
+        service.inativarAtivarPessoa(pessoa.getId());
+    }
+
+    @Test
+    @Order(10)
+    void inativarAtivarPessoa_inativar_DeveLancarExcecao() {
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.inativarAtivarPessoa(pessoaPadrao.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .withMessage("A Pessoa padrão não pode ser alterada/deletada.");
+    }
+
 }
