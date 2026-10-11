@@ -25,7 +25,7 @@ public class ProdutoService {
         return produtoRepository.inserirProduto(produto);
     }
 
-    public boolean atualizarStatusProduto(int idProduto) {
+    public boolean atualizarStatusProduto(Long idProduto) {
         Produto produto = validarProdutoExiste(produtoRepository.buscarPorId(idProduto));
 
         return produtoRepository.atualizarStatusProduto(!produto.isAtivo(), idProduto);
@@ -50,12 +50,12 @@ public class ProdutoService {
         return produtoRepository.buscarTodosAtivo();
     }
 
-    public Produto buscarPorId(int idProduto) {
+    public Produto buscarPorId(Long idProduto) {
 
         return validarProdutoExiste(produtoRepository.buscarPorId(idProduto));
     }
 
-    public Produto buscarPorIdAtivo(int idProduto) {
+    public Produto buscarPorIdAtivo(Long idProduto) {
 
         return validarProdutoAtivo(produtoRepository.buscarPorId(idProduto));
     }

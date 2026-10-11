@@ -1,9 +1,6 @@
 package domain.ajusteestoque;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,8 +8,10 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 public class AjusteEstoque {
+    @EqualsAndHashCode.Include
     private Long id;
     private String titulo;
     private LocalDateTime dateHora;
@@ -29,7 +28,7 @@ public class AjusteEstoque {
             StatusMovimentoCriado statusMovimentoCriado,
             List<AjusteEstoqueItens> ajusteEstoqueItens) {
 
-        if (titulo == null || titulo.isEmpty()) throw new IllegalArgumentException("Título obrigatório");
+        if (titulo == null || titulo.isBlank()) throw new IllegalArgumentException("Título obrigatório");
 
         if (status == null) throw new IllegalArgumentException("Status obrigatório");
 

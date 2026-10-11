@@ -26,7 +26,7 @@ public class HistoricoEstoqueRepository {
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, historicoEstoque.getProduto().getId());
+            ps.setLong(1, historicoEstoque.getProduto().getId());
             ps.setInt(2, historicoEstoque.getMovimento().getId());
             ps.setInt(3, historicoEstoque.getTipo().getCodigo());
             ps.setBigDecimal(4, historicoEstoque.getQuantidade());
@@ -50,7 +50,7 @@ public class HistoricoEstoqueRepository {
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                Produto produto = produtoRepository.buscarPorId(rs.getInt("id_produto"));
+                Produto produto = produtoRepository.buscarPorId(rs.getLong("id_produto"));
                 Movimento movimento = movimentoRepository.buscarPorId(rs.getInt("id_movimento"));
 
                 return HistoricoEstoque.builder()

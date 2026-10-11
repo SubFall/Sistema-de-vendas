@@ -26,7 +26,7 @@ public class AjusteEstoqueRepository {
     }
 
     public Long inserirAjusteEstoque(Connection conn, AjusteEstoque estoque) throws SQLException {
-        String sql = "INSERT INTO ajuste_estoque (titulo, data, status, status_movimento) VALUES (?, ?, ?, ?);";
+        var sql = "INSERT INTO ajuste_estoque (titulo, data, status, status_movimento) VALUES (?, ?, ?, ?);";
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -46,9 +46,21 @@ public class AjusteEstoqueRepository {
         }
     }
 
+    public void atualizarAjusteEstoque(Connection conn, AjusteEstoque ajusteEstoque) throws SQLException {
+        var sql = "UPDATE ajuste_estoque SET titulo = ?, status = ? WHERE id_ajuste_estoque = ?;";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, ajusteEstoque.getTitulo());
+            ps.setInt(2, ajusteEstoque.getStatus().getCodigo());
+            ps.setLong(3, ajusteEstoque.getId());
+
+            ps.executeUpdate();
+        }
+    }
+
     public List<AjusteEstoque> buscarAjustePorStatus(Status status) {
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
-        String sql = """
+        var sql = """
                 SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
                 WHERE status = ? AND status_movimento <> 1;
                 """;
@@ -69,9 +81,9 @@ public class AjusteEstoqueRepository {
         return ajusteEstoques;
     }
 
-    public List<AjusteEstoque> buscarTodosAjuste() {
+    public List<AjusteEstoque> buscarTodosAjusteEstoqueAberto() {
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
-        String sql = """
+        var sql = """
                 SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
                 WHERE status_movimento <> 1;
                 """;
@@ -89,8 +101,50 @@ public class AjusteEstoqueRepository {
         return ajusteEstoques;
     }
 
+    public List<AjusteEstoque> buscarTodosAjusteEstoque() {
+        List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
+        var sql = """
+                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque;
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ajusteEstoques.add(mapearAjusteEstoque(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ajusteEstoques;
+    }
+
+    public List<AjusteEstoque> buscarAjusteEstoquePorTitulo(String titulo) {
+        List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
+        var sql = """
+                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque
+                WHERE titulo LIKE ?;
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, '%'+titulo+'%');
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ajusteEstoques.add(mapearAjusteEstoque(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ajusteEstoques;
+    }
+
     public AjusteEstoque buscarAjustePorId(Long idAjuste) {
-        String sql = "SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
+        var sql = "SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,7 +164,7 @@ public class AjusteEstoqueRepository {
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
         List<AjusteEstoqueItens> ajusteEstoqueItens = new ArrayList<>();
-        String sql = """
+        var sql = """
                 SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
                 WHERE id_ajuste_estoque = ? AND contagem > 0;
                 """;
@@ -133,7 +187,7 @@ public class AjusteEstoqueRepository {
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensSaida(Long idAjuste) {
         List<AjusteEstoqueItens> ajusteEstoqueItens = new ArrayList<>();
-        String sql = """
+        var sql = """
                 SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
                 WHERE id_ajuste_estoque = ? AND contagem < 0;
                 """;
@@ -155,7 +209,7 @@ public class AjusteEstoqueRepository {
     }
 
     public AjusteEstoqueItens buscarAjusteEstoqueItem(Long idAjuste) {
-        String sql = """
+        var sql = """
                 SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
                 WHERE id_ajuste_estoque_itens = ?;
                 """;
@@ -176,8 +230,31 @@ public class AjusteEstoqueRepository {
         return null;
     }
 
+    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensList(Long idAjuste) {
+        List<AjusteEstoqueItens> ajusteEstoqueItensList = new ArrayList<>();
+        var sql = """
+                SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
+                WHERE id_ajuste_estoque = ?;
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idAjuste);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ajusteEstoqueItensList.add(mapearAjusteEstoqueItens(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return ajusteEstoqueItensList;
+    }
+
     public void mudarStatusMovimento(Connection conn, StatusMovimentoCriado statusMovimentoCriado, Long idAjuste) {
-        String sql = "UPDATE ajuste_estoque SET status_movimento = ? WHERE (id_ajuste_estoque = ?);";
+        var sql = "UPDATE ajuste_estoque SET status_movimento = ? WHERE (id_ajuste_estoque = ?);";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, statusMovimentoCriado.getCodigo());
@@ -190,7 +267,7 @@ public class AjusteEstoqueRepository {
     }
 
     public void removerAjusteEstoque(Connection conn, AjusteEstoque ajusteEstoque) throws SQLException {
-        String sql = "DELETE FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
+        var sql = "DELETE FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, ajusteEstoque.getId());
@@ -202,7 +279,7 @@ public class AjusteEstoqueRepository {
     }
 
     public void removerAjusteEstoqueItem(Connection conn, AjusteEstoque ajusteEstoque) throws SQLException {
-        String sql = "DELETE FROM ajuste_estoque_itens WHERE id_ajuste_estoque = ?;";
+        var sql = "DELETE FROM ajuste_estoque_itens WHERE id_ajuste_estoque = ?;";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, ajusteEstoque.getId());
@@ -225,8 +302,8 @@ public class AjusteEstoqueRepository {
     private AjusteEstoqueItens mapearAjusteEstoqueItens(ResultSet rs) throws SQLException {
         return AjusteEstoqueItens.builder()
                 .id(rs.getLong("id_ajuste_estoque_itens"))
-                .estoque(estoqueRepository.buscarPorIdProduto(rs.getInt("id_produto")))
-                .produto(produtoRepository.buscarPorId(rs.getInt("id_produto")))
+                .estoque(estoqueRepository.buscarPorIdProduto(rs.getLong("id_produto")))
+                .produto(produtoRepository.buscarPorId(rs.getLong("id_produto")))
                 .contagem(rs.getBigDecimal("contagem"))
                 .build();
     }

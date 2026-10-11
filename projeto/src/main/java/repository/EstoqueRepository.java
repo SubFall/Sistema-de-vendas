@@ -19,11 +19,11 @@ public class EstoqueRepository {
         this.connectionProvider = connectionProvider;
     }
 
-    public boolean inserirEstoque(Connection conn, int idProduto, BigDecimal saldo) {
+    public boolean inserirEstoque(Connection conn, Long idProduto, BigDecimal saldo) {
         String sql = "INSERT INTO estoque (id_produto, quantidade) VALUES (?, ?);";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idProduto);
+            ps.setLong(1, idProduto);
             ps.setBigDecimal(2, saldo);
 
             return ps.executeUpdate() > 0;
@@ -32,12 +32,12 @@ public class EstoqueRepository {
         }
     }
 
-    public boolean atualizarEstoque(Connection conn, int idProduto, BigDecimal saldo) {
+    public boolean atualizarEstoque(Connection conn, Long idProduto, BigDecimal saldo) {
         String sql = "UPDATE estoque SET quantidade = ? WHERE id_produto = ?;";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setBigDecimal(1, saldo);
-            ps.setInt(2, idProduto);
+            ps.setLong(2, idProduto);
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -45,16 +45,16 @@ public class EstoqueRepository {
         }
     }
 
-    public Estoque buscarPorIdProduto(Connection conn, int idProduto) {
+    public Estoque buscarPorIdProduto(Connection conn, Long idProduto) {
         String sql = "SELECT id_estoque, id_produto, quantidade FROM estoque WHERE id_produto = ?;";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idProduto);
+            ps.setLong(1, idProduto);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Estoque.builder()
-                            .idProduto(rs.getInt("id_produto"))
+                            .idProduto(rs.getLong("id_produto"))
                             .quantidade(rs.getBigDecimal("quantidade"))
                             .build();
                 }
@@ -65,17 +65,17 @@ public class EstoqueRepository {
         return null;
     }
 
-    public Estoque buscarPorIdProduto(int idProduto) {
+    public Estoque buscarPorIdProduto(Long idProduto) {
         String sql = "SELECT id_estoque, id_produto, quantidade FROM estoque WHERE id_produto = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idProduto);
+            ps.setLong(1, idProduto);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Estoque.builder()
-                            .idProduto(rs.getInt("id_produto"))
+                            .idProduto(rs.getLong("id_produto"))
                             .quantidade(rs.getBigDecimal("quantidade"))
                             .build();
                 }
@@ -83,7 +83,8 @@ public class EstoqueRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
+
+        return Estoque.builder().idProduto(idProduto).quantidade(BigDecimal.ZERO).build();
     }
 
     public List<ProdutoEstoqueDTO> buscarProdutosEstoque() {

@@ -3,10 +3,10 @@ package domain.estoque;
 import java.math.BigDecimal;
 
 public class Estoque {
-    private int idProduto;
+    private Long idProduto;
     private BigDecimal quantidade;
 
-    private Estoque(int idProduto, BigDecimal quantidade) {
+    private Estoque(Long idProduto, BigDecimal quantidade) {
         this.idProduto = idProduto;
         this.quantidade = quantidade;
     }
@@ -16,10 +16,10 @@ public class Estoque {
     }
 
     public static final class EstoqueBuilder {
-        private int idProduto;
+        private Long idProduto;
         private BigDecimal quantidade;
 
-        public EstoqueBuilder idProduto(int idProduto) {
+        public EstoqueBuilder idProduto(Long idProduto) {
             this.idProduto = idProduto;
             return this;
         }
@@ -34,7 +34,7 @@ public class Estoque {
         }
     }
 
-    public int getIdProduto() {
+    public Long getIdProduto() {
         return idProduto;
     }
 

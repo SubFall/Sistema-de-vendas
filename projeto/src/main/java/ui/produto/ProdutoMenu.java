@@ -5,7 +5,7 @@ import domain.produto.Produto;
 import service.CategoriaService;
 import service.ProdutoService;
 import ui.categoria.CategoriaMenu;
-import util.ConsoleUtils;
+import util.console.ConsoleUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -117,7 +117,7 @@ public class ProdutoMenu {
         listar(4); //somente produtos ativos
         try {
             System.out.print("Digite o ID do produto para inativar:");
-            Produto produto = produtoService.buscarPorIdAtivo(ConsoleUtils.lerInteiro(scanner, "ID"));
+            Produto produto = produtoService.buscarPorIdAtivo(ConsoleUtils.lerLong(scanner, "ID"));
 
             if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja inativar " + produto.getDescricao() + " ?")) {
                 return;
@@ -138,7 +138,7 @@ public class ProdutoMenu {
 
         try {
             System.out.println("Selecione um ID para atualizar");
-            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
 
             atualizarDescricao(produto);
             atualizarPreco(produto);
@@ -215,7 +215,7 @@ public class ProdutoMenu {
 
         try {
             System.out.println("Selecione um ID");
-            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
             System.out.println("ID: " + produto.getId());
             System.out.println("Descricao: " + produto.getDescricao());
             System.out.println("Preco venda: " + produto.getPrecoVenda());
@@ -242,7 +242,7 @@ public class ProdutoMenu {
             case 3 -> {
                 System.out.print("Digite o ID: ");
                 try {
-                    produtos.add(produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
+                    produtos.add(produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID")));
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }

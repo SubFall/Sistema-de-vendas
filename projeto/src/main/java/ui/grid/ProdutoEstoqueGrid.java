@@ -3,7 +3,8 @@ package ui.grid;
 import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
 import dto.ProdutoEstoqueDTO;
-import util.ConsoleUtils;
+import util.console.ConsoleUtils;
+import util.mensagens.MensagensProdutos;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public final class ProdutoEstoqueGrid {
         String quantidade;
 
         if (produtoEstoqueDTOS.isEmpty()) {
-            System.out.println("Nenhum produto encontrado.");
+            System.out.println(MensagensProdutos.PRODUTO_NAO_ENCONTRADO);
             return;
         }
 
@@ -77,7 +78,7 @@ public final class ProdutoEstoqueGrid {
 
 
         if (itens.isEmpty()) {
-            System.out.println("Nenhum produto encontrado.");
+            System.out.println(MensagensProdutos.PRODUTO_NAO_ENCONTRADO);
             return;
         }
 

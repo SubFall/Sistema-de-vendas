@@ -12,7 +12,7 @@ import service.PessoaService;
 import service.ProdutoService;
 import ui.pessoa.PessoaMenu;
 import ui.produto.ProdutoMenu;
-import util.ConsoleUtils;
+import util.console.ConsoleUtils;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
@@ -320,7 +320,7 @@ public class MovimentoMenu {
     private void adicionarItem(List<MovimentoItem> movimentoItems) {
         produtoMenu.listar(4);//todos ativos
         System.out.print("Digite o ID do produto: ");
-        Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+        Produto produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
         MovimentoItem item = MovimentoItem.builder()
                 .produto(produto)
                 .quantidade(ConsoleUtils.lerBigDecimal(scanner, "Quantidade"))
@@ -338,7 +338,7 @@ public class MovimentoMenu {
     private MovimentoItem criarMovimentoItem() {
         produtoMenu.listar(4);//todos ativos
         System.out.print("Digite o ID do produto: ");
-        Produto produto = produtoService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+        Produto produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
         return MovimentoItem.builder()
                 .produto(produto)
                 .quantidade(ConsoleUtils.lerBigDecimal(scanner, "Quantidade"))

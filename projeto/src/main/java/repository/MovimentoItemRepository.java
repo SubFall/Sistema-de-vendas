@@ -28,7 +28,7 @@ public class MovimentoItemRepository {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idMovimento);
-            ps.setInt(2, item.getProduto().getId());
+            ps.setLong(2, item.getProduto().getId());
             ps.setBigDecimal(3, item.getQuantidade());
             ps.setBigDecimal(4, item.getValorUnitario());
             ps.setBigDecimal(5, item.getValorTotal());
@@ -79,7 +79,7 @@ public class MovimentoItemRepository {
     private MovimentoItem mapearMovimentoItem(ResultSet rs) throws SQLException {
         return MovimentoItem.builder()
                 .id(rs.getInt("id_movimento_item"))
-                .produto(produtoRepository.buscarPorId(rs.getInt("id_produto")))
+                .produto(produtoRepository.buscarPorId(rs.getLong("id_produto")))
                 .quantidade(rs.getBigDecimal("quantidade"))
                 .build();
     }

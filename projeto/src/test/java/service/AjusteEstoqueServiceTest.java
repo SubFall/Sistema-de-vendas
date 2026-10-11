@@ -63,9 +63,9 @@ class AjusteEstoqueServiceTest {
 
     @BeforeEach
     void init() {
-        var computador = Produto.builder().id(1).descricao("computador").precoCusto(new BigDecimal("999")).precoVenda(new BigDecimal("1500")).build();
-        var notebook = Produto.builder().id(2).descricao("notebook").precoCusto(new BigDecimal("1200")).precoVenda(new BigDecimal("2000")).build();
-        var mouse = Produto.builder().id(3).descricao("mouse logitech").precoCusto(new BigDecimal("399")).precoVenda(new BigDecimal("800")).build();
+        var computador = Produto.builder().id(1L).descricao("computador").precoCusto(new BigDecimal("999")).precoVenda(new BigDecimal("1500")).build();
+        var notebook = Produto.builder().id(2L).descricao("notebook").precoCusto(new BigDecimal("1200")).precoVenda(new BigDecimal("2000")).build();
+        var mouse = Produto.builder().id(3L).descricao("mouse logitech").precoCusto(new BigDecimal("399")).precoVenda(new BigDecimal("800")).build();
 
         var estoqueComputador = Estoque.builder().idProduto(computador.getId()).quantidade(new BigDecimal("5")).build();
         var estoqueNotebook = Estoque.builder().idProduto(notebook.getId()).quantidade(new BigDecimal("10")).build();
@@ -153,20 +153,20 @@ class AjusteEstoqueServiceTest {
 
     @Test
     @Order(6)
-    void buscarTodosAjuste_RetornaListaAjusteEstoque_QuandoForBemSucedido() {
-        BDDMockito.when(ajusteEstoqueRepository.buscarTodosAjuste()).thenReturn(List.of(ajusteEstoque));
+    void buscarTodosAjuste_RetornaListaAjusteEstoqueAbertoEstoque_QuandoForBemSucedido() {
+        BDDMockito.when(ajusteEstoqueRepository.buscarTodosAjusteEstoqueAberto()).thenReturn(List.of(ajusteEstoque));
 
-        var ajusteEstoqueList = service.buscarTodosAjuste();
+        var ajusteEstoqueList = service.buscarTodosAjusteEstoqueAberto();
 
         Assertions.assertThat(ajusteEstoqueList).isEqualTo(List.of(ajusteEstoque));
     }
 
     @Test
     @Order(7)
-    void buscarTodosAjuste_RetornaListaVaziaAjusteEstoque() {
-        BDDMockito.when(ajusteEstoqueRepository.buscarTodosAjuste()).thenReturn(List.of());
+    void buscarTodosAjuste_RetornaListaVaziaAjusteEstoqueAbertoEstoque() {
+        BDDMockito.when(ajusteEstoqueRepository.buscarTodosAjusteEstoqueAberto()).thenReturn(List.of());
 
-        var ajusteEstoqueList = service.buscarTodosAjuste();
+        var ajusteEstoqueList = service.buscarTodosAjusteEstoqueAberto();
 
         Assertions.assertThat(ajusteEstoqueList).isEmpty();
     }
@@ -280,9 +280,9 @@ class AjusteEstoqueServiceTest {
         BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(id)).thenReturn(estoqueItensList);
         BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(id)).thenReturn(List.of());
 
-        BDDMockito.when(produtoRepository.buscarPorId(1)).thenReturn(computador);
-        BDDMockito.when(produtoRepository.buscarPorId(2)).thenReturn(notebook);
-        BDDMockito.when(produtoRepository.buscarPorId(3)).thenReturn(mouse);
+        BDDMockito.when(produtoRepository.buscarPorId(1L)).thenReturn(computador);
+        BDDMockito.when(produtoRepository.buscarPorId(2L)).thenReturn(notebook);
+        BDDMockito.when(produtoRepository.buscarPorId(3L)).thenReturn(mouse);
 
         BDDMockito.when(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO)).thenReturn(pessoaPadrao);
 
@@ -342,9 +342,9 @@ class AjusteEstoqueServiceTest {
         BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(id)).thenReturn(estoqueItensList);
         BDDMockito.when(ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(id)).thenReturn(List.of());
 
-        BDDMockito.when(produtoRepository.buscarPorId(1)).thenReturn(computador);
-        BDDMockito.when(produtoRepository.buscarPorId(2)).thenReturn(notebook);
-        BDDMockito.when(produtoRepository.buscarPorId(3)).thenReturn(mouse);
+        BDDMockito.when(produtoRepository.buscarPorId(1L)).thenReturn(computador);
+        BDDMockito.when(produtoRepository.buscarPorId(2L)).thenReturn(notebook);
+        BDDMockito.when(produtoRepository.buscarPorId(3L)).thenReturn(mouse);
 
         BDDMockito.when(pessoaRepository.buscarPorId(Pessoa.ID_PESSOA_PADRAO)).thenReturn(pessoaPadrao);
 

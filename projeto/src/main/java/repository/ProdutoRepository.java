@@ -36,14 +36,14 @@ public class ProdutoRepository {
         }
     }
 
-    public boolean atualizarStatusProduto(boolean ativo, int idProduto) {
+    public boolean atualizarStatusProduto(boolean ativo, Long idProduto) {
         String sql = "UPDATE produtos SET ativo = ? WHERE (`id_produto` = ?);";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, ativo);
-            ps.setInt(2, idProduto);
+            ps.setLong(2, idProduto);
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -65,7 +65,7 @@ public class ProdutoRepository {
             ps.setBigDecimal(3, produto.getPrecoCusto());
             ps.setBoolean(4, produto.isAtivo());
             ps.setInt(5, produto.getCategoria().getId());
-            ps.setInt(6, produto.getId());
+            ps.setLong(6, produto.getId());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -144,7 +144,7 @@ public class ProdutoRepository {
         return produtos;
     }
 
-    public Produto buscarPorId(int idProduto) {
+    public Produto buscarPorId(Long idProduto) {
         String sql = """
                         SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
                             		p.ativo, p.id_categoria, c.descricao
@@ -155,7 +155,7 @@ public class ProdutoRepository {
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, idProduto);
+            ps.setLong(1, idProduto);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -170,7 +170,7 @@ public class ProdutoRepository {
 
     private Produto mapearProduto(ResultSet rs) throws SQLException {
         return Produto.builder()
-                .id(rs.getInt("p.id_produto"))
+                .id(rs.getLong("p.id_produto"))
                 .descricao(rs.getString("p.descricao"))
                 .precoVenda(rs.getBigDecimal("p.preco_venda"))
                 .precoCusto(rs.getBigDecimal("p.preco_custo"))

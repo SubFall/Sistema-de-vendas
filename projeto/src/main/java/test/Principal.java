@@ -8,7 +8,7 @@ import ui.categoria.CategoriaMenu;
 import ui.movimento.MovimentoMenu;
 import ui.pessoa.PessoaMenu;
 import ui.produto.ProdutoMenu;
-import util.ConsoleUtils;
+import util.console.ConsoleUtils;
 
 import java.util.Scanner;
 
@@ -73,7 +73,9 @@ public class Principal {
                     movimentoItemRepository,
                     historicoEstoqueService,
                     pessoaRepository,
-                    connectionFactory);
+                    connectionFactory,
+                    estoqueService,
+                    produtoService);
 
     private final PessoaMenu pessoaMenu = new PessoaMenu(scanner, pessoaService);
     private final CategoriaMenu categoriaMenu = new CategoriaMenu(scanner, categoriaService);

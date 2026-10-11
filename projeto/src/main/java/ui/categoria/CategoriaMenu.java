@@ -2,7 +2,7 @@ package ui.categoria;
 
 import domain.categoria.Categoria;
 import service.CategoriaService;
-import util.ConsoleUtils;
+import util.console.ConsoleUtils;
 
 import java.util.ArrayList;
 import java.util.List;

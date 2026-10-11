@@ -6,7 +6,7 @@ import domain.endereco.Endereco;
 import domain.pessoa.Pessoa;
 import domain.pessoa.PessoaPapel;
 import service.PessoaService;
-import util.ConsoleUtils;
+import util.console.ConsoleUtils;
 
 import java.util.ArrayList;
 import java.util.List;

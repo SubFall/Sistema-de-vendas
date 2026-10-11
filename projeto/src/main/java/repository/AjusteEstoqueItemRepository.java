@@ -14,7 +14,7 @@ public class AjusteEstoqueItemRepository {
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             for (AjusteEstoqueItens item : itens) {
-                ps.setInt(1, item.getProduto().getId());
+                ps.setLong(1, item.getProduto().getId());
                 ps.setBigDecimal(2, item.getEstoque().getQuantidade());
                 ps.setBigDecimal(3, item.getContagem());
                 ps.setBigDecimal(4, item.getDiferenca());

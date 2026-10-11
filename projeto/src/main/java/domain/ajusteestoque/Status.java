@@ -2,7 +2,7 @@ package domain.ajusteestoque;
 
 public enum Status {
     ABERTO(0),
-    FINALIZADO(1);
+    FECHADO(1);
 
     private final int codigo;
 

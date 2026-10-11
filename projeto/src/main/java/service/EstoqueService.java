@@ -15,7 +15,7 @@ public class EstoqueService {
         this.estoqueRepository = estoqueRepository;
     }
 
-    public void salvarEstoque(Connection conn, int idProduto, BigDecimal saldo) {
+    public void salvarEstoque(Connection conn, Long idProduto, BigDecimal saldo) {
         Estoque estoque = estoqueRepository.buscarPorIdProduto(conn, idProduto);
 
         if (estoque == null) {
@@ -25,7 +25,7 @@ public class EstoqueService {
         estoqueRepository.atualizarEstoque(conn, idProduto, saldo);
     }
 
-    public Estoque buscarPorIdProduto(Connection conn, int idProduto) {
+    public Estoque buscarPorIdProduto(Connection conn, Long idProduto) {
         Estoque estoque = estoqueRepository.buscarPorIdProduto(conn, idProduto);
         if (estoque != null) {
             return estoque;
@@ -33,12 +33,8 @@ public class EstoqueService {
         return Estoque.builder().idProduto(idProduto).quantidade(BigDecimal.ZERO).build();
     }
 
-    public Estoque buscarPorIdProduto(int idProduto) {
-        Estoque estoque = estoqueRepository.buscarPorIdProduto(idProduto);
-        if (estoque != null) {
-            return estoque;
-        }
-        return Estoque.builder().idProduto(idProduto).quantidade(BigDecimal.ZERO).build();
+    public Estoque buscarPorIdProduto(Long idProduto) {
+        return estoqueRepository.buscarPorIdProduto(idProduto);
     }
 
     public List<ProdutoEstoqueDTO> buscarProdutosEstoque() {
