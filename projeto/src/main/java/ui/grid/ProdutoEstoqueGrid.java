@@ -24,7 +24,7 @@ public final class ProdutoEstoqueGrid {
         System.out.println("|*****************************|");
     }
 
-    public static void exibiCabecalhoGirdProdutoEstoque() {
+    public static void exibiCabecalhoGridProdutoEstoque() {
         System.out.println("=======================================");
         System.out.println("                PRODUTOS               ");
         System.out.println("=======================================");
@@ -36,7 +36,7 @@ public final class ProdutoEstoqueGrid {
     }
 
 
-    public static void exibirtGirdProdutoEstoque(List<ProdutoEstoqueDTO> produtoEstoqueDTOS) {
+    public static void exibirtGridProdutoEstoque(List<ProdutoEstoqueDTO> produtoEstoqueDTOS) {
         String id;
         String descricao;
         String quantidade;
@@ -46,7 +46,7 @@ public final class ProdutoEstoqueGrid {
             return;
         }
 
-        exibiCabecalhoGirdProdutoEstoque();
+        exibiCabecalhoGridProdutoEstoque();
 
         for (ProdutoEstoqueDTO produtoEstoqueDTO : produtoEstoqueDTOS) {
             id = ConsoleUtils.formatarColuna(String.valueOf(produtoEstoqueDTO.getIdProduto()), 3);
@@ -61,7 +61,7 @@ public final class ProdutoEstoqueGrid {
 
     public static void exibirCabecalhoGridItens() {
         System.out.println("====================================================");
-        System.out.println("                  AJUSTE DE ESTOQUE                 ");
+        System.out.println("            AJUSTE DE ESTOQUE ITENS                 ");
         System.out.println("====================================================");
         System.out.printf(
                 "%-3s | %-15s | %-5s | %-8s | %-11s%n",

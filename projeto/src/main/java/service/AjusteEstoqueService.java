@@ -11,10 +11,12 @@ import domain.movimento.StatusMovimento;
 import domain.movimento.Tipo;
 import domain.pessoa.Pessoa;
 import domain.produto.Produto;
+import lombok.RequiredArgsConstructor;
 import repository.*;
 import util.console.ConsoleUtils;
 import util.mensagens.MensagensAjusteEstoque;
 import util.mensagens.MensagensGlobais;
+import util.mensagens.MensagensMovimentos;
 import util.mensagens.MensagensProdutos;
 
 import java.sql.Connection;
@@ -25,7 +27,9 @@ import java.util.Scanner;
 
 import static ui.grid.ProdutoEstoqueGrid.*;
 
+@RequiredArgsConstructor
 public class AjusteEstoqueService {
+    private final Scanner scanner;
     private final AjusteEstoqueRepository ajusteEstoqueRepository;
     private final AjusteEstoqueItemRepository ajusteEstoqueItemRepository;
     private final ProdutoRepository produtoRepository;
@@ -36,29 +40,6 @@ public class AjusteEstoqueService {
     private final ConnectionProvider connectionProvider;
     private final EstoqueService estoqueService;
     private final ProdutoService produtoService;
-    private final Scanner scanner = new Scanner(System.in);
-
-    public AjusteEstoqueService(AjusteEstoqueRepository estoqueRepository,
-                                AjusteEstoqueItemRepository ajusteEstoqueItemRepository,
-                                ProdutoRepository produtoRepository,
-                                MovimentoRepository movimentoRepository,
-                                MovimentoItemRepository movimentoItemRepository,
-                                HistoricoEstoqueService historicoEstoqueService,
-                                PessoaRepository pessoaRepository,
-                                ConnectionProvider connectionProvider,
-                                EstoqueService estoqueService,
-                                ProdutoService produtoService) {
-        this.ajusteEstoqueRepository = estoqueRepository;
-        this.ajusteEstoqueItemRepository = ajusteEstoqueItemRepository;
-        this.produtoRepository = produtoRepository;
-        this.movimentoRepository = movimentoRepository;
-        this.movimentoItemRepository = movimentoItemRepository;
-        this.historicoEstoqueService = historicoEstoqueService;
-        this.pessoaRepository = pessoaRepository;
-        this.connectionProvider = connectionProvider;
-        this.estoqueService = estoqueService;
-        this.produtoService = produtoService;
-    }
 
     public void inserirAjusteEstoque(AjusteEstoque ajusteEstoque) {
         Connection conn = null;
@@ -72,14 +53,14 @@ public class AjusteEstoqueService {
             var isInseriu = ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(conn, idAjusteEstoque, ajusteEstoque.getAjusteEstoqueItens());
 
             if (!isInseriu) {
-                throw new IllegalArgumentException("Erro ao inserir item do Ajuste Estoque");
+                throw new IllegalArgumentException(MensagensAjusteEstoque.ERRO_INSERIR_AJUSTE_ESTOQUE);
             }
 
             conn.commit();
         } catch (SQLException e) {
             rollback(conn);
 
-            throw new RuntimeException("Erro ao inserir movimento", e);
+            throw new RuntimeException(MensagensMovimentos.ERRO_INSERIR_MOVIMENTO, e);
         } catch (IllegalArgumentException e) {
             rollback(conn);
 
@@ -90,33 +71,31 @@ public class AjusteEstoqueService {
     }
 
     public List<AjusteEstoque> buscarTodosAjusteEstoqueAberto() {
-        return ajusteEstoqueRepository.buscarTodosAjusteEstoqueAberto();
+        List<AjusteEstoque> ajusteEstoqueList = new ArrayList<>();
+        try {
+            ajusteEstoqueList = ajusteEstoqueRepository.buscarTodosAjusteEstoqueAberto();
+
+            return ajusteEstoqueList;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return ajusteEstoqueList;
     }
 
     public AjusteEstoque buscarAjustePorId(Long idAjuste) {
-        var ajusteEstoque = ajusteEstoqueRepository.buscarAjustePorId(idAjuste);
+        try {
+            var ajusteEstoque = ajusteEstoqueRepository.buscarAjusteEstoquePorId(idAjuste);
 
-        if (ajusteEstoque == null) {
-            throw new IllegalArgumentException("Ajuste de Estoque não localizado");
+            if (ajusteEstoque == null) {
+                throw new IllegalArgumentException(MensagensAjusteEstoque.AJUSTE_ESTOQUE_NAO_LOCALIZADO);
+            }
+
+            return ajusteEstoque;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
-
-        return ajusteEstoque;
+        return null;
     }
-
-    public AjusteEstoqueItens buscarAjusteEstoqueItemPorId(Long idAjuste) {
-        var ajusteEstoqueItem = ajusteEstoqueRepository.buscarAjusteEstoqueItem(idAjuste);
-
-        if (ajusteEstoqueItem == null) {
-            throw new IllegalArgumentException("Ajuste Item não localizado");
-        }
-
-        return ajusteEstoqueItem;
-    }
-
-    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensList(Long idAjuste) {
-        return ajusteEstoqueRepository.buscarAjusteEstoqueItensList(idAjuste);
-    }
-
 
     private void criarMovimento(Connection conn, List<AjusteEstoqueItens> ajusteEstoqueItens, Tipo tipo) {
         List<MovimentoItem> movimentoItems = new ArrayList<>();
@@ -157,7 +136,7 @@ public class AjusteEstoqueService {
             var isInseriu = movimentoItemRepository.inserirMovimentoItem(conn, idMovimento, movimentoItem);
 
             if (!isInseriu) {
-                throw new IllegalArgumentException("Erro ao inserir item do movimento");
+                throw new IllegalArgumentException(MensagensMovimentos.ERRO_INSERIR_MOVIMENTO);
             }
 
             if (movimento.getStatusMovimento() == StatusMovimento.FINALIZADO) {
@@ -193,7 +172,7 @@ public class AjusteEstoqueService {
         } catch (SQLException e) {
             rollback(conn);
 
-            throw new RuntimeException("Erro ao inserir movimento", e);
+            throw new RuntimeException(MensagensMovimentos.ERRO_INSERIR_MOVIMENTO, e);
         } catch (IllegalArgumentException e) {
             rollback(conn);
 
@@ -204,11 +183,29 @@ public class AjusteEstoqueService {
     }
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
-        return ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(idAjuste);
+        List<AjusteEstoqueItens> ajusteEstoqueItensList = new ArrayList<>();
+
+        try {
+            ajusteEstoqueItensList = ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(idAjuste);
+
+            return ajusteEstoqueItensList;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return ajusteEstoqueItensList;
     }
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensSaida(Long idAjuste) {
-        return ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(idAjuste);
+        List<AjusteEstoqueItens> ajusteEstoqueItensList = new ArrayList<>();
+
+        try {
+            ajusteEstoqueItensList = ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(idAjuste);
+
+            return ajusteEstoqueItensList;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return ajusteEstoqueItensList;
     }
 
     public void criarMovimento() {
@@ -221,18 +218,26 @@ public class AjusteEstoqueService {
 
         try {
             System.out.print(MensagensAjusteEstoque.DIGITE_ID);
-            var ajusteEstoque = buscarAjustePorId(ConsoleUtils.lerLong(scanner, "ID"));
+            var ajusteEstoque = buscarAjustePorId(ConsoleUtils.lerLong(scanner, MensagensGlobais.ID));
 
             criarMovimentoAjusteEstoque(ajusteEstoque.getId());
 
-            System.out.println("Movimento criado com Sucesso!");
+            System.out.println("\nMovimento criado com Sucesso!\n");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public List<AjusteEstoque> buscarAjustePorStatus(Status status) {
-        return ajusteEstoqueRepository.buscarAjustePorStatus(status);
+        List<AjusteEstoque> ajusteEstoqueList = new ArrayList<>();
+        try {
+            ajusteEstoqueList = ajusteEstoqueRepository.buscarAjustePorStatus(status);
+
+            return ajusteEstoqueList;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return ajusteEstoqueList;
     }
 
     public void novoAjuste() {
@@ -253,7 +258,7 @@ public class AjusteEstoqueService {
                 case 1 -> adicionarItem(itens);
                 case 2 -> removerItem(itens);
                 case 3 -> {
-                    if (concluirAjuste(titulo, itens)) {
+                    if (concluir(titulo, itens)) {
                         repeticao = false;
                     }
                 }
@@ -275,7 +280,7 @@ public class AjusteEstoqueService {
         } catch (SQLException e) {
             rollback(conn);
 
-            throw new RuntimeException("Erro ao inserir movimento", e);
+            throw new RuntimeException(MensagensMovimentos.ERRO_INSERIR_MOVIMENTO, e);
         } catch (IllegalArgumentException e) {
             rollback(conn);
 
@@ -285,7 +290,7 @@ public class AjusteEstoqueService {
         }
     }
 
-    public void removerAjuste() {
+    public void remover() {
         var ajusteEstoqueList = buscarTodosAjusteEstoqueAberto();
         exibirGridAjusteEstoque(ajusteEstoqueList);
 
@@ -293,11 +298,11 @@ public class AjusteEstoqueService {
 
         try {
             System.out.print(MensagensAjusteEstoque.DIGITE_ID);
-            AjusteEstoque ajusteEstoque = buscarAjustePorId(ConsoleUtils.lerLong(scanner, "ID"));
+            AjusteEstoque ajusteEstoque = buscarAjustePorId(ConsoleUtils.lerLong(scanner, MensagensGlobais.ID));
 
             removerAjusteEstoque(ajusteEstoque);
 
-            System.out.println("Ajuste Estoque removido com Sucesso!");
+            System.out.println("\nAjuste Estoque removido com Sucesso!\n");
         } catch (IllegalAccessError e) {
             System.out.println(e.getMessage());
         }
@@ -316,14 +321,14 @@ public class AjusteEstoqueService {
             var isInseriu = ajusteEstoqueItemRepository.inserirAjusteEstoqueItens(conn, ajusteEstoque.getId(), ajusteEstoque.getAjusteEstoqueItens());
 
             if (!isInseriu) {
-                throw new IllegalArgumentException("Erro ao inserir item do Ajuste Estoque");
+                throw new IllegalArgumentException(MensagensAjusteEstoque.ERRO_INSERIR_AJUSTE_ESTOQUE_ITENS);
             }
 
             conn.commit();
         } catch (SQLException e) {
             rollback(conn);
 
-            throw new RuntimeException("Erro ao inserir movimento", e);
+            throw new RuntimeException(MensagensMovimentos.ERRO_INSERIR_MOVIMENTO, e);
         } catch (IllegalArgumentException e) {
             rollback(conn);
 
@@ -372,21 +377,21 @@ public class AjusteEstoqueService {
         var ajusteEstoqueItens = AjusteEstoqueItens.builder().produto(produto).build();
 
         if (!ajusteEstoqueItensList.contains(ajusteEstoqueItens)) {
-            System.out.println("Item Não localizado!");
+            System.out.println("\nItem Não localizado!\n");
             return;
         }
 
         ajusteEstoqueItensList.remove(ajusteEstoqueItens);
 
-        System.out.println("\nItem removido da Lista");
+        System.out.println("\nItem removido da Lista.\n");
         exibirGridItens(ajusteEstoqueItensList);
     }
 
     private Produto getProduto() {
-        exibirtGirdProdutoEstoque(estoqueService.buscarProdutosEstoque());
+        exibirtGridProdutoEstoque(estoqueService.buscarTodosProdutosEstoque());
         System.out.print(MensagensProdutos.DIGITE_ID);
 
-        return produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
+        return produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, MensagensGlobais.ID));
     }
 
     private Produto getProdutoAjusteEstoqueItens(List<AjusteEstoqueItens> ajusteEstoqueItensList) {
@@ -394,14 +399,14 @@ public class AjusteEstoqueService {
         System.out.print(MensagensProdutos.DIGITE_ID);
 
         try {
-            return produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
+            return produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, MensagensGlobais.ID));
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
         return null;
     }
 
-    public void atualizar() {
+    public void atualizarAjusteEstoque() {
         var ajusteEstoqueList = buscarTodosAjusteEstoqueAberto();
         exibirGridAjusteEstoque(ajusteEstoqueList);
 
@@ -410,7 +415,7 @@ public class AjusteEstoqueService {
         try {
             System.out.print(MensagensAjusteEstoque.DIGITE_ID);
 
-            var ajusteEstoque = buscarAjustePorId(ConsoleUtils.lerLong(scanner, "ID"));
+            var ajusteEstoque = buscarAjustePorId(ConsoleUtils.lerLong(scanner, MensagensGlobais.ID));
             ajusteEstoque.setAjusteEstoqueItens(buscarAjusteEstoqueItensList(ajusteEstoque.getId()));
 
             System.out.println(MensagensGlobais.MANTER_VALOR_ANTIGO);
@@ -440,6 +445,10 @@ public class AjusteEstoqueService {
         }
     }
 
+    private List<AjusteEstoqueItens> buscarAjusteEstoqueItensList(Long idAjuste) {
+        return ajusteEstoqueRepository.buscarAjusteEstoqueItensList(idAjuste);
+    }
+
     private void atualizarTitulo(AjusteEstoque ajusteEstoque) {
         System.out.println("Título Atual: " + ajusteEstoque.getTitulo());
         System.out.print("Novo Título: ");
@@ -466,18 +475,18 @@ public class AjusteEstoqueService {
         }
     }
 
-    public boolean concluirAjuste(String titulo, List<AjusteEstoqueItens> itens) {
+    public boolean concluir(String titulo, List<AjusteEstoqueItens> itens) {
         int opcao;
         do {
             System.out.println("1 - Salvar ajuste em aberto");
             System.out.println("2 - Salvar ajuste finalizado");
             System.out.println("3 - Cancelar operação");
 
-            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+            opcao = ConsoleUtils.lerInteiro(scanner, MensagensGlobais.OPCAO);
         } while (opcao != 1 && opcao != 2 && opcao != 3);
 
         if (itens.isEmpty()) {
-            System.out.println("Adicione pelo menos um item antes de concluir a venda.");
+            System.out.println("\nAdicione pelo menos um item antes de concluir a venda.\n");
             return false;
         }
 
@@ -490,23 +499,48 @@ public class AjusteEstoqueService {
         if (opcao == 2) {
             ajusteEstoque.setStatus(Status.FECHADO);
         } else if (opcao == 3) {
-            System.out.println("Ajuste cancelado!");
+            System.out.println("\nAjuste cancelado!\n");
             return true;
         }
 
         inserirAjusteEstoque(ajusteEstoque);
-        System.out.println("Ajuste criado com sucesso!");
+        System.out.println("\nAjuste criado com sucesso!\n");
         return true;
     }
 
     public void buscarTodosAjusteEstoque() {
-        exibirGridAjusteEstoque(ajusteEstoqueRepository.buscarTodosAjusteEstoque());
+        try {
+            exibirGridAjusteEstoque(ajusteEstoqueRepository.buscarTodosAjusteEstoque());
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void buscarAjusteEstoquePorTitulo() {
         System.out.print("Digite o Título: ");
         var titulo = scanner.nextLine();
-        exibirGridAjusteEstoque(ajusteEstoqueRepository.buscarAjusteEstoquePorTitulo(titulo));
+
+        try {
+            exibirGridAjusteEstoque(ajusteEstoqueRepository.buscarAjusteEstoquePorTitulo(titulo));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void buscarAjusteEstoqueItens() {
+        try {
+            var ajusteEstoqueList = ajusteEstoqueRepository.buscarTodosAjusteEstoque();
+            exibirGridAjusteEstoque(ajusteEstoqueList);
+
+            System.out.print(MensagensAjusteEstoque.DIGITE_ID);
+            var ajusteEstoque = buscarAjustePorId(ConsoleUtils.lerLong(scanner, MensagensGlobais.ID));
+
+            ajusteEstoque.setAjusteEstoqueItens(ajusteEstoqueRepository.buscarAjusteEstoqueItensList(ajusteEstoque.getId()));
+
+            exibirGridItens(ajusteEstoque.getAjusteEstoqueItens());
+        } catch (SQLException | IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void rollback(Connection conn) {
@@ -515,7 +549,7 @@ public class AjusteEstoqueService {
                 conn.rollback();
             }
         } catch (SQLException ex) {
-            throw new RuntimeException("Erro ao realizar rollback", ex);
+            throw new RuntimeException("\nErro ao realizar rollback!\n", ex);
         }
     }
 
@@ -525,7 +559,7 @@ public class AjusteEstoqueService {
                 conn.close();
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao fechar a conexão", e);
+            throw new RuntimeException("\nErro ao fechar a conexão!\n", e);
         }
     }
 }

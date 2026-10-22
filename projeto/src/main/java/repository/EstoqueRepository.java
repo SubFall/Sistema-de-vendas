@@ -3,6 +3,7 @@ package repository;
 import conn.ConnectionProvider;
 import domain.estoque.Estoque;
 import dto.ProdutoEstoqueDTO;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -12,12 +13,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class EstoqueRepository {
     private final ConnectionProvider connectionProvider;
-
-    public EstoqueRepository(ConnectionProvider connectionProvider) {
-        this.connectionProvider = connectionProvider;
-    }
 
     public boolean inserirEstoque(Connection conn, Long idProduto, BigDecimal saldo) {
         String sql = "INSERT INTO estoque (id_produto, quantidade) VALUES (?, ?);";
@@ -87,7 +85,7 @@ public class EstoqueRepository {
         return Estoque.builder().idProduto(idProduto).quantidade(BigDecimal.ZERO).build();
     }
 
-    public List<ProdutoEstoqueDTO> buscarProdutosEstoque() {
+    public List<ProdutoEstoqueDTO> buscarTodosProdutosEstoque() throws SQLException {
         List<ProdutoEstoqueDTO> produtoEstoque = new ArrayList<>();
         String sql = """
                 SELECT
@@ -101,7 +99,7 @@ public class EstoqueRepository {
                 produtoEstoque.add(mapearProdutosEstoque(rs));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
         }
         return produtoEstoque;
     }

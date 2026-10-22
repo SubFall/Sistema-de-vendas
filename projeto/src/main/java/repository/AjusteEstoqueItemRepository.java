@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class AjusteEstoqueItemRepository {
-    public boolean inserirAjusteEstoqueItens(Connection conn, Long idAjusteEstoque, List<AjusteEstoqueItens> itens) {
+    public boolean inserirAjusteEstoqueItens(Connection conn, Long idAjusteEstoque, List<AjusteEstoqueItens> itens) throws SQLException {
         String sql = "INSERT INTO ajuste_estoque_itens (id_produto, saldo, contagem, diferenca, id_ajuste_estoque) " +
                 "VALUES (?, ?, ?, ?, ?);";
 
@@ -27,7 +27,7 @@ public class AjusteEstoqueItemRepository {
 
             return resultados.length == itens.size();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao inserir Ajuste Estoque Itens.",e);
         }
     }
 }

@@ -5,20 +5,16 @@ import domain.estoque.HistoricoEstoque;
 import domain.movimento.Movimento;
 import domain.movimento.Tipo;
 import domain.produto.Produto;
+import lombok.RequiredArgsConstructor;
 import repository.HistoricoEstoqueRepository;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 
+@RequiredArgsConstructor
 public class HistoricoEstoqueService {
     private final HistoricoEstoqueRepository historicoEstoqueRepository;
     private final EstoqueService estoqueService;
-
-    public HistoricoEstoqueService(HistoricoEstoqueRepository historicoEstoqueRepository, EstoqueService estoqueService) {
-        this.historicoEstoqueRepository = historicoEstoqueRepository;
-        this.estoqueService = estoqueService;
-
-    }
 
     public void movimentar(
             Connection conn, Produto produto, Movimento movimento, BigDecimal quantidade, Tipo tipo

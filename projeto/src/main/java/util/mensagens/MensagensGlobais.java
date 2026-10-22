@@ -13,4 +13,6 @@ public final class MensagensGlobais {
 
     public static final String OPCAO =
             "Opção: ";
+
+    public static final String ID = "ID";
 }

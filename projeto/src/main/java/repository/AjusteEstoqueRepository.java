@@ -5,25 +5,17 @@ import domain.ajusteestoque.AjusteEstoque;
 import domain.ajusteestoque.AjusteEstoqueItens;
 import domain.ajusteestoque.Status;
 import domain.ajusteestoque.StatusMovimentoCriado;
+import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class AjusteEstoqueRepository {
     private final ConnectionProvider connectionProvider;
     private final ProdutoRepository produtoRepository;
     private final EstoqueRepository estoqueRepository;
-
-    public AjusteEstoqueRepository(
-            ConnectionProvider connectionProvider,
-            ProdutoRepository produtoRepository,
-            EstoqueRepository estoqueRepository
-    ) {
-        this.connectionProvider = connectionProvider;
-        this.produtoRepository = produtoRepository;
-        this.estoqueRepository = estoqueRepository;
-    }
 
     public Long inserirAjusteEstoque(Connection conn, AjusteEstoque estoque) throws SQLException {
         var sql = "INSERT INTO ajuste_estoque (titulo, data, status, status_movimento) VALUES (?, ?, ?, ?);";
@@ -42,7 +34,7 @@ public class AjusteEstoqueRepository {
                     return rs.getLong(1);
                 }
             }
-            throw new SQLException("Erro ao obter ID do Ajuste Estoque");
+            throw new SQLException("Erro ao obter ID do Ajuste Estoque.");
         }
     }
 
@@ -58,7 +50,7 @@ public class AjusteEstoqueRepository {
         }
     }
 
-    public List<AjusteEstoque> buscarAjustePorStatus(Status status) {
+    public List<AjusteEstoque> buscarAjustePorStatus(Status status) throws SQLException{
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
                 SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
@@ -76,12 +68,12 @@ public class AjusteEstoqueRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao buscar Ajuste Estoque por Status.", e);
         }
         return ajusteEstoques;
     }
 
-    public List<AjusteEstoque> buscarTodosAjusteEstoqueAberto() {
+    public List<AjusteEstoque> buscarTodosAjusteEstoqueAberto() throws SQLException{
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
                 SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
@@ -96,12 +88,12 @@ public class AjusteEstoqueRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao buscar Ajuste Estoque aberto.", e);
         }
         return ajusteEstoques;
     }
 
-    public List<AjusteEstoque> buscarTodosAjusteEstoque() {
+    public List<AjusteEstoque> buscarTodosAjusteEstoque() throws SQLException{
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
                 SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque;
@@ -115,12 +107,12 @@ public class AjusteEstoqueRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao buscar Todos os Ajuste Estoque.", e);
         }
         return ajusteEstoques;
     }
 
-    public List<AjusteEstoque> buscarAjusteEstoquePorTitulo(String titulo) {
+    public List<AjusteEstoque> buscarAjusteEstoquePorTitulo(String titulo) throws SQLException {
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
                 SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque
@@ -138,12 +130,12 @@ public class AjusteEstoqueRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao buscar Ajuste Estoque por Título.", e);
         }
         return ajusteEstoques;
     }
 
-    public AjusteEstoque buscarAjustePorId(Long idAjuste) {
+    public AjusteEstoque buscarAjusteEstoquePorId(Long idAjuste) throws SQLException {
         var sql = "SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -157,12 +149,12 @@ public class AjusteEstoqueRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao buscar Ajuste Estoque", e);
         }
         return null;
     }
 
-    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
+    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) throws SQLException {
         List<AjusteEstoqueItens> ajusteEstoqueItens = new ArrayList<>();
         var sql = """
                 SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
@@ -179,13 +171,13 @@ public class AjusteEstoqueRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao buscar Ajuste Estoque Itens Entrada", e);
         }
 
         return ajusteEstoqueItens;
     }
 
-    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensSaida(Long idAjuste) {
+    public List<AjusteEstoqueItens> buscarAjusteEstoqueItensSaida(Long idAjuste) throws SQLException {
         List<AjusteEstoqueItens> ajusteEstoqueItens = new ArrayList<>();
         var sql = """
                 SELECT id_ajuste_estoque_itens, id_produto, saldo, contagem FROM ajuste_estoque_itens
@@ -202,7 +194,7 @@ public class AjusteEstoqueRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao buscar Ajuste Estoque Itens Sáida");
         }
 
         return ajusteEstoqueItens;
