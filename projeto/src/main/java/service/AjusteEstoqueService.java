@@ -60,7 +60,7 @@ public class AjusteEstoqueService {
         } catch (SQLException e) {
             rollback(conn);
 
-            throw new RuntimeException(MensagensMovimentos.ERRO_INSERIR_MOVIMENTO, e);
+            throw new RuntimeException(MensagensAjusteEstoque.ERRO_INSERIR_AJUSTE_ESTOQUE, e);
         } catch (IllegalArgumentException e) {
             rollback(conn);
 
@@ -71,15 +71,11 @@ public class AjusteEstoqueService {
     }
 
     public List<AjusteEstoque> buscarTodosAjusteEstoqueAberto() {
-        List<AjusteEstoque> ajusteEstoqueList = new ArrayList<>();
         try {
-            ajusteEstoqueList = ajusteEstoqueRepository.buscarTodosAjusteEstoqueAberto();
-
-            return ajusteEstoqueList;
+            return ajusteEstoqueRepository.buscarTodosAjusteEstoqueAberto();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Falha ao consultar ajustes de estoque abertos.", e);
         }
-        return ajusteEstoqueList;
     }
 
     public AjusteEstoque buscarAjustePorId(Long idAjuste) {
@@ -92,9 +88,8 @@ public class AjusteEstoqueService {
 
             return ajusteEstoque;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Falha ao consultar o ajuste de estoque.", e);
         }
-        return null;
     }
 
     private void criarMovimento(Connection conn, List<AjusteEstoqueItens> ajusteEstoqueItens, Tipo tipo) {
@@ -183,29 +178,19 @@ public class AjusteEstoqueService {
     }
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensEntrada(Long idAjuste) {
-        List<AjusteEstoqueItens> ajusteEstoqueItensList = new ArrayList<>();
-
         try {
-            ajusteEstoqueItensList = ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(idAjuste);
-
-            return ajusteEstoqueItensList;
+            return ajusteEstoqueRepository.buscarAjusteEstoqueItensEntrada(idAjuste);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Falha ao consultar os itens de entrada do ajuste.", e);
         }
-        return ajusteEstoqueItensList;
     }
 
     public List<AjusteEstoqueItens> buscarAjusteEstoqueItensSaida(Long idAjuste) {
-        List<AjusteEstoqueItens> ajusteEstoqueItensList = new ArrayList<>();
-
         try {
-            ajusteEstoqueItensList = ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(idAjuste);
-
-            return ajusteEstoqueItensList;
+            return ajusteEstoqueRepository.buscarAjusteEstoqueItensSaida(idAjuste);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Falha ao consultar os itens de saída do ajuste.", e);
         }
-        return ajusteEstoqueItensList;
     }
 
     public void criarMovimento() {
@@ -229,15 +214,11 @@ public class AjusteEstoqueService {
     }
 
     public List<AjusteEstoque> buscarAjustePorStatus(Status status) {
-        List<AjusteEstoque> ajusteEstoqueList = new ArrayList<>();
         try {
-            ajusteEstoqueList = ajusteEstoqueRepository.buscarAjustePorStatus(status);
-
-            return ajusteEstoqueList;
+            return ajusteEstoqueRepository.buscarAjustePorStatus(status);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Falha ao consultar ajustes de estoque por status.", e);
         }
-        return ajusteEstoqueList;
     }
 
     public void novoAjuste() {

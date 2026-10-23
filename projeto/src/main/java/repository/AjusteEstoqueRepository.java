@@ -53,7 +53,7 @@ public class AjusteEstoqueRepository {
     public List<AjusteEstoque> buscarAjustePorStatus(Status status) throws SQLException{
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
-                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
+                SELECT id_ajuste_estoque, titulo, data, status, status_movimento FROM ajuste_estoque 
                 WHERE status = ? AND status_movimento <> 1;
                 """;
 
@@ -73,18 +73,21 @@ public class AjusteEstoqueRepository {
         return ajusteEstoques;
     }
 
-    public List<AjusteEstoque> buscarTodosAjusteEstoqueAberto() throws SQLException{
+    public List<AjusteEstoque> buscarTodosAjusteEstoqueAberto() throws SQLException {
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
-                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque 
-                WHERE status_movimento <> 1;
+                SELECT id_ajuste_estoque, titulo, data, status, status_movimento FROM ajuste_estoque 
+                WHERE status = ? AND status_movimento = ?;
                 """;
 
         try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                ajusteEstoques.add(mapearAjusteEstoque(rs));
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, Status.ABERTO.getCodigo());
+            ps.setInt(2, StatusMovimentoCriado.MOVIMENTO_NAO_CRIADO.getCodigo());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ajusteEstoques.add(mapearAjusteEstoque(rs));
+                }
             }
 
         } catch (SQLException e) {
@@ -96,7 +99,7 @@ public class AjusteEstoqueRepository {
     public List<AjusteEstoque> buscarTodosAjusteEstoque() throws SQLException{
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
-                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque;
+                SELECT id_ajuste_estoque, titulo, data, status, status_movimento FROM ajuste_estoque;
                 """;
 
         try (Connection conn = connectionProvider.getConnection();
@@ -115,7 +118,7 @@ public class AjusteEstoqueRepository {
     public List<AjusteEstoque> buscarAjusteEstoquePorTitulo(String titulo) throws SQLException {
         List<AjusteEstoque> ajusteEstoques = new ArrayList<>();
         var sql = """
-                SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque
+                SELECT id_ajuste_estoque, titulo, data, status, status_movimento FROM ajuste_estoque
                 WHERE titulo LIKE ?;
                 """;
 
@@ -136,7 +139,7 @@ public class AjusteEstoqueRepository {
     }
 
     public AjusteEstoque buscarAjusteEstoquePorId(Long idAjuste) throws SQLException {
-        var sql = "SELECT id_ajuste_estoque, titulo, data, status FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
+        var sql = "SELECT id_ajuste_estoque, titulo, data, status, status_movimento FROM ajuste_estoque WHERE id_ajuste_estoque = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -245,16 +248,18 @@ public class AjusteEstoqueRepository {
         return ajusteEstoqueItensList;
     }
 
-    public void mudarStatusMovimento(Connection conn, StatusMovimentoCriado statusMovimentoCriado, Long idAjuste) {
+    public void mudarStatusMovimento(Connection conn, StatusMovimentoCriado statusMovimentoCriado, Long idAjuste) throws SQLException {
         var sql = "UPDATE ajuste_estoque SET status_movimento = ? WHERE (id_ajuste_estoque = ?);";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, statusMovimentoCriado.getCodigo());
             ps.setLong(2, idAjuste);
 
-            ps.executeUpdate();
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("O ajuste de estoque não foi encontrado ou não pôde ser atualizado.");
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException("Erro ao atualizar o status dos movimentos do ajuste.", e);
         }
     }
 
@@ -288,6 +293,7 @@ public class AjusteEstoqueRepository {
                 .titulo(rs.getString("titulo"))
                 .dateHora(rs.getTimestamp("data").toLocalDateTime())
                 .status(Status.porCodigo(rs.getInt("status")))
+                .statusMovimentoCriado(StatusMovimentoCriado.porCodigo(rs.getInt("status_movimento")))
                 .build();
     }
 
