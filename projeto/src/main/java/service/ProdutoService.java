@@ -2,20 +2,17 @@ package service;
 
 import domain.categoria.Categoria;
 import domain.produto.Produto;
+import lombok.RequiredArgsConstructor;
 import repository.CategoriaRepository;
 import repository.ProdutoRepository;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
-
-    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository) {
-        this.produtoRepository = produtoRepository;
-        this.categoriaRepository = categoriaRepository;
-    }
 
     public boolean inserirProduto(Produto produto) {
 

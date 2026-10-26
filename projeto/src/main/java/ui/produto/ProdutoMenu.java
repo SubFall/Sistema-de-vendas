@@ -2,9 +2,11 @@ package ui.produto;
 
 import domain.categoria.Categoria;
 import domain.produto.Produto;
+import lombok.RequiredArgsConstructor;
 import service.CategoriaService;
 import service.ProdutoService;
 import ui.categoria.CategoriaMenu;
+import ui.grid.ProdutosGrid;
 import util.console.ConsoleUtils;
 
 import java.math.BigDecimal;
@@ -12,37 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+@RequiredArgsConstructor
 public class ProdutoMenu {
     private final Scanner scanner;
     private final ProdutoService produtoService;
     private final CategoriaService categoriaService;
     private final CategoriaMenu categoriaMenu;
 
-    public ProdutoMenu(
-            Scanner scanner,
-            ProdutoService produtoService,
-            CategoriaService categoriaService,
-            CategoriaMenu categoriaMenu) {
-
-        this.scanner = scanner;
-        this.produtoService = produtoService;
-        this.categoriaService = categoriaService;
-        this.categoriaMenu = categoriaMenu;
-    }
-
-
     public void iniciar() {
         int opcao;
 
         do {
-            System.out.println("\n|********** Produto **********|");
-            System.out.println("|1 - Cadastrar          - [] X|");
-            System.out.println("|2 - Inativar                 |");
-            System.out.println("|3 - Atualizar                |");
-            System.out.println("|4 - Detalhes                 |");
-            System.out.println("|5 - Listar                   |");
-            System.out.println("|0 - Voltar                   |");
-            System.out.println("|*****************************|");
+            ProdutosGrid.menu();
 
             System.out.print("Opção: ");
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
@@ -77,6 +60,7 @@ public class ProdutoMenu {
         BigDecimal precoVenda;
         BigDecimal precoCusto;
         Categoria categoria = null;
+
         try {
             System.out.print("Descricao: ");
             descricao = scanner.nextLine();
@@ -85,19 +69,11 @@ public class ProdutoMenu {
 
             precoCusto = ConsoleUtils.lerBigDecimal(scanner, "Preço de custo");
 
-            int op;
-            do {
-                System.out.println("Deseja cadastrar a categoria ?");
-                System.out.println("1 - SIM");
-                System.out.println("2 - Não");
-                op = ConsoleUtils.lerInteiro(scanner, "Opção");
-            } while (op != 1 && op != 2);
-
-            if (op == 1) {
+            if (ConsoleUtils.confirmar(scanner, "Deseja cadastrar a categoria ?")) {
                 categoria = selecionarCategoria();
             }
 
-            Produto produto = Produto.builder()
+            var produto = Produto.builder()
                     .descricao(descricao)
                     .precoVenda(precoVenda)
                     .precoCusto(precoCusto)
@@ -204,9 +180,9 @@ public class ProdutoMenu {
         } while (op != 1 && op != 2 && op != 3);
 
         if (op == 1) {
-            produto.setAtivo(true);
+            produto.ativar();
         } else if (op == 2) {
-            produto.setAtivo(false);
+            produto.inativar();
         }
     }
 
@@ -250,51 +226,25 @@ public class ProdutoMenu {
             case 4 -> produtos = produtoService.buscarTodosAtivo();
             default -> System.out.println("opção inválida!");
         }
-        exibirGrid(produtos);
+        ProdutosGrid.exibirGridProdutos(produtos);
     }
 
     private Categoria selecionarCategoria() {
+        int contador = 0;
         while (true) {
             try {
-
+                if (contador > 0) {
+                    if (!ConsoleUtils.confirmar(scanner, "Deseja cadastrar a categoria ?")) {
+                        return null;
+                    }
+                }
+                contador++;
                 categoriaMenu.listar(1); //1 - Listar todas as categorias
-                return categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
 
+                return categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
-        }
-    }
-
-    private void exibirCabecalhoGrid() {
-        System.out.printf(
-                "%-5s | %-20s | %-10s | %-10s | %-10s%n",
-                "ID", "DESCRICAO", "PRECO VENDA", "PRECO CUSTO", "ATIVO"
-        );
-    }
-
-    private void exibirGrid(List<Produto> produtos) {
-        String id;
-        String descricao;
-        String precoVenda;
-        String precoCusto;
-        String ativo;
-
-        if (produtos.isEmpty()) {
-            System.out.println("Nenhum produto encontrado.");
-            return;
-        }
-
-        exibirCabecalhoGrid();
-
-        for (Produto p : produtos) {
-            id = ConsoleUtils.formatarColuna(String.valueOf(p.getId()), 5);
-            descricao = ConsoleUtils.formatarColuna(p.getDescricao(), 20);
-            precoVenda = ConsoleUtils.formatarColuna(ConsoleUtils.formatarMoeda(p.getPrecoVenda()), 11);
-            precoCusto = ConsoleUtils.formatarColuna(ConsoleUtils.formatarMoeda(p.getPrecoCusto()), 11);
-            ativo = p.isAtivo() ? "SIM" : "NÃO";
-
-            System.out.printf("%s | %s | %s | %s | %s %n", id, descricao, precoVenda, precoCusto, ativo);
         }
     }
 }

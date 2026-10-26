@@ -81,8 +81,9 @@ public final class ConsoleUtils {
         do {
             System.out.println("1 - SIM");
             System.out.println("2 - NÃO");
+            System.out.print("Opcao: ");
 
-            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+            opcao = ConsoleUtils.lerInteiro(scanner, "Opcao");
         } while (opcao != 1 && opcao != 2);
 
         return opcao == 1;

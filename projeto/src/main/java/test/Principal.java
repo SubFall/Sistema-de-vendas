@@ -99,15 +99,21 @@ public class Principal {
 
     public void iniciar() {
         while (true) {
-            System.out.println("\n|** Bem vindo - Eclipse.NET **|");
-            System.out.println("|1 - Pessoa             - [] X|");
-            System.out.println("|2 - Produto                  |");
-            System.out.println("|3 - Categoria                |");
-            System.out.println("|4 - Movimento                |");
-            System.out.println("|5 - Ajuste Estoque           |");
-            System.out.println("|0 - Sair                     |");
-            System.out.println("|*****************************|");
-            System.out.print("Opção: ");
+            System.out.println("\n+----------------------------------+");
+            System.out.println("|        SISTEMA DE VENDAS         |");
+            System.out.println("+----------------------------------+");
+            System.out.println("| CADASTROS                        |");
+            System.out.println("|  1 - Pessoas                     |");
+            System.out.println("|  2 - Produtos                    |");
+            System.out.println("|  3 - Categorias                  |");
+            System.out.println("|                                  |");
+            System.out.println("| OPERACOES                        |");
+            System.out.println("|  4 - Movimentacoes               |");
+            System.out.println("|  5 - Ajuste de estoque           |");
+            System.out.println("|                                  |");
+            System.out.println("|  0 - Sair                        |");
+            System.out.println("+----------------------------------+");
+            System.out.print("Digite o numero da opcao: ");
 
             int opcao;
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
