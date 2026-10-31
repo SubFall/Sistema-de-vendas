@@ -81,7 +81,7 @@ public class Principal {
     private final PessoaMenu pessoaMenu = new PessoaMenu(scanner, pessoaService);
     private final CategoriaMenu categoriaMenu = new CategoriaMenu(scanner, categoriaService);
     private final ProdutoMenu produtoMenu = new ProdutoMenu(scanner, produtoService, categoriaService, categoriaMenu);
-    private final AjusteEstoqueMenu ajusteEstoqueMenu = new AjusteEstoqueMenu(scanner,ajusteEstoqueService);
+    private final AjusteEstoqueMenu ajusteEstoqueMenu = new AjusteEstoqueMenu(scanner, ajusteEstoqueService);
     private final MovimentoMenu movimentoMenu =
             new MovimentoMenu(
                     scanner,

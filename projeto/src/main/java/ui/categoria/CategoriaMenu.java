@@ -1,41 +1,32 @@
 package ui.categoria;
 
 import domain.categoria.Categoria;
+import lombok.RequiredArgsConstructor;
 import service.CategoriaService;
+import ui.grid.CategoriaGrid;
 import util.console.ConsoleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+@RequiredArgsConstructor
 public class CategoriaMenu {
     private final Scanner scanner;
     private final CategoriaService categoriaService;
-
-    public CategoriaMenu(Scanner scanner, CategoriaService categoriaService) {
-        this.scanner = scanner;
-        this.categoriaService = categoriaService;
-    }
 
     public void iniciar() {
         int opcao;
 
         do {
-            System.out.println("\n|********* Categoria *********|");
-            System.out.println("|1 - Cadastrar          - [] X|");
-            System.out.println("|2 - Remover                  |");
-            System.out.println("|3 - Atualizar                |");
-            System.out.println("|4 - Listar                   |");
-            System.out.println("|0 - Voltar                   |");
-            System.out.println("|*****************************|");
-
+            CategoriaGrid.menu();
             System.out.print("Opção: ");
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
-                case 1 -> cadastrar();
-                case 2 -> remover();
-                case 3 -> atualizar();
+                case 1 -> cadastrarCategoria();
+                case 2 -> removerCategoria();
+                case 3 -> atualizarCategoria();
                 case 4 -> {
                     int op;
                     do {
@@ -55,48 +46,56 @@ public class CategoriaMenu {
         } while (opcao != 0);
     }
 
-    private void cadastrar() {
+    private void cadastrarCategoria() {
 
         try {
             System.out.print("Descricao: ");
-            Categoria categoria = Categoria.builder()
-                    .descricao(scanner.nextLine())
-                    .build();
+            var categoria = Categoria.builder().descricao(scanner.nextLine()).build();
 
-            categoriaService.inserirCategoria(categoria);
-            System.out.println("Categoria " + categoria.getDescricao() + " cadastrada com sucesso!");
+            var isInseriu = categoriaService.inserirCategoria(categoria);
+
+            if (isInseriu) {
+                System.out.println("Categoria " + categoria.getDescricao() + " cadastrada com sucesso!");
+            } else {
+                System.out.println("Erro ao inserir categoria: " + categoria.getDescricao());
+            }
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private void remover() {
-        listar(1);
+    private void removerCategoria() {
+
         try {
+            listar(1);
+
             System.out.print("Digite o ID da categoria para remover:");
-            Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+            var categoria = categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
 
             if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja Excluir " + categoria.getDescricao() + " ?")) {
                 return;
             }
-            int i = categoriaService.deletarInativarCategoria(categoria.getId());
+            var i = categoriaService.deletarInativarCategoria(categoria);
 
             if (i == 0) {
                 System.out.println("Categoria inativada.");
-            } else {
+            } else if (i == 1) {
                 System.out.println("Categoria deletada com sucesso!");
+            } else {
+                System.out.println("Erro ao inativar/deletar");
             }
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private void atualizar() {
-        listar(1);
-        System.out.println("Selecione um ID para atualizar");
+    private void atualizarCategoria() {
 
         try {
-            Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID Categoria"));
+            listar(1);
+            System.out.println("Selecione um ID para atualizar");
+
+            var categoria = categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID Categoria"));
 
             System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
 
@@ -116,7 +115,7 @@ public class CategoriaMenu {
         System.out.println("Descricao Atual: " + categoria.getDescricao());
         System.out.println("Nova Descricao:");
 
-        String descricao = scanner.nextLine();
+        var descricao = scanner.nextLine();
         categoria.setDescricao(descricao.isBlank() ? categoria.getDescricao() : descricao);
     }
 
@@ -146,41 +145,13 @@ public class CategoriaMenu {
                 System.out.print("Digite o ID: ");
 
                 try {
-                    categorias.add(categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID")));
+                    categorias.add(categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID")));
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
             }
             default -> System.out.println("opção inválida!");
         }
-        exibirGrid(categorias);
-    }
-
-    private void exibirCabecalhoGrid() {
-        System.out.printf(
-                "%-5s | %-20s | %-10s%n",
-                "ID", "DESCRICAO", "ATIVO"
-        );
-    }
-
-    private void exibirGrid(List<Categoria> categorias) {
-        String id;
-        String descricao;
-        String ativo;
-
-        if (categorias.isEmpty()) {
-            System.out.println("Nenhuma categoria encontrado.");
-            return;
-        }
-
-        exibirCabecalhoGrid();
-
-        for (Categoria c : categorias) {
-            id = ConsoleUtils.formatarColuna(String.valueOf(c.getId()), 5);
-            descricao = ConsoleUtils.formatarColuna(c.getDescricao(), 20);
-            ativo = c.isAtivo() ? "SIM" : "NÃO";
-
-            System.out.println(id + " | " + descricao + " | " + ativo);
-        }
+        CategoriaGrid.exibirGridCategoria(categorias);
     }
 }

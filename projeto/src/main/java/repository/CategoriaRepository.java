@@ -27,17 +27,17 @@ public class CategoriaRepository {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao inserir Categoria!", e);
         }
     }
 
-    public boolean deletarCategoria(int idCategoria) {
+    public boolean deletarCategoria(Long idCategoria) {
         String sql = "DELETE FROM categoria WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, idCategoria);
+            ps.setLong(1, idCategoria);
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -45,14 +45,14 @@ public class CategoriaRepository {
         }
     }
 
-    public boolean atualizarStatusCategoria(boolean ativo, int idCategoria) {
+    public boolean atualizarStatusCategoria(boolean ativo, Long idCategoria) {
         String sql = "UPDATE categoria SET ativo = ? WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, ativo);
-            ps.setInt(2, idCategoria);
+            ps.setLong(2, idCategoria);
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -68,7 +68,7 @@ public class CategoriaRepository {
 
             ps.setString(1, categoria.getDescricao());
             ps.setBoolean(2, categoria.isAtivo());
-            ps.setInt(3, categoria.getId());
+            ps.setLong(3, categoria.getId());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -76,13 +76,13 @@ public class CategoriaRepository {
         }
     }
 
-    public boolean categoriaPossuiProdutos(String categoria) {
+    public boolean categoriaPossuiProdutos(Categoria categoria) {
         String sql = "SELECT 1 FROM categoria WHERE descricao = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, categoria);
+            ps.setString(1, categoria.getDescricao());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -90,7 +90,7 @@ public class CategoriaRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao verificar Cateoria tem Produtos!", e);
         }
         return false;
     }
@@ -111,13 +111,13 @@ public class CategoriaRepository {
         }
     }
 
-    public Categoria buscarPorId(int idCategoria) {
+    public Categoria buscarPorId(Long idCategoria) {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, idCategoria);
+            ps.setLong(1, idCategoria);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -125,7 +125,7 @@ public class CategoriaRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao buscar por ID", e);
         }
         return null;
     }
@@ -168,14 +168,14 @@ public class CategoriaRepository {
         return categorias;
     }
 
-    public boolean existeOutraCategoriaComDescricao(String descricao, int idCategoria) {
+    public boolean existeOutraCategoriaComDescricao(String descricao, Long idCategoria) {
         String sql = "SELECT 1 FROM categoria WHERE descricao = ? AND id_categoria <> ?;";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, descricao);
-            ps.setInt(2, idCategoria);
+            ps.setLong(2, idCategoria);
 
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -187,7 +187,7 @@ public class CategoriaRepository {
 
     private Categoria mapearCategoria(ResultSet rs) throws SQLException {
         return Categoria.builder()
-                .id(rs.getInt("id_categoria"))
+                .id(rs.getLong("id_categoria"))
                 .descricao(rs.getString("descricao"))
                 .ativo(rs.getBoolean("ativo"))
                 .build();

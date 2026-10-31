@@ -1,38 +1,60 @@
 package service;
 
 import domain.categoria.Categoria;
+import lombok.RequiredArgsConstructor;
 import repository.CategoriaRepository;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
 
-    public CategoriaService(CategoriaRepository categoriaRepository) {
-        this.categoriaRepository = categoriaRepository;
-    }
-
     public boolean inserirCategoria(Categoria categoria) {
-        if (categoriaRepository.categoriaPossuiProdutos(categoria.getDescricao())) {
-            throw new IllegalArgumentException("Categoria já cadastrada");
+
+        try {
+            verificaSeCateoriaDescricaoExiste(categoria);
+
+            return categoriaRepository.inserirCategoria(categoria);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
         }
-        return categoriaRepository.inserirCategoria(categoria);
+
+        return false;
     }
 
-    public int deletarInativarCategoria(int idCategoria) {
-        Categoria categoria = validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
+    private void verificaSeCateoriaDescricaoExiste(Categoria categoria) {
+        var isCategoriaJaCadastrada = categoriaRepository.categoriaPossuiProdutos(categoria);
 
-        if (categoria.getId() == Categoria.ID_SEM_CATEGORIA) {
-            throw new IllegalArgumentException("A categoria padrão não pode se removida.");
+        if (isCategoriaJaCadastrada) {
+            throw new IllegalArgumentException("Categoria já cadastrada!");
+        }
+    }
+
+    public int deletarInativarCategoria(Categoria categoria) {
+
+        try {
+            validarCategoriaExiste(categoriaRepository.buscarPorId(categoria.getId()));
+
+            if (categoria.getId().equals(Categoria.ID_SEM_CATEGORIA)) {
+                throw new IllegalArgumentException("A categoria padrão não pode ser removida!");
+            }
+
+            var isCategoriaExiste = categoriaRepository.categoriaPossuiProdutos(categoria);
+
+            if (isCategoriaExiste) {
+                categoriaRepository.atualizarStatusCategoria(false, categoria.getId());
+
+                return 0;
+            }
+            categoriaRepository.deletarCategoria(categoria.getId());
+
+            return 1;
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
         }
 
-        if (categoriaRepository.categoriaPossuiProdutos(categoria.getId())) {
-            categoriaRepository.atualizarStatusCategoria(false, categoria.getId());
-            return 0;
-        }
-
-        categoriaRepository.deletarCategoria(categoria.getId());
-        return 1;
+        return -1;
     }
 
     public boolean atualizarCategoria(Categoria categoria) {
@@ -46,7 +68,7 @@ public class CategoriaService {
         return categoriaRepository.atualizarCategoria(categoria);
     }
 
-    public Categoria buscarPorId(int idCategoria) {
+    public Categoria buscarPorId(Long idCategoria) {
 
         return validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
     }
@@ -68,4 +90,6 @@ public class CategoriaService {
         }
         return categoria;
     }
+
+
 }

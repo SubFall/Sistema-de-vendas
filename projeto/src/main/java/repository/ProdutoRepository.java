@@ -27,7 +27,7 @@ public class ProdutoRepository {
             ps.setBigDecimal(2, produto.getPrecoVenda());
             ps.setBigDecimal(3, produto.getPrecoCusto());
             ps.setBoolean(4, produto.isAtivo());
-            ps.setInt(5, produto.getCategoria().getId());
+            ps.setLong(5, produto.getCategoria().getId());
 
 
             return ps.executeUpdate() > 0;
@@ -64,7 +64,7 @@ public class ProdutoRepository {
             ps.setBigDecimal(2, produto.getPrecoVenda());
             ps.setBigDecimal(3, produto.getPrecoCusto());
             ps.setBoolean(4, produto.isAtivo());
-            ps.setInt(5, produto.getCategoria().getId());
+            ps.setLong(5, produto.getCategoria().getId());
             ps.setLong(6, produto.getId());
 
             return ps.executeUpdate() > 0;
@@ -181,7 +181,7 @@ public class ProdutoRepository {
 
     private Categoria mapearCategoria(ResultSet rs) throws SQLException {
         return Categoria.builder()
-                .id(rs.getInt("p.id_categoria"))
+                .id(rs.getLong("p.id_categoria"))
                 .descricao(rs.getString("c.descricao"))
                 .build();
     }

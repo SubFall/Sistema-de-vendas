@@ -2,6 +2,7 @@ package ui.produto;
 
 import domain.categoria.Categoria;
 import domain.produto.Produto;
+import lombok.RequiredArgsConstructor;
 import service.CategoriaService;
 import service.ProdutoService;
 import ui.categoria.CategoriaMenu;
@@ -12,24 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+@RequiredArgsConstructor
 public class ProdutoMenu {
     private final Scanner scanner;
     private final ProdutoService produtoService;
     private final CategoriaService categoriaService;
     private final CategoriaMenu categoriaMenu;
-
-    public ProdutoMenu(
-            Scanner scanner,
-            ProdutoService produtoService,
-            CategoriaService categoriaService,
-            CategoriaMenu categoriaMenu) {
-
-        this.scanner = scanner;
-        this.produtoService = produtoService;
-        this.categoriaService = categoriaService;
-        this.categoriaMenu = categoriaMenu;
-    }
-
 
     public void iniciar() {
         int opcao;
@@ -187,7 +176,7 @@ public class ProdutoMenu {
 
         if (ConsoleUtils.confirmar(scanner, "Deseja atualizar a Categoria ?")) {
             categoriaMenu.listar(1);
-            Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+            Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
             produto.setCategoria(categoria);
         }
     }
@@ -258,7 +247,7 @@ public class ProdutoMenu {
             try {
 
                 categoriaMenu.listar(1); //1 - Listar todas as categorias
-                return categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+                return categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
 
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
