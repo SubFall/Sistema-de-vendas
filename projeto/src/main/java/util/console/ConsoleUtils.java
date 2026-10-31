@@ -26,7 +26,7 @@ public final class ConsoleUtils {
             try {
                 return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.println("Digite um " + label + " válido");
+                System.out.println("Digite um " + label + " valido");
             }
         }
     }
@@ -36,7 +36,7 @@ public final class ConsoleUtils {
             try {
                 return Long.parseLong(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.println("Digite um " + label + " válido");
+                System.out.println("Digite um " + label + " valido");
             }
         }
     }
@@ -50,7 +50,7 @@ public final class ConsoleUtils {
                 return new BigDecimal(scanner.nextLine().replace(",", "."));
 
             } catch (NumberFormatException e) {
-                System.out.println("Valor inválido");
+                System.out.println("Valor invalido");
             }
         }
     }
@@ -59,7 +59,7 @@ public final class ConsoleUtils {
         while (true) {
             try {
 
-                System.out.println(label + ": ");
+                System.out.print(label + ": ");
                 String valor = scanner.nextLine();
 
                 if (valor.isBlank()) {
@@ -68,7 +68,7 @@ public final class ConsoleUtils {
                 return new BigDecimal(valor.replace(",", "."));
 
             } catch (NumberFormatException e) {
-                System.out.println("Valor inválido");
+                System.out.println("Valor invalido");
             }
         }
     }
@@ -80,7 +80,7 @@ public final class ConsoleUtils {
 
         do {
             System.out.println("1 - SIM");
-            System.out.println("2 - NÃO");
+            System.out.println("2 - NAO");
             System.out.print("Opcao: ");
 
             opcao = ConsoleUtils.lerInteiro(scanner, "Opcao");

@@ -47,8 +47,11 @@ public class CategoriaService {
     }
 
     public Categoria buscarPorId(int idCategoria) {
-
-        return validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
+        try {
+            return validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Categoria> buscarPorDescricao(String descricao) {

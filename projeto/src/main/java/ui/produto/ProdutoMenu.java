@@ -33,9 +33,10 @@ public class ProdutoMenu {
             switch (opcao) {
                 case 1 -> cadastrar();
                 case 2 -> inativar();
-                case 3 -> atualizar();
-                case 4 -> detalhes();
-                case 5 -> {
+                case 3 -> ativar();
+                case 4 -> atualizar();
+                case 5 -> detalhes();
+                case 6 -> {
                     int op;
                     do {
                         System.out.println("1 - Listar todos produtos");
@@ -92,57 +93,92 @@ public class ProdutoMenu {
     private void inativar() {
         listar(4); //somente produtos ativos
         try {
-            System.out.print("Digite o ID do produto para inativar:");
-            Produto produto = produtoService.buscarPorIdAtivo(ConsoleUtils.lerLong(scanner, "ID"));
+            System.out.print("Digite o ID do produto para inativar: ");
+            var produto = produtoService.buscarPorIdAtivo(ConsoleUtils.lerLong(scanner, "ID"));
 
             if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja inativar " + produto.getDescricao() + " ?")) {
                 return;
             }
-            boolean atualizado = produtoService.atualizarStatusProduto(produto.getId());
 
-            if (atualizado) {
+            produto.inativar();
+
+            var isAtualizado = produtoService.atualizarStatusProduto(produto);
+
+            if (isAtualizado) {
                 System.out.println("Produto " + produto.getDescricao() + " inativado com sucesso!");
             }
 
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void ativar() {
+        listar(5); //somente produtos inativos
+        try {
+            System.out.print("Digite o ID do produto para ativar: ");
+            var produto = produtoService.buscarPorIdInativo(ConsoleUtils.lerLong(scanner, "ID"));
+
+            if (!ConsoleUtils.confirmar(scanner, "Tem certeza que deseja ativar " + produto.getDescricao() + " ?")) {
+                return;
+            }
+
+            produto.ativar();
+
+            var isAtualizado = produtoService.atualizarStatusProduto(produto);
+
+            if (isAtualizado) {
+                System.out.println("Produto " + produto.getDescricao() + " ativado com sucesso!");
+            }
+
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
     }
 
     private void atualizar() {
-        listar(1);
+        listar(1); //busca todos os produtos
 
         try {
-            System.out.println("Selecione um ID para atualizar");
-            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
+            System.out.print("Selecione um ID para atualizar: ");
+            var produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
 
             atualizarDescricao(produto);
+
             atualizarPreco(produto);
+
             atualizarCusto(produto);
-            atualizarCategoria(produto);
+
+            while(true){
+                if (atualizarCategoria(produto)) break;
+            }
+
             atualizarStatus(produto);
 
             if (produtoService.atualizarProduto(produto)) {
                 System.out.println("Produto " + produto.getDescricao() + " atualizado com sucesso!");
             }
 
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
     }
 
     private void atualizarDescricao(Produto produto) {
+
         System.out.println("Caso queira deixar o valor antigo, aperta apenas ENTER");
         System.out.println("Descricao Atual: " + produto.getDescricao());
-        System.out.println("Nova Descricao:");
+        System.out.print("Nova Descricao: ");
 
-        String descricao = scanner.nextLine();
+        var descricao = scanner.nextLine();
         produto.setDescricao(descricao.isBlank() ? produto.getDescricao() : descricao);
     }
 
     private void atualizarPreco(Produto produto) {
+
         System.out.println("Preco Atual: " + produto.getPrecoVenda());
-        BigDecimal precoVenda = ConsoleUtils.lerDecimal(scanner, "Novo valor");
+
+        var precoVenda = ConsoleUtils.lerDecimal(scanner, "Novo valor");
 
         if (precoVenda != null) {
             produto.setPrecoVenda(precoVenda);
@@ -150,40 +186,58 @@ public class ProdutoMenu {
     }
 
     private void atualizarCusto(Produto produto) {
+
         System.out.println("Custo Atual: " + produto.getPrecoCusto());
-        BigDecimal precoCusto = ConsoleUtils.lerDecimal(scanner, "Novo valor");
+
+        var precoCusto = ConsoleUtils.lerDecimal(scanner, "Novo valor");
 
         if (precoCusto != null) {
             produto.setPrecoCusto(precoCusto);
         }
     }
 
-    private void atualizarCategoria(Produto produto) {
-        System.out.println("Categoria Atual: " + produto.getCategoria().getDescricao());
+    private boolean atualizarCategoria(Produto produto) {
 
-        if (ConsoleUtils.confirmar(scanner, "Deseja atualizar a Categoria ?")) {
-            categoriaMenu.listar(1);
-            Categoria categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
-            produto.setCategoria(categoria);
+        try {
+            System.out.println("Categoria Atual: " + produto.getCategoria().getDescricao());
+
+            if (ConsoleUtils.confirmar(scanner, "Deseja atualizar a Categoria ?")) {
+                categoriaMenu.listar(1);
+
+                var categoria = categoriaService.buscarPorId(ConsoleUtils.lerInteiro(scanner, "ID"));
+
+                produto.setCategoria(categoria);
+            }
+
+            return true;
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
         }
+
+        return false;
     }
 
     private void atualizarStatus(Produto produto) {
         int op;
-        do {
-            System.out.println("Status Atual: " + (produto.isAtivo() ? "Ativo" : "Inativo"));
-            System.out.println("\n1 - Manter Ativo");
-            System.out.println("2 - Alterar para Inativo");
-            System.out.println("3 - Não alterar");
 
-            op = ConsoleUtils.lerInteiro(scanner, "Opção");
-        } while (op != 1 && op != 2 && op != 3);
+        System.out.println("Status Atual: " + (produto.isAtivo() ? "Ativo" : "Inativo"));
 
-        if (op == 1) {
-            produto.ativar();
-        } else if (op == 2) {
-            produto.inativar();
+        if (ConsoleUtils.confirmar(scanner, "Deseja atualizar o Status ?")) {
+            do {
+                System.out.println("1 - Ativo");
+                System.out.println("2 - Inativo");
+                System.out.println("3 - Cancelar");
+
+                op = ConsoleUtils.lerInteiro(scanner, "Opcao");
+            } while (op != 1 && op != 2 && op != 3);
+
+            if (op == 1) {
+                produto.ativar();
+            } else if (op == 2) {
+                produto.inativar();
+            }
         }
+
     }
 
     public void detalhes() {
@@ -204,7 +258,6 @@ public class ProdutoMenu {
     }
 
     /**
-     *
      * @param idLista 1 Lista todos, 2 Lista por Descrição, 3 Lista por ID e 4 Lista todos ativos
      */
     public void listar(int idLista) {
@@ -223,7 +276,8 @@ public class ProdutoMenu {
                     System.out.println(e.getMessage());
                 }
             }
-            case 4 -> produtos = produtoService.buscarTodosAtivo();
+            case 4 -> produtos = produtoService.buscarTodosAtivos();
+            case 5 -> produtos = produtoService.buscarTodosInativos();
             default -> System.out.println("opção inválida!");
         }
         ProdutosGrid.exibirGridProdutos(produtos);

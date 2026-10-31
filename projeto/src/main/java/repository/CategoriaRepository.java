@@ -125,7 +125,7 @@ public class CategoriaRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao buscar Categoria por Id",e);
         }
         return null;
     }

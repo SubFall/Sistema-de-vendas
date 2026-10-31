@@ -63,6 +63,7 @@ public class Produto {
     }
 
     public void setCategoria(Categoria categoria) {
+
         if (categoria == null) {
             this.categoria = Categoria.builder().id(Categoria.ID_SEM_CATEGORIA).descricao("Sem Categoria").ativo(true).build();
         } else {
