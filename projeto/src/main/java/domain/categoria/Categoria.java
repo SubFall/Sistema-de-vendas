@@ -15,10 +15,6 @@ public class Categoria {
 
     @Builder
     private Categoria(Long id, String descricao, boolean ativo) {
-        if (this.id == 1) {
-            this.descricao = "Sem Categoria";
-        }
-
         this.id = id;
         setDescricao(descricao);
         this.ativo = ativo;

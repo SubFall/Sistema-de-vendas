@@ -52,10 +52,12 @@ public class CategoriaMenu {
             System.out.print("Descricao: ");
             var categoria = Categoria.builder().descricao(scanner.nextLine()).build();
 
-            var isInseriu = categoriaService.inserirCategoria(categoria);
+            var categoriaCadastrada = categoriaService.inserirCategoria(categoria);
 
-            if (isInseriu) {
-                System.out.println("Categoria " + categoria.getDescricao() + " cadastrada com sucesso!");
+            if (categoriaCadastrada != null && Categoria.ID_SEM_CATEGORIA.equals(categoriaCadastrada.getId())) {
+                System.out.println("Categoria padrao utilizada: " + categoriaCadastrada.getDescricao());
+            } else if (categoriaCadastrada != null) {
+                System.out.println("Categoria " + categoriaCadastrada.getDescricao() + " cadastrada com sucesso!");
             } else {
                 System.out.println("Erro ao inserir categoria: " + categoria.getDescricao());
             }

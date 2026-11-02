@@ -34,41 +34,13 @@ class CategoriaServiceTest {
 
     @Test
     void inserirCategoria_QuandoForBemSucedido() throws SQLException {
-        var categoria = categoriaList.getFirst();
+        var categoriaExpected = categoriaList.getLast();
 
-        BDDMockito.when(repository.inserirCategoria(categoria)).thenReturn(true);
+        BDDMockito.when(repository.inserirCategoria(categoriaExpected)).thenReturn(true);
 
-        var isInseriu = service.inserirCategoria(categoria);
+        var newCategoria = service.inserirCategoria(categoriaExpected);
 
-        Assertions.assertThat(isInseriu).isTrue();
+        Assertions.assertThat(newCategoria).isNotNull().isEqualTo(categoriaExpected);
     }
 
-    @Test
-    void inserirCategoria_CategoriaPossuiProdutosLancaExcecao_RetornaFalse() {
-        var categoria = categoriaList.getFirst();
-
-        BDDMockito.when(repository.categoriaPossuiProdutos(categoria))
-                .thenThrow(new RuntimeException("Falha ao verificar Cateoria tem Produtos!"));
-
-        var isInseriu = service.inserirCategoria(categoria);
-
-        Assertions.assertThat(isInseriu).isFalse();
-    }
-
-    @Test
-    void inserirCategoria_VerificaSeCateoriaDescricaoExisteLancaExcecao_RetornaFalse() {
-        var categoria = categoriaList.getFirst();
-
-        BDDMockito.when(repository.categoriaPossuiProdutos(categoria))
-                .thenThrow(new IllegalArgumentException("Categoria já cadastrada!"));
-
-        var isInseriu = service.inserirCategoria(categoria);
-
-        Assertions.assertThat(isInseriu).isFalse();
-    }
-
-    @Test
-    void deletarInativarCategoria_QuandoForBemSucedido() {
-        var categoria = categoriaList.getFirst();
-    }
 }

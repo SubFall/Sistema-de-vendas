@@ -10,21 +10,25 @@ import java.util.List;
 public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
 
-    public boolean inserirCategoria(Categoria categoria) {
+    public Categoria inserirCategoria(Categoria categoria) {
 
         try {
-            verificaSeCateoriaDescricaoExiste(categoria);
+            if (Categoria.ID_SEM_CATEGORIA.equals(categoria.getId())
+                    || "Sem Categoria".equalsIgnoreCase(categoria.getDescricao().trim())) {
+                return validarCategoriaExiste(categoriaRepository.buscarPorId(Categoria.ID_SEM_CATEGORIA));
+            }
 
-            return categoriaRepository.inserirCategoria(categoria);
+            verificaSeCategoriaDescricaoExiste(categoria);
+            return categoriaRepository.inserirCategoria(categoria) ? categoria : null;
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
 
-        return false;
+        return null;
     }
 
-    private void verificaSeCateoriaDescricaoExiste(Categoria categoria) {
-        var isCategoriaJaCadastrada = categoriaRepository.categoriaPossuiProdutos(categoria);
+    private void verificaSeCategoriaDescricaoExiste(Categoria categoria) {
+        var isCategoriaJaCadastrada = categoriaRepository.existeOutraCategoriaComDescricao(categoria.getDescricao(), 0L);
 
         if (isCategoriaJaCadastrada) {
             throw new IllegalArgumentException("Categoria já cadastrada!");
@@ -58,7 +62,7 @@ public class CategoriaService {
     }
 
     public boolean atualizarCategoria(Categoria categoria) {
-        if (categoria.getId() == Categoria.ID_SEM_CATEGORIA) {
+        if (Categoria.ID_SEM_CATEGORIA.equals(categoria.getId())) {
             throw new IllegalArgumentException("A categoria padrão não pode ser alterada.");
         }
 

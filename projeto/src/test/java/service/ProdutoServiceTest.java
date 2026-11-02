@@ -31,8 +31,7 @@ class ProdutoServiceTest {
 
     @BeforeEach
     void init() {
-        var semCategoriaCategoria = Categoria.builder().id(Categoria.ID_SEM_CATEGORIA).descricao("Sem Categoria").ativo(true).build();
-        var informaticaCategoria = Categoria.builder().id(2).descricao("Informática").ativo(true).build();
+        var informaticaCategoria = Categoria.builder().id(2L).descricao("Informática").ativo(true).build();
 
         var processadorProduto = Produto.builder().id(1L).descricao("Processador").precoVenda(new BigDecimal("999.00"))
                 .precoCusto(new BigDecimal("699.99")).ativo(true).categoria(informaticaCategoria).build();
