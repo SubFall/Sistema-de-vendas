@@ -32,22 +32,21 @@ public class ProdutoRepository {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao inserir produto!", e);
         }
     }
 
-    public boolean atualizarStatusProduto(boolean ativo, Long idProduto) {
+    public boolean atualizarStatusProduto(Produto produto) {
         String sql = "UPDATE produtos SET ativo = ? WHERE (`id_produto` = ?);";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setBoolean(1, ativo);
-            ps.setLong(2, idProduto);
-
+            ps.setBoolean(1, produto.isAtivo());
+            ps.setLong(2, produto.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao atualizar Status!", e);
         }
     }
 
@@ -69,7 +68,7 @@ public class ProdutoRepository {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao atualizar Produto!", e);
         }
     }
 
@@ -90,30 +89,32 @@ public class ProdutoRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao buscar Produtos!", e);
         }
         return produtos;
     }
 
-    public List<Produto> buscarTodosAtivo() {
+    public List<Produto> buscarTodosPorStatus(boolean status) {
         String sql = """
                     SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
                     		p.ativo, p.id_categoria,c.descricao
                     FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria 
-                    WHERE p.ativo = 1 ORDER BY p.descricao;
+                    WHERE p.ativo = ? ORDER BY p.descricao;
                     """;
         List<Produto> produtos = new ArrayList<>();
 
         try (Connection conn = connectionProvider.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                produtos.add(mapearProduto(rs));
+            ps.setBoolean(1, status);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    produtos.add(mapearProduto(rs));
+                }
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao buscar Produtos por Status!", e);
         }
         return produtos;
     }
@@ -139,7 +140,7 @@ public class ProdutoRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao buscar Produto por Descricao!", e);
         }
         return produtos;
     }
@@ -163,7 +164,7 @@ public class ProdutoRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao buscar Produto!", e);
         }
         return null;
     }

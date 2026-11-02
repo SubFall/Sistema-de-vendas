@@ -12,7 +12,7 @@ public final class MensagensGlobais {
             "Deseja atualizar os Itens ?";
 
     public static final String OPCAO =
-            "Opção: ";
+            "Opcao: ";
 
     public static final String ID = "ID";
 }
