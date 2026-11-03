@@ -40,8 +40,9 @@ public class CategoriaService {
         try {
             validarCategoriaExiste(categoriaRepository.buscarPorId(categoria.getId()));
 
-            if (categoria.getId().equals(Categoria.ID_SEM_CATEGORIA)) {
-                throw new IllegalArgumentException("A categoria padrão não pode ser removida!");
+            if (Categoria.ID_SEM_CATEGORIA.equals(categoria.getId())
+                    || "Sem Categoria".equalsIgnoreCase(categoria.getDescricao().trim())) {
+                throw new IllegalArgumentException("A categoria padrão nao pode ser removida!");
             }
 
             var isCategoriaExiste = categoriaRepository.categoriaPossuiProdutos(categoria);
@@ -52,7 +53,6 @@ public class CategoriaService {
                 return 0;
             }
             categoriaRepository.deletarCategoria(categoria.getId());
-
             return 1;
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
@@ -62,14 +62,25 @@ public class CategoriaService {
     }
 
     public boolean atualizarCategoria(Categoria categoria) {
-        if (Categoria.ID_SEM_CATEGORIA.equals(categoria.getId())) {
-            throw new IllegalArgumentException("A categoria padrão não pode ser alterada.");
+
+        try {
+            if (Categoria.ID_SEM_CATEGORIA.equals(categoria.getId())
+                    || "Sem Categoria".equalsIgnoreCase(categoria.getDescricao().trim())) {
+                throw new IllegalArgumentException("A categoria padrão não pode ser alterada.");
+            }
+
+            var isCategoriaExiste = categoriaRepository
+                    .existeOutraCategoriaComDescricao(categoria.getDescricao(), categoria.getId());
+
+            if (isCategoriaExiste) {
+                throw new IllegalArgumentException("Categoria já existe");
+            }
+            return categoriaRepository.atualizarCategoria(categoria);
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
         }
 
-        if (categoriaRepository.existeOutraCategoriaComDescricao(categoria.getDescricao(), categoria.getId())) {
-            throw new IllegalArgumentException("Categoria já existe");
-        }
-        return categoriaRepository.atualizarCategoria(categoria);
+        return false;
     }
 
     public Categoria buscarPorId(Long idCategoria) {

@@ -104,10 +104,13 @@ public class CategoriaMenu {
             atualizarDescricao(categoria);
             atualizarStatus(categoria);
 
-            categoriaService.atualizarCategoria(categoria);
+            var isCategoriaAtualizado = categoriaService.atualizarCategoria(categoria);
 
-            System.out.println("Categoria " + categoria.getDescricao() + " atualizado com sucesso!");
-
+            if (isCategoriaAtualizado) {
+                System.out.println("Categoria " + categoria.getDescricao() + " atualizado com sucesso!");
+            } else {
+                System.out.println("Ops! Erro ao Atualizar Categoria " + categoria.getDescricao());
+            }
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

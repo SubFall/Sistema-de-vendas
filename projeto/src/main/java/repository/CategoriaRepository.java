@@ -41,7 +41,7 @@ public class CategoriaRepository {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao Deletar Categoria", e);
         }
     }
 
@@ -56,7 +56,7 @@ public class CategoriaRepository {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao atualizar Status Categoria!", e);
         }
     }
 
@@ -72,7 +72,7 @@ public class CategoriaRepository {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao Atualizar Categoria", e);
         }
     }
 
@@ -90,7 +90,7 @@ public class CategoriaRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Falha ao verificar Cateoria tem Produtos!", e);
+            throw new RuntimeException("Falha ao verificar Categoria tem Produtos!", e);
         }
         return false;
     }
@@ -181,7 +181,7 @@ public class CategoriaRepository {
                 return rs.next();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Falha ao verificar Outra Categoria Com Descricao", e);
         }
     }
 
