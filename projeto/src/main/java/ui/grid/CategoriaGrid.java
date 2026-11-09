@@ -10,13 +10,25 @@ public final class CategoriaGrid {
     }
 
     public static void menu() {
-        System.out.println("\n|********* Categoria *********|");
-        System.out.println("|1 - Cadastrar          - [] X|");
-        System.out.println("|2 - Remover                  |");
-        System.out.println("|3 - Atualizar                |");
-        System.out.println("|4 - Listar                   |");
-        System.out.println("|0 - Voltar                   |");
-        System.out.println("|*****************************|");
+        System.out.println("\n+-----------------------------------+");
+        System.out.println("|             CATEGORIA             |");
+        System.out.println("+-----------------------------------+");
+        System.out.println("| 1 - Cadastrar                     |");
+        System.out.println("| 2 - Remover                       |");
+        System.out.println("| 3 - Atualizar                     |");
+        System.out.println("| 4 - Listar                        |");
+        System.out.println("| 0 - Voltar                        |");
+        System.out.println("+-----------------------------------+");
+    }
+
+    public static void listar() {
+        System.out.println("\n+-----------------------------------+");
+        System.out.println("|          LISTAR CATEGORIA         |");
+        System.out.println("+-----------------------------------+");
+        System.out.println("| 1 - Listar todas categoriras      |");
+        System.out.println("| 2 - Listar categora por descricao |");
+        System.out.println("| 3 - Listar categora por id        |");
+        System.out.println("+-----------------------------------+");
     }
 
     public static void exibirCabecalhoGridCategoria() {

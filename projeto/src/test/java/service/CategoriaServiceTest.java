@@ -12,6 +12,7 @@ import repository.CategoriaRepository;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -214,5 +215,66 @@ class CategoriaServiceTest {
         var isCategoriaAtualizado = service.atualizarCategoria(categoria);
 
         Assertions.assertThat(isCategoriaAtualizado).isFalse();
+    }
+
+    @Test
+    void buscarPorId_RetornaCategoriia_QuandoForBemSucedido() {
+        var categoria = categoriaList.getFirst();
+
+        BDDMockito.when(repository.buscarPorId(categoria.getId())).thenReturn(categoria);
+
+        var categoriaExpected = service.buscarPorId(categoria.getId());
+
+        Assertions.assertThat(categoriaExpected).isNotNull().isEqualTo(categoria);
+    }
+
+    @Test
+    void buscarPorId_ValidarCategoriaExisteLancaExcecao() {
+        var id = 99L;
+
+        BDDMockito.when(repository.buscarPorId(id))
+                .thenThrow(new IllegalArgumentException("Categoria não encontrada"));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorId(id));
+    }
+
+    @Test
+    void buscarPorDescricao_QuandoForBemSucedido() {
+        var categoria = categoriaList.getFirst();
+
+        BDDMockito.when(repository.buscarPorDescricao(categoria.getDescricao()))
+                .thenReturn(List.of(categoria));
+
+        var categoriaListExpected = service.buscarPorDescricao(categoria.getDescricao());
+
+        Assertions.assertThat(categoriaListExpected).isNotEmpty().isEqualTo(List.of(categoria));
+    }
+
+    @Test
+    void buscarPorDescricao_QuandoDescricaoForNull_RetornaTodasCategorias() {
+        BDDMockito.when(repository.buscarTodos()).thenReturn(categoriaList);
+
+        var categoriasListExpected = service.buscarPorDescricao(null);
+
+        Assertions.assertThat(categoriasListExpected).isNotEmpty().isEqualTo(categoriaList);
+    }
+
+    @Test
+    void buscarPorDescricao_QuandoDescricaoForBlank_RetornaTodasCategorias() {
+        BDDMockito.when(repository.buscarTodos()).thenReturn(categoriaList);
+
+        var categoriasListExpected = service.buscarPorDescricao("   ");
+
+        Assertions.assertThat(categoriasListExpected).isNotEmpty().isEqualTo(categoriaList);
+    }
+
+    @Test
+    void buscarTodos_QuandoForBemSucedido_RetornaTodasCategorias() {
+        BDDMockito.when(repository.buscarTodos()).thenReturn(categoriaList);
+
+        var categoriasListExpected = service.buscarTodos();
+
+        Assertions.assertThat(categoriasListExpected).isNotEmpty().isEqualTo(categoriaList);
     }
 }

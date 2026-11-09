@@ -116,7 +116,7 @@ public class Principal {
             System.out.print("Digite o numero da opcao: ");
 
             int opcao;
-            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+            opcao = ConsoleUtils.lerInteiro(scanner, "Digite o numero da opcao: ");
 
             switch (opcao) {
                 case 1 -> pessoaMenu.iniciar();

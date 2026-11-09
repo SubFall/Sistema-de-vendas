@@ -20,7 +20,7 @@ public class CategoriaMenu {
 
         do {
             CategoriaGrid.menu();
-            System.out.print("Opção: ");
+            System.out.print("Digite o numero da opcao: ");
             opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
 
             switch (opcao) {
@@ -30,12 +30,9 @@ public class CategoriaMenu {
                 case 4 -> {
                     int op;
                     do {
-                        System.out.println("1 - Listar todas categoriras");
-                        System.out.println("2 - Listar categora por descricao");
-                        System.out.println("3 - Listar categora por id");
-
-                        op = ConsoleUtils.lerInteiro(scanner, "Opção");
-
+                        CategoriaGrid.listar();
+                        System.out.print("Digite o numero da opcao: ");
+                        op = ConsoleUtils.lerInteiro(scanner, "Digite o numero da opcao:");
                     } while (op != 1 && op != 2 && op != 3);
 
                     listar(op);
