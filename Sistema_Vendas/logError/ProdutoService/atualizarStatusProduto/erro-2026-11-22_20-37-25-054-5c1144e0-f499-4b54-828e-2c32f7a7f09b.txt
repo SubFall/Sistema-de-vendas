@@ -1,0 +1,18 @@
+Data: 2026-11-22T20:37:25.054873100
+Método: atualizarStatusProduto
+Erro: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'SET dt_alteracao = '2026-11-22 20:37:25.043546' WHERE (`id_produto` = 25)' at line 1
+
+java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'SET dt_alteracao = '2026-11-22 20:37:25.043546' WHERE (`id_produto` = 25)' at line 1
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:988)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1166)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1101)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1448)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:1084)
+	at repository.ProdutoRepository.atualizarStatusProduto(ProdutoRepository.java:45)
+	at service.ProdutoService.atualizarStatusProduto(ProdutoService.java:40)
+	at ui.produto.ProdutoMenu.inativar(ProdutoMenu.java:115)
+	at ui.produto.ProdutoMenu.iniciar(ProdutoMenu.java:37)
+	at test.Principal.iniciar(Principal.java:123)
+	at test.Principal.main(Principal.java:97)

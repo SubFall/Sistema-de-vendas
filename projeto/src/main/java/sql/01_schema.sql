@@ -88,6 +88,8 @@ CREATE TABLE `eclipse_net`.`produtos`
     `preco_venda`  DECIMAL(15, 2) NOT NULL,
     `preco_custo`  DECIMAL(15, 2) NOT NULL,
     `ativo`        TINYINT(1) NOT NULL DEFAULT 1,
+    `dt_criacao`   DATETIME,
+    `dt_alteracao` DATETIME,
     `id_categoria` INT            NOT NULL,
     PRIMARY KEY (`id_produto`),
     INDEX          `id_categoria_idx` (`id_categoria` ASC) VISIBLE,

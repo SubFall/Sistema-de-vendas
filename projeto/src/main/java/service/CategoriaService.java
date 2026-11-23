@@ -1,9 +1,13 @@
 package service;
 
 import domain.categoria.Categoria;
+import domain.exception.FalhaAoBuscarCategoriaException;
+import domain.exception.FalhaAoBuscarProdutoException;
 import lombok.RequiredArgsConstructor;
 import repository.CategoriaRepository;
+import util.Log;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class CategoriaService {
             return categoriaRepository.inserirCategoria(categoria) ? categoria : null;
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         return null;
@@ -56,6 +62,8 @@ public class CategoriaService {
             return 1;
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         return -1;
@@ -84,8 +92,14 @@ public class CategoriaService {
     }
 
     public Categoria buscarPorId(Long idCategoria) {
-
-        return validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
+        try {
+            return validarCategoriaExiste(categoriaRepository.buscarPorId(idCategoria));
+        } catch (SQLException e) {
+            Log.registrarErro("CategoriaService","buscarPorId", e);
+            throw new FalhaAoBuscarCategoriaException(
+                    "Nao foi possivel buscar a categoria. Tente novamente."
+            );
+        }
     }
 
     public List<Categoria> buscarPorDescricao(String descricao) {

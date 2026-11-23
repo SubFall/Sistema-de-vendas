@@ -92,7 +92,7 @@ public class AjusteEstoqueService {
         }
     }
 
-    private void criarMovimento(Connection conn, List<AjusteEstoqueItens> ajusteEstoqueItens, Tipo tipo) {
+    private void criarMovimento(Connection conn, List<AjusteEstoqueItens> ajusteEstoqueItens, Tipo tipo) throws SQLException {
         List<MovimentoItem> movimentoItems = new ArrayList<>();
 
         adicionarMovimentoItem(ajusteEstoqueItens, movimentoItems);
@@ -105,7 +105,7 @@ public class AjusteEstoqueService {
         inserirMovimentoItem(conn, movimento, idMovimento);
     }
 
-    private void adicionarMovimentoItem(List<AjusteEstoqueItens> ajusteEstoqueItens, List<MovimentoItem> movimentoItems) {
+    private void adicionarMovimentoItem(List<AjusteEstoqueItens> ajusteEstoqueItens, List<MovimentoItem> movimentoItems) throws SQLException {
         for (AjusteEstoqueItens estoqueItens : ajusteEstoqueItens) {
             var movimentoItem = MovimentoItem.builder()
                     .produto(produtoRepository.buscarPorId(estoqueItens.getProduto().getId()))

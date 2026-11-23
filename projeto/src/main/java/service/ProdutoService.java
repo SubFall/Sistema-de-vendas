@@ -1,11 +1,14 @@
 package service;
 
 import domain.categoria.Categoria;
+import domain.exception.*;
 import domain.produto.Produto;
 import lombok.RequiredArgsConstructor;
 import repository.CategoriaRepository;
 import repository.ProdutoRepository;
+import util.Log;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -15,125 +18,131 @@ public class ProdutoService {
     private final CategoriaRepository categoriaRepository;
 
     public boolean inserirProduto(Produto produto) {
-
         try {
-            return produtoRepository.inserirProduto(produto);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-        }
+            var produtosCadastradosList = buscarPorDescricao(produto.getDescricao());
+            if (!produtosCadastradosList.isEmpty()) throw new FalhaValorJaRegistradoException(
+                    "\nProduto: " + produto.getDescricao() + " Já Cadastrado."
+            );
 
-        return false;
+            return produtoRepository.inserirProduto(produto);
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","inserirProduto", e);
+            throw new FalhaAoInserirProdutoException(
+                    "Nao foi possivel cadastrar o produto. Tente novamente.", e
+            );
+        }
     }
 
     public boolean atualizarStatusProduto(Produto produto) {
-
         try {
-            return produtoRepository.atualizarStatusProduto(produto);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-        }
+            produto.setModifiedOn();
 
-        return false;
+            return produtoRepository.atualizarStatusProduto(produto);
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","atualizarStatusProduto", e);
+            throw new FalhaAoAtualizarProdutoException(
+              "Nao foi possivel atualizar o produto. Tente novamente."
+            );
+        }
     }
 
     public boolean atualizarProduto(Produto produto) {
-
         try {
             validarProdutoExiste(produtoRepository.buscarPorId(produto.getId()));
-
-            if (produto.getCategoria() == null) {
-                produto.setCategoria(categoriaRepository.buscarPorId(Categoria.ID_SEM_CATEGORIA));
-            }
+            produto.setModifiedOn();
 
             return produtoRepository.atualizarProduto(produto);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","atualizarProduto", e);
+            throw new FalhaAoAtualizarProdutoException(
+                    "Nao foi possivel atualizar o produto. Tente novamente."
+            );
         }
-
-        return false;
     }
 
     public List<Produto> buscarTodos() {
-
         try {
             return produtoRepository.buscarTodos();
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","buscarTodos", e);
+            throw new FalhaAoBuscarProdutoException(
+                    "Nao foi possivel buscar o produto. Tente novamente."
+            );
         }
-
-        return List.of();
     }
 
     public List<Produto> buscarTodosAtivos() {
-
         try {
             return produtoRepository.buscarTodosPorStatus(true);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","buscarTodosAtivos", e);
+            throw new FalhaAoBuscarProdutoException(
+                    "Nao foi possivel buscar o produto. Tente novamente."
+            );
         }
-
-        return List.of();
     }
 
     public List<Produto> buscarTodosInativos() {
-
         try {
             return produtoRepository.buscarTodosPorStatus(false);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","buscarTodosInativos", e);
+            throw new FalhaAoBuscarProdutoException(
+                    "Nao foi possivel buscar o produto. Tente novamente."
+            );
         }
-
-        return List.of();
     }
 
     public Produto buscarPorId(Long idProduto) {
-
         try {
             return validarProdutoExiste(produtoRepository.buscarPorId(idProduto));
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","buscarPorId", e);
+            throw new FalhaAoBuscarProdutoException(
+                    "Nao foi possivel buscar o produto. Tente novamente."
+            );
         }
-
-        return null;
     }
 
     public Produto buscarPorIdAtivo(Long idProduto) {
-
         try {
             return validarProdutoAtivo(produtoRepository.buscarPorId(idProduto));
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","buscarPorIdAtivo", e);
+            throw new FalhaAoBuscarProdutoException(
+                    "Nao foi possivel buscar o produto. Tente novamente."
+            );
         }
-
-        return null;
     }
 
     public Produto buscarPorIdInativo(Long idProduto) {
-
         try {
             return validarProdutoInativo(produtoRepository.buscarPorId(idProduto));
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","buscarPorIdInativo", e);
+            throw new FalhaAoBuscarProdutoException(
+                    "Nao foi possivel buscar o produto. Tente novamente."
+            );
         }
     }
 
     public List<Produto> buscarPorDescricao(String descricao) {
-
         try {
             if (descricao == null || descricao.isBlank()) {
                 return produtoRepository.buscarTodos();
             }
             return produtoRepository.buscarPorDescricao(descricao);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            Log.registrarErro("ProdutoService","buscarPorDescricao", e);
+            throw new FalhaAoBuscarProdutoException(
+                    "Nao foi possivel buscar o produto. Tente novamente."
+            );
         }
-
-        return List.of();
     }
 
     private Produto validarProdutoExiste(Produto produto) {
         if (produto == null) {
-            throw new IllegalArgumentException("Produto não cadastrado");
+            throw new FalhaProdutoNaoExisteException("\nProduto nao cadastrado.");
         }
         return produto;
     }
@@ -142,7 +151,7 @@ public class ProdutoService {
         validarProdutoExiste(produto);
 
         if (!produto.isAtivo()) {
-            throw new IllegalArgumentException("Produto está inativo!");
+            throw new FalhaProdutoEstaInativoException("\nProduto está inativo.");
         }
         return produto;
     }
@@ -151,7 +160,7 @@ public class ProdutoService {
         validarProdutoExiste(produto);
 
         if (produto.isAtivo()) {
-            throw new IllegalArgumentException("Produto está ativo");
+            throw new FalhaProdutoEstaAtivoException("\nProduto está ativo.");
         }
         return produto;
     }

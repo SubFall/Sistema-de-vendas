@@ -26,7 +26,7 @@ public final class ConsoleUtils {
             try {
                 return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.println("Digite um " + label + " valido");
+                System.out.print("Digite um " + label + " valido: ");
             }
         }
     }
@@ -36,7 +36,7 @@ public final class ConsoleUtils {
             try {
                 return Long.parseLong(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.println("Digite um " + label + " valido");
+                System.out.print("Digite um " + label + " valido: ");
             }
         }
     }

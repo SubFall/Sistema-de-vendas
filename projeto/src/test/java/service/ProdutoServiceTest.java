@@ -1,6 +1,7 @@
 package service;
 
 import domain.categoria.Categoria;
+import domain.exception.*;
 import domain.produto.Produto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import repository.CategoriaRepository;
 import repository.ProdutoRepository;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +51,7 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void inserirProduto_QuandoForBemSucedido_RetornaTrue() {
+    void inserirProduto_QuandoForBemSucedido_RetornaTrue() throws SQLException {
         var produto = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.inserirProduto(produto))
@@ -60,22 +62,37 @@ class ProdutoServiceTest {
         Assertions.assertThat(isInseriu).isTrue();
 
         BDDMockito.verify(produtoRepository).inserirProduto(produto);
+        BDDMockito.verifyNoInteractions(categoriaRepository);
     }
 
     @Test
-    void inserirProduto_QuandoRepositorioLancaExcecao_RetornaFalse() {
+    void inserirProduto_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         var produto = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.inserirProduto(produto))
-                .thenThrow(new RuntimeException("Falha ao inserir produto!"));
+                .thenThrow(new SQLException("Nao foi possivel cadastrar o produto. Tente novamente."));
 
-        var isInseriu = service.inserirProduto(produto);
-
-        Assertions.assertThat(isInseriu).isFalse();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.inserirProduto(produto))
+                .isInstanceOf(FalhaAoInserirProdutoException.class)
+                .withMessage("Nao foi possivel cadastrar o produto. Tente novamente.");
     }
 
     @Test
-    void atualizarStatusProduto_QuandoForBemSucedido() {
+    void inserirProduto_LancaExcecaoDeDominio_FalhaValorJaRegistradoException() throws SQLException {
+        var produto = produtoList.getFirst();
+
+        BDDMockito.when(produtoRepository.buscarPorDescricao(produto.getDescricao()))
+                .thenThrow(new FalhaValorJaRegistradoException("Produto: " + produto.getDescricao() + " Já Cadastrado."));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.inserirProduto(produto))
+                .isInstanceOf(FalhaValorJaRegistradoException.class)
+                .withMessage("Produto: " + produto.getDescricao() + " Já Cadastrado.");
+    }
+
+    @Test
+    void atualizarStatusProduto_QuandoForBemSucedido() throws SQLException {
         var produto = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.atualizarStatusProduto(produto))
@@ -89,24 +106,27 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void atualizarStatusProduto_Falha_RetornaFalse() {
+    void atualizarStatusProduto_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         var produto = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.atualizarStatusProduto(produto))
-                .thenThrow(new RuntimeException("Falha ao atualizar Status!"));
+                .thenThrow(new SQLException("Nao foi possivel atualizar o produto. Tente novamente."));
 
-        var isAtualizou = service.atualizarStatusProduto(produto);
-
-        Assertions.assertThat(isAtualizou).isFalse();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.atualizarStatusProduto(produto))
+                .isInstanceOf(FalhaAoAtualizarProdutoException.class)
+                .withMessage("Nao foi possivel atualizar o produto. Tente novamente.");
     }
 
     @Test
-    void atualizarProduto_QuandoForBemSucedido() {
+    void atualizarProduto_QuandoForBemSucedido() throws SQLException {
         var produto = produtoList.getFirst();
 
-        BDDMockito.when(produtoRepository.buscarPorId(produto.getId())).thenReturn(produto);
+        BDDMockito.when(produtoRepository.buscarPorId(produto.getId()))
+                .thenReturn(produto);
 
-        BDDMockito.when(produtoRepository.atualizarProduto(produto)).thenReturn(true);
+        BDDMockito.when(produtoRepository.atualizarProduto(produto))
+                .thenReturn(true);
 
         var isAtualizou = service.atualizarProduto(produto);
 
@@ -116,51 +136,72 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void atualizarProduto_BuscarPorIdFalha_RetornaFalse() {
+    void atualizarProduto_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         var produto = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.buscarPorId(produto.getId()))
-                .thenThrow(new RuntimeException("Falha ao buscar Produto!"));
+                .thenThrow(new SQLException("Nao foi possivel atualizar o produto. Tente novamente."));
 
-        var isAtualizou = service.atualizarProduto(produto);
-
-        Assertions.assertThat(isAtualizou).isFalse();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.atualizarProduto(produto))
+                .isInstanceOf(FalhaAoAtualizarProdutoException.class)
+                .withMessage("Nao foi possivel atualizar o produto. Tente novamente.");
 
         BDDMockito.verify(produtoRepository, BDDMockito.never())
                 .atualizarProduto(produto);
     }
 
     @Test
-    void buscarTodos_QuandoFoBemSucedido() {
-        BDDMockito.when(produtoRepository.buscarTodos()).thenReturn(produtoList);
+    void atualizarProduto_QuandoLancaExcecaoDeDominio() throws SQLException {
+        var produto = produtoList.getFirst();
 
-        var produtoListExpectd = service.buscarTodos();
+        BDDMockito.when(produtoRepository.buscarPorId(produto.getId()))
+                .thenThrow(new FalhaProdutoNaoExisteException("Produto nao cadastrado."));
 
-        Assertions.assertThat(produtoListExpectd).isNotNull().isEqualTo(produtoList);
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.atualizarProduto(produto))
+                .isInstanceOf(FalhaProdutoNaoExisteException.class)
+                .withMessage("Produto nao cadastrado.");
+
+        BDDMockito.verify(produtoRepository, BDDMockito.never())
+                .atualizarProduto(produto);
     }
 
     @Test
-    void buscarTodos_RetornaListaVazia() {
-        BDDMockito.when(produtoRepository.buscarTodos()).thenReturn(List.of());
-
-        var listProdutoEmpty = service.buscarTodos();
-
-        Assertions.assertThat(listProdutoEmpty).isEmpty();
-    }
-
-    @Test
-    void buscarTodos_Falha_buscarTodosLancaExcecao_RetornaListaVazia() {
+    void buscarTodos_QuandoFoBemSucedido() throws SQLException {
         BDDMockito.when(produtoRepository.buscarTodos())
-                .thenThrow(new RuntimeException("Falha ao buscar Produtos!"));
+                .thenReturn(produtoList);
 
-        var listProdutoEmpty = service.buscarTodos();
+        var produtoListExpected = service.buscarTodos();
 
-        Assertions.assertThat(listProdutoEmpty).isEmpty();
+        Assertions.assertThat(produtoListExpected).isNotNull().isEqualTo(produtoList);
     }
 
     @Test
-    void buscarTodosAtivos_QuandoForBemSucedido() {
-        BDDMockito.when(produtoRepository.buscarTodosPorStatus(true)).thenReturn(produtoList);
+    void buscarTodos_RetornaListaVazia_QuandoNaoTemProdutoCadastrado() throws SQLException {
+        BDDMockito.when(produtoRepository.buscarTodos())
+                .thenReturn(List.of());
+
+        var produtosListEmpty = service.buscarTodos();
+
+        Assertions.assertThat(produtosListEmpty).isEmpty();
+    }
+
+    @Test
+    void buscarTodos_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
+        BDDMockito.when(produtoRepository.buscarTodos())
+                .thenThrow(new SQLException("Nao foi possivel buscar o produto. Tente novamente."));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarTodos())
+                .isInstanceOf(FalhaAoBuscarProdutoException.class)
+                .withMessage("Nao foi possivel buscar o produto. Tente novamente.");
+    }
+
+    @Test
+    void buscarTodosAtivos_QuandoForBemSucedido() throws SQLException {
+        BDDMockito.when(produtoRepository.buscarTodosPorStatus(true))
+                .thenReturn(produtoList);
 
         var listProdutosAtivos = service.buscarTodosAtivos();
 
@@ -168,9 +209,20 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarTodosAtivos_buscarTodosPorStatusLancaExcecao_RetornaListaVazia() {
+    void buscarTodosAtivos_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         BDDMockito.when(produtoRepository.buscarTodosPorStatus(true))
-                .thenThrow(new RuntimeException("Falha ao buscar Produtos por Status!"));
+                .thenThrow(new SQLException("Nao foi possivel buscar o produto. Tente novamente."));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarTodosAtivos())
+                .isInstanceOf(FalhaAoBuscarProdutoException.class)
+                .withMessage("Nao foi possivel buscar o produto. Tente novamente.");
+    }
+
+    @Test
+    void buscarTodosAtivos_RetornaListaVazia_QuandoNaoTemProdutoCadastrado() throws SQLException {
+        BDDMockito.when(produtoRepository.buscarTodosPorStatus(true))
+                .thenReturn(List.of());
 
         var listProdutosEmpty = service.buscarTodosAtivos();
 
@@ -178,17 +230,9 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarTodosAtivos_RetornaListaVazia() {
-        BDDMockito.when(produtoRepository.buscarTodosPorStatus(true)).thenReturn(List.of());
-
-        var listProdutosEmpty = service.buscarTodosAtivos();
-
-        Assertions.assertThat(listProdutosEmpty).isEmpty();
-    }
-
-    @Test
-    void buscarTodosInativos_QuandoForBemSucedido() {
-        BDDMockito.when(produtoRepository.buscarTodosPorStatus(false)).thenReturn(produtoList);
+    void buscarTodosInativos_QuandoForBemSucedido() throws SQLException {
+        BDDMockito.when(produtoRepository.buscarTodosPorStatus(false))
+                .thenReturn(produtoList);
 
         var listProdutosInativos = service.buscarTodosInativos();
 
@@ -196,9 +240,20 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarTodosIntivos_buscarTodosPorStatusLancaExcecao_RetornaListaVazia() {
+    void buscarTodosIntivos_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         BDDMockito.when(produtoRepository.buscarTodosPorStatus(false))
-                .thenThrow(new RuntimeException("Falha ao buscar Produtos por Status!"));
+                .thenThrow(new SQLException("Nao foi possivel buscar o produto. Tente novamente."));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarTodosInativos())
+                .isInstanceOf(FalhaAoBuscarProdutoException.class)
+                .withMessage("Nao foi possivel buscar o produto. Tente novamente.");
+    }
+
+    @Test
+    void buscarTodosInativos_RetornaListaVazia() throws SQLException {
+        BDDMockito.when(produtoRepository.buscarTodosPorStatus(false))
+                .thenReturn(List.of());
 
         var listProdutosInativosEmpty = service.buscarTodosInativos();
 
@@ -206,19 +261,11 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarTodosInativos_RetornaListaVazia() {
-        BDDMockito.when(produtoRepository.buscarTodosPorStatus(false)).thenReturn(List.of());
-
-        var listProdutosInativosEmpty = service.buscarTodosInativos();
-
-        Assertions.assertThat(listProdutosInativosEmpty).isEmpty();
-    }
-
-    @Test
-    void buscarPorId_QuandoForBemSucedido() {
+    void buscarPorId_QuandoForBemSucedido() throws SQLException {
         var produto = produtoList.getFirst();
 
-        BDDMockito.when(produtoRepository.buscarPorId(produto.getId())).thenReturn(produto);
+        BDDMockito.when(produtoRepository.buscarPorId(produto.getId()))
+                .thenReturn(produto);
 
         var expectedProduto = service.buscarPorId(produto.getId());
 
@@ -226,33 +273,37 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarPorId_RetornaNull() {
+    void buscarPorId_RetornaNull() throws SQLException {
         var id = 99L;
 
-        BDDMockito.when(produtoRepository.buscarPorId(id)).thenReturn(null);
+        BDDMockito.when(produtoRepository.buscarPorId(id))
+                .thenThrow(new FalhaProdutoNaoExisteException("Produto nao cadastrado."));
 
-        var produtoIsNull = service.buscarPorId(id);
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorId(id))
+                .isInstanceOf(FalhaProdutoNaoExisteException.class)
+                .withMessage("Produto nao cadastrado.");
     }
 
     @Test
-    void buscarPorId_BuscarPorIdLancaExecao_RetornaNull() {
+    void buscarPorId_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         var produto = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.buscarPorId(produto.getId()))
-                .thenThrow(new RuntimeException("Falha ao buscar Produtos!"));
+                .thenThrow(new SQLException("Nao foi possivel buscar o produto. Tente novamente."));
 
-        var produtoIsNull = service.buscarPorId(produto.getId());
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorId(produto.getId()))
+                .isInstanceOf(FalhaAoBuscarProdutoException.class)
+                .withMessage("Nao foi possivel buscar o produto. Tente novamente.");
     }
 
     @Test
-    void buscarPorIdAtivo_QuandoForBemSucedido() {
+    void buscarPorIdAtivo_QuandoForBemSucedido() throws SQLException {
         var produtoAtivo = produtoList.getFirst();
 
-        BDDMockito.when(produtoRepository.buscarPorId(produtoAtivo.getId())).thenReturn(produtoAtivo);
+        BDDMockito.when(produtoRepository.buscarPorId(produtoAtivo.getId()))
+                .thenReturn(produtoAtivo);
 
         var produtoAtivoExpected = service.buscarPorIdAtivo(produtoAtivo.getId());
 
@@ -260,45 +311,63 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarPorIdAtivo_RetornaNull() {
+    void buscarPorIdAtivo_RetornaNull() throws SQLException {
         var id = 99L;
 
-        BDDMockito.when(produtoRepository.buscarPorId(id)).thenReturn(null);
+        BDDMockito.when(produtoRepository.buscarPorId(id))
+                .thenThrow(new FalhaProdutoNaoExisteException("Produto nao cadastrado."));
 
-        var produtoIsNull = service.buscarPorIdAtivo(id);
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdAtivo(id))
+                .isInstanceOf(FalhaProdutoNaoExisteException.class)
+                .withMessage("Produto nao cadastrado.");
     }
 
     @Test
-    void buscarPorIdAtivo_BuscarPorIdLancaExcecao_RetornaNull() {
+    void buscarPorIdAtivo_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         var produtoAtivo = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.buscarPorId(produtoAtivo.getId()))
-                .thenThrow(new IllegalArgumentException("Falha ao buscar Produtos!"));
+                .thenThrow(new SQLException("Nao foi possivel buscar o produto. Tente novamente."));
 
-        var produtoIsNull = service.buscarPorIdAtivo(produtoAtivo.getId());
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdAtivo(produtoAtivo.getId()))
+                .isInstanceOf(FalhaAoBuscarProdutoException.class)
+                .withMessage("Nao foi possivel buscar o produto. Tente novamente.");
     }
 
     @Test
-    void buscarPorIdAtivo_ValidarProdutoAtivoLancaExcecao_RetornaNull() {
+    void buscarPorIdAtivo_LancaExcecaoDeDominio_FalhaProdutoNaoExisteException() throws SQLException {
         var produtoAtivo = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.buscarPorId(produtoAtivo.getId()))
-                .thenThrow(new RuntimeException("Produto está inativo!"));
+                .thenThrow(new FalhaProdutoNaoExisteException("Produto nao cadastrado."));
 
-        var produtoIsNull = service.buscarPorIdAtivo(produtoAtivo.getId());
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdAtivo(produtoAtivo.getId()))
+                .isInstanceOf(FalhaProdutoNaoExisteException.class)
+                .withMessage("Produto nao cadastrado.");
     }
 
     @Test
-    void buscarPorIdInativo_QuandoForBemSucedido() {
+    void buscarPorIdAtivo_LancaExcecaoDeDominio_FalhaProdutoEstaInativoException() throws SQLException {
+        var produtoAtivo = produtoList.getFirst();
+
+        BDDMockito.when(produtoRepository.buscarPorId(produtoAtivo.getId()))
+                .thenThrow(new FalhaProdutoEstaInativoException("Produto está inativo."));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdAtivo(produtoAtivo.getId()))
+                .isInstanceOf(FalhaProdutoEstaInativoException.class)
+                .withMessage("Produto está inativo.");
+    }
+
+    @Test
+    void buscarPorIdInativo_QuandoForBemSucedido() throws SQLException {
         var produtoInativo = produtoList.getLast();
 
-        BDDMockito.when(produtoRepository.buscarPorId(produtoInativo.getId())).thenReturn(produtoInativo);
+        BDDMockito.when(produtoRepository.buscarPorId(produtoInativo.getId()))
+                .thenReturn(produtoInativo);
 
         var produtoInativoExpected = service.buscarPorIdInativo(produtoInativo.getId());
 
@@ -306,44 +375,61 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarPorIdInativo_RetornaNull() {
+    void buscarPorIdInativo_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         var id = 99L;
 
-        BDDMockito.when(produtoRepository.buscarPorId(id)).thenReturn(null);
+        BDDMockito.when(produtoRepository.buscarPorId(id))
+                .thenThrow(new SQLException("Nao foi possivel buscar o produto. Tente novamente."));
 
-        var produtoIsNull = service.buscarPorIdInativo(id);
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdInativo(id))
+                .isInstanceOf(FalhaAoBuscarProdutoException.class)
+                .withMessage("Nao foi possivel buscar o produto. Tente novamente.");
     }
 
     @Test
-    void buscarPorIdInativo_BuscarPorIdLancaExcecao_RetornaNull() {
+    void buscarPorIdInativo_LancaExcecaoDeDominio_FalhaProdutoNaoExisteException() throws SQLException {
         var produtoInativo = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.buscarPorId(produtoInativo.getId()))
-                .thenThrow(new IllegalArgumentException("Falha ao buscar Produtos!"));
+                .thenThrow(new FalhaProdutoNaoExisteException("Produto nao cadastrado."));
 
-        var produtoIsNull = service.buscarPorIdInativo(produtoInativo.getId());
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdInativo(produtoInativo.getId()))
+                .isInstanceOf(FalhaProdutoNaoExisteException.class)
+                .withMessage("Produto nao cadastrado.");
     }
 
     @Test
-    void buscarPorIdInativo_ValidarProdutoInativoLancaExcecao_RetornaNull() {
-        var produtoInativo = produtoList.getFirst();
+    void buscarPorIdInativo_LancaExcecaoDeDominio_FalhaProdutoEstaAtivoException() throws SQLException {
+        var produtoAtivo = produtoList.getFirst();
 
-        BDDMockito.when(produtoRepository.buscarPorId(produtoInativo.getId()))
-                .thenThrow(new RuntimeException("Produto está inativo!"));
+        BDDMockito.when(produtoRepository.buscarPorId(produtoAtivo.getId()))
+                .thenThrow(new FalhaProdutoEstaAtivoException("Produto está ativo."));
 
-        var produtoIsNull = service.buscarPorIdInativo(produtoInativo.getId());
-
-        Assertions.assertThat(produtoIsNull).isNull();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdAtivo(produtoAtivo.getId()))
+                .isInstanceOf(FalhaProdutoEstaAtivoException.class)
+                .withMessage("Produto está ativo.");
     }
-    
+
     @Test
-    void buscarPorDescricao_QuandoForBemSucedido() {
+    void buscarPorIdInativo_RetornaNull() throws SQLException {
+        var id = 99L;
+
+        BDDMockito.when(produtoRepository.buscarPorId(id))
+                .thenThrow(new FalhaProdutoNaoExisteException("Produto nao cadastrado"));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorIdInativo(id))
+                .isInstanceOf(FalhaProdutoNaoExisteException.class)
+                .withMessage("Produto nao cadastrado");
+    }
+
+    @Test
+    void buscarPorDescricao_QuandoForBemSucedido() throws SQLException {
         var produto = produtoList.getFirst();
-        
+
         BDDMockito.when(produtoRepository.buscarPorDescricao(produto.getDescricao()))
                 .thenReturn(List.of(produto));
 
@@ -353,32 +439,44 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void buscarPorDescricao_BuscarTdosLancaExcecao_RetornaListVazia () {
+    void buscarPorDescricao_PassandoParametroNull() throws SQLException {
         BDDMockito.when(produtoRepository.buscarTodos())
-                .thenThrow(new RuntimeException("Falha ao buscar Produtos!"));
+                .thenReturn(produtoList);
 
-        var produtosListEmpty = service.buscarPorDescricao(null);
+        var produtoAllListExpected = service.buscarPorDescricao(null);
 
-        Assertions.assertThat(produtosListEmpty).isEmpty();
+        Assertions.assertThat(produtoAllListExpected).isNotNull().isEqualTo(produtoList);
     }
 
     @Test
-    void buscarPorDescricao_BuscarPorDescricaoLancaExcecao_RetornaListVazia () {
+    void buscarPorDescricao_PassandoParametroVazio() throws SQLException {
+        BDDMockito.when(produtoRepository.buscarTodos())
+                .thenReturn(produtoList);
+
+        var produtoAllListExpected = service.buscarPorDescricao("");
+
+        Assertions.assertThat(produtoAllListExpected).isNotNull().isEqualTo(produtoList);
+    }
+
+    @Test
+    void buscarPorDescricao_QuandoRepositorioLancaSQLException_LancaExcecaoDeDominio() throws SQLException {
         var produto = produtoList.getFirst();
 
         BDDMockito.when(produtoRepository.buscarPorDescricao(produto.getDescricao()))
-                .thenThrow(new RuntimeException("Falha ao buscar Produto por Descricao!"));
+                .thenThrow(new SQLException("Nao foi possivel buscar o produto. Tente novamente."));
 
-        var produtosListEmpty = service.buscarPorDescricao(produto.getDescricao());
-
-        Assertions.assertThat(produtosListEmpty).isEmpty();
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.buscarPorDescricao(produto.getDescricao()))
+                .isInstanceOf(FalhaAoBuscarProdutoException.class)
+                .withMessage("Nao foi possivel buscar o produto. Tente novamente.");
     }
 
     @Test
-    void buscarPorDescricao_RetornaListVazia () {
+    void buscarPorDescricao_RetornaListVazia() throws SQLException {
         var teste = "teste";
 
-        BDDMockito.when(produtoRepository.buscarPorDescricao(teste)).thenReturn(List.of());
+        BDDMockito.when(produtoRepository.buscarPorDescricao(teste))
+                .thenReturn(List.of());
 
         var produtosListEmpty = service.buscarPorDescricao(teste);
 

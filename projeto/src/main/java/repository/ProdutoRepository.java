@@ -4,10 +4,8 @@ import conn.ConnectionProvider;
 import domain.categoria.Categoria;
 import domain.produto.Produto;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +15,9 @@ public class ProdutoRepository {
     public ProdutoRepository(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
-    public boolean inserirProduto(Produto produto) {
-        String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo, id_categoria) VALUES (?, ?, ?, ?, ?);";
+
+    public boolean inserirProduto(Produto produto) throws SQLException {
+        String sql = "INSERT INTO produtos (descricao, preco_venda, preco_custo, ativo, dt_criacao, id_categoria) VALUES (?, ?, ?, ?, ?, ?);";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,33 +26,30 @@ public class ProdutoRepository {
             ps.setBigDecimal(2, produto.getPrecoVenda());
             ps.setBigDecimal(3, produto.getPrecoCusto());
             ps.setBoolean(4, produto.isAtivo());
-            ps.setLong(5, produto.getCategoria().getId());
-
+            ps.setTimestamp(5, Timestamp.valueOf(produto.getCreatedAt()));
+            ps.setLong(6, produto.getCategoria().getId());
 
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao inserir produto!", e);
         }
     }
 
-    public boolean atualizarStatusProduto(Produto produto) {
-        String sql = "UPDATE produtos SET ativo = ? WHERE (`id_produto` = ?);";
+    public boolean atualizarStatusProduto(Produto produto) throws SQLException {
+        String sql = "UPDATE produtos SET ativo = ?, dt_alteracao = ? WHERE (`id_produto` = ?);";
 
         try (Connection conn = connectionProvider.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBoolean(1, produto.isAtivo());
-            ps.setLong(2, produto.getId());
+            ps.setTimestamp(2, Timestamp.valueOf(produto.getModifiedOn()));
+            ps.setLong(3, produto.getId());
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao atualizar Status!", e);
         }
     }
 
-    public boolean atualizarProduto(Produto produto) {
+    public boolean atualizarProduto(Produto produto) throws SQLException {
         String sql = """
-                    UPDATE produtos SET descricao = ?, preco_venda = ?, preco_custo = ?, ativo = ?, id_categoria = ? 
-                    WHERE id_produto = ?;
+                    UPDATE produtos SET descricao = ?, preco_venda = ?, preco_custo = ?, ativo = ?, 
+                                        dt_alteracao = ?, id_categoria = ? WHERE id_produto = ?;
                 """;
 
         try (Connection conn = connectionProvider.getConnection();
@@ -63,21 +59,20 @@ public class ProdutoRepository {
             ps.setBigDecimal(2, produto.getPrecoVenda());
             ps.setBigDecimal(3, produto.getPrecoCusto());
             ps.setBoolean(4, produto.isAtivo());
-            ps.setLong(5, produto.getCategoria().getId());
-            ps.setLong(6, produto.getId());
+            ps.setTimestamp(5, Timestamp.valueOf(produto.getModifiedOn()));
+            ps.setLong(6, produto.getCategoria().getId());
+            ps.setLong(7, produto.getId());
 
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao atualizar Produto!", e);
         }
     }
 
-    public List<Produto> buscarTodos() {
+    public List<Produto> buscarTodos() throws SQLException {
         String sql = """
-                    SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
-                    		p.ativo, p.id_categoria,c.descricao
-                    FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria ORDER BY p.descricao;
-                    """;
+                SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
+                		p.ativo, p.dt_criacao, p.dt_alteracao, p.id_categoria,c.descricao
+                FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria ORDER BY p.descricao;
+                """;
         List<Produto> produtos = new ArrayList<>();
 
         try (Connection conn = connectionProvider.getConnection();
@@ -87,20 +82,17 @@ public class ProdutoRepository {
             while (rs.next()) {
                 produtos.add(mapearProduto(rs));
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao buscar Produtos!", e);
         }
         return produtos;
     }
 
-    public List<Produto> buscarTodosPorStatus(boolean status) {
+    public List<Produto> buscarTodosPorStatus(boolean status) throws SQLException {
         String sql = """
-                    SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
-                    		p.ativo, p.id_categoria,c.descricao
-                    FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria 
-                    WHERE p.ativo = ? ORDER BY p.descricao;
-                    """;
+                SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
+                		p.ativo, p.dt_criacao, p.dt_alteracao, p.id_categoria,c.descricao
+                FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria 
+                WHERE p.ativo = ? ORDER BY p.descricao;
+                """;
         List<Produto> produtos = new ArrayList<>();
 
         try (Connection conn = connectionProvider.getConnection();
@@ -113,16 +105,14 @@ public class ProdutoRepository {
                     produtos.add(mapearProduto(rs));
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao buscar Produtos por Status!", e);
         }
         return produtos;
     }
 
-    public List<Produto> buscarPorDescricao(String descricao) {
+    public List<Produto> buscarPorDescricao(String descricao) throws SQLException {
         String sql = """
                 SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
-                    		p.ativo, p.id_categoria,c.descricao
+                    		p.ativo, p.dt_criacao, p.dt_alteracao, p.id_categoria,c.descricao
                     FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria
                     WHERE p.descricao LIKE ? ORDER BY p.descricao;
                 """;
@@ -138,17 +128,14 @@ public class ProdutoRepository {
                     produtos.add(mapearProduto(rs));
                 }
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao buscar Produto por Descricao!", e);
         }
         return produtos;
     }
 
-    public Produto buscarPorId(Long idProduto) {
+    public Produto buscarPorId(Long idProduto) throws SQLException {
         String sql = """
                         SELECT p.id_produto, p.descricao, p.preco_venda, p.preco_custo,
-                            		p.ativo, p.id_categoria, c.descricao
+                            		p.ativo, p.dt_criacao, p.dt_alteracao, p.id_categoria, c.descricao
                             FROM produtos AS p LEFT JOIN categoria AS c ON c.id_categoria = p.id_categoria
                             WHERE id_produto = ?;
                 """;
@@ -163,21 +150,27 @@ public class ProdutoRepository {
                     return mapearProduto(rs);
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao buscar Produto!", e);
         }
         return null;
     }
 
     private Produto mapearProduto(ResultSet rs) throws SQLException {
-        return Produto.builder()
-                .id(rs.getLong("p.id_produto"))
-                .descricao(rs.getString("p.descricao"))
-                .precoVenda(rs.getBigDecimal("p.preco_venda"))
-                .precoCusto(rs.getBigDecimal("p.preco_custo"))
-                .ativo(rs.getBoolean("p.ativo"))
-                .categoria(mapearCategoria(rs))
-                .build();
+        var produto = Produto.builder();
+
+        produto.id(rs.getLong("p.id_produto"));
+        produto.descricao(rs.getString("p.descricao"));
+        produto.precoVenda(rs.getBigDecimal("p.preco_venda"));
+        produto.precoCusto(rs.getBigDecimal("p.preco_custo"));
+        produto.ativo(rs.getBoolean("p.ativo"));
+
+        var dataCriacao = rs.getTimestamp("p.dt_criacao");
+        if (dataCriacao != null) produto.createdAt(dataCriacao.toLocalDateTime());
+
+        var dataModificacao = rs.getTimestamp("p.dt_alteracao");
+        if (dataModificacao != null) produto.modifiedOn(dataModificacao.toLocalDateTime());
+
+        produto.categoria(mapearCategoria(rs));
+        return produto.build();
     }
 
     private Categoria mapearCategoria(ResultSet rs) throws SQLException {

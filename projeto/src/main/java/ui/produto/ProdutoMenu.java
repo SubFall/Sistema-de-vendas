@@ -1,6 +1,7 @@
 package ui.produto;
 
 import domain.categoria.Categoria;
+import domain.exception.*;
 import domain.produto.Produto;
 import lombok.RequiredArgsConstructor;
 import service.CategoriaService;
@@ -10,6 +11,7 @@ import ui.grid.ProdutosGrid;
 import util.console.ConsoleUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -27,8 +29,8 @@ public class ProdutoMenu {
         do {
             ProdutosGrid.menu();
 
-            System.out.print("Opção: ");
-            opcao = ConsoleUtils.lerInteiro(scanner, "Opção");
+            System.out.print("Opcao: ");
+            opcao = ConsoleUtils.lerInteiro(scanner, "Opcao");
 
             switch (opcao) {
                 case 1 -> cadastrar();
@@ -43,15 +45,19 @@ public class ProdutoMenu {
                         System.out.println("2 - Listar produtos por descricao");
                         System.out.println("3 - Listar produto por id");
                         System.out.println("4 - Listar somente ativos");
+                        System.out.println("5 - Listar somente inativos");
+                        System.out.println();
+                        System.out.println("0 - Voltar");
 
-                        op = ConsoleUtils.lerInteiro(scanner, "Opção");
+                        System.out.print("Opcao: ");
+                        op = ConsoleUtils.lerInteiro(scanner, "Opcao");
 
-                    } while (op != 1 && op != 2 && op != 3 && op != 4);
+                    } while (op != 0 && op != 1 && op != 2 && op != 3 && op != 4 && op != 5);
 
-                    listar(op);
+                    if (op != 0) listar(op);
                 }
                 case 0 -> System.out.println("Saindo...");
-                default -> System.out.println("Opção inválida");
+                default -> System.out.println("Opcao invalida");
             }
         } while (opcao != 0);
     }
@@ -64,28 +70,32 @@ public class ProdutoMenu {
 
         try {
             System.out.print("Descricao: ");
-            descricao = scanner.nextLine();
+            descricao = scanner.nextLine().trim();
+            if (descricao.isBlank()) throw new FalhaValorObrigatorioException("Descricao Obrigatoria.");
 
-            precoVenda = ConsoleUtils.lerBigDecimal(scanner, "Preço de venda");
+            precoVenda = ConsoleUtils.lerBigDecimal(scanner, "Preco de venda");
+            if (precoVenda.compareTo(BigDecimal.ZERO) <= 0) throw new FalhaValorNaoPodeSerNegativoException("Preco de venda deve ser maior que zero");
 
-            precoCusto = ConsoleUtils.lerBigDecimal(scanner, "Preço de custo");
+            precoCusto = ConsoleUtils.lerBigDecimal(scanner, "Preco de custo");
+            if (precoCusto.compareTo(BigDecimal.ZERO) < 0) throw new FalhaValorNaoPodeSerNegativoException("Preco de custo nao deve ser menor que zero");
 
             if (ConsoleUtils.confirmar(scanner, "Deseja cadastrar a categoria ?")) {
                 categoria = selecionarCategoria();
             }
 
-            var produto = Produto.builder()
-                    .descricao(descricao)
-                    .precoVenda(precoVenda)
-                    .precoCusto(precoCusto)
-                    .categoria(categoria)
-                    .build();
+            var produto = Produto.builder().descricao(descricao).precoVenda(precoVenda)
+                    .precoCusto(precoCusto).ativo(true).createdAt(LocalDateTime.now())
+                    .categoria(categoria).build();
 
-            produtoService.inserirProduto(produto);
+            var isInseriu = produtoService.inserirProduto(produto);
 
-            System.out.println("Produto " + produto.getDescricao() + " cadastrado com sucesso!");
-
-        } catch (IllegalArgumentException e) {
+            if (isInseriu) {
+                System.out.println("Produto " + produto.getDescricao() + " cadastrado com sucesso!");
+            } else {
+                System.out.println("Erro ao inserir Produto!");
+            }
+        } catch (IllegalArgumentException | FalhaAoInserirProdutoException | FalhaValorObrigatorioException |
+                FalhaValorNaoPodeSerNegativoException | FalhaValorJaRegistradoException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -108,7 +118,7 @@ public class ProdutoMenu {
                 System.out.println("Produto " + produto.getDescricao() + " inativado com sucesso!");
             }
 
-        } catch (RuntimeException e) {
+        } catch (FalhaAoAtualizarProdutoException | FalhaProdutoNaoExisteException | FalhaProdutoEstaInativoException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -131,7 +141,7 @@ public class ProdutoMenu {
                 System.out.println("Produto " + produto.getDescricao() + " ativado com sucesso!");
             }
 
-        } catch (RuntimeException e) {
+        } catch (FalhaAoAtualizarProdutoException | FalhaProdutoNaoExisteException | FalhaProdutoEstaAtivoException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -149,7 +159,7 @@ public class ProdutoMenu {
 
             atualizarCusto(produto);
 
-            while(true){
+            while (true) {
                 if (atualizarCategoria(produto)) break;
             }
 
@@ -159,7 +169,9 @@ public class ProdutoMenu {
                 System.out.println("Produto " + produto.getDescricao() + " atualizado com sucesso!");
             }
 
-        } catch (RuntimeException e) {
+        } catch (FalhaAoAtualizarProdutoException |
+                 FalhaProdutoNaoExisteException |
+                 FalhaValorNaoPodeSerNegativoException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -170,7 +182,7 @@ public class ProdutoMenu {
         System.out.println("Descricao Atual: " + produto.getDescricao());
         System.out.print("Nova Descricao: ");
 
-        var descricao = scanner.nextLine();
+        var descricao = scanner.nextLine().trim();
         produto.setDescricao(descricao.isBlank() ? produto.getDescricao() : descricao);
     }
 
@@ -203,6 +215,7 @@ public class ProdutoMenu {
 
             if (ConsoleUtils.confirmar(scanner, "Deseja atualizar a Categoria ?")) {
                 categoriaMenu.listar(1);
+                System.out.print("Digite ID da Categoria: ");
 
                 var categoria = categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
 
@@ -244,15 +257,11 @@ public class ProdutoMenu {
         listar(1);
 
         try {
-            System.out.println("Selecione um ID");
-            Produto produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
-            System.out.println("ID: " + produto.getId());
-            System.out.println("Descricao: " + produto.getDescricao());
-            System.out.println("Preco venda: " + produto.getPrecoVenda());
-            System.out.println("Preco custo: " + produto.getPrecoCusto());
-            System.out.println("Categoria: " + produto.getCategoria().getDescricao());
-            System.out.println("Ativo: " + (produto.isAtivo() ? "SIM" : "NÃO"));
-        } catch (IllegalArgumentException e) {
+            System.out.print("Selecione um ID: ");
+            var produto = produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID"));
+
+            ProdutosGrid.exibirDetalhesProduto(produto);
+        } catch (FalhaAoBuscarProdutoException | FalhaProdutoNaoExisteException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -261,26 +270,32 @@ public class ProdutoMenu {
      * @param idLista 1 Lista todos, 2 Lista por Descrição, 3 Lista por ID e 4 Lista todos ativos
      */
     public void listar(int idLista) {
-        List<Produto> produtos = new ArrayList<>();
-        switch (idLista) {
-            case 1 -> produtos = produtoService.buscarTodos();
-            case 2 -> {
-                System.out.print("Digite a descrição: ");
-                produtos = produtoService.buscarPorDescricao(scanner.nextLine());
-            }
-            case 3 -> {
-                System.out.print("Digite o ID: ");
-                try {
-                    produtos.add(produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID")));
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
+        try {
+            List<Produto> produtos = new ArrayList<>();
+
+            switch (idLista) {
+                case 1 -> produtos = produtoService.buscarTodos();
+                case 2 -> {
+                    System.out.print("Digite a descricao: ");
+                    produtos = produtoService.buscarPorDescricao(scanner.nextLine());
                 }
+                case 3 -> {
+                    System.out.print("Digite o ID: ");
+                    try {
+                        produtos.add(produtoService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID")));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                case 4 -> produtos = produtoService.buscarTodosAtivos();
+                case 5 -> produtos = produtoService.buscarTodosInativos();
+                default -> System.out.println("opcao invalida!");
             }
-            case 4 -> produtos = produtoService.buscarTodosAtivos();
-            case 5 -> produtos = produtoService.buscarTodosInativos();
-            default -> System.out.println("opção inválida!");
+            ProdutosGrid.exibirGridProdutos(produtos);
+        } catch (FalhaAoBuscarProdutoException | FalhaProdutoEstaInativoException | FalhaProdutoEstaAtivoException |
+                FalhaProdutoNaoExisteException e) {
+            System.out.println(e.getMessage());
         }
-        ProdutosGrid.exibirGridProdutos(produtos);
     }
 
     private Categoria selecionarCategoria() {

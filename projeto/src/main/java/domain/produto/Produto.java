@@ -1,9 +1,12 @@
 package domain.produto;
 
 import domain.categoria.Categoria;
+import domain.exception.FalhaValorNaoPodeSerNegativoException;
+import domain.exception.FalhaValorObrigatorioException;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @ToString
@@ -15,22 +18,27 @@ public class Produto {
     private BigDecimal precoVenda;
     private BigDecimal precoCusto;
     private boolean ativo;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedOn;
     private Categoria categoria;
 
     @Builder
-    private Produto(Long id, String descricao, BigDecimal precoVenda, BigDecimal precoCusto, boolean ativo, Categoria categoria) {
+    private Produto(Long id, String descricao, BigDecimal precoVenda, BigDecimal precoCusto,
+                    boolean ativo, LocalDateTime createdAt, LocalDateTime modifiedOn, Categoria categoria) {
         this.id = id;
         setDescricao(descricao.trim());
         setPrecoVenda(precoVenda);
         setPrecoCusto(precoCusto);
         this.ativo = ativo;
+        this.createdAt = createdAt;
+        this.modifiedOn = modifiedOn;
         setCategoria(categoria);
     }
 
     public void setDescricao(String descricao) {
 
         if (descricao == null || descricao.isBlank()) {
-            throw new IllegalArgumentException("Descricao obrigatoria.");
+            throw new FalhaValorObrigatorioException("Descricao obrigatoria.");
         }
 
         this.descricao = descricao;
@@ -39,11 +47,11 @@ public class Produto {
     public void setPrecoVenda(BigDecimal precoVenda) {
 
         if (precoVenda == null) {
-            throw new IllegalArgumentException("Preco de venda obrigatorio.");
+            throw new FalhaValorObrigatorioException("Preco de venda obrigatorio.");
         }
 
         if (precoVenda.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Preco de venda deve ser maior que zero");
+            throw new FalhaValorNaoPodeSerNegativoException("Preco de venda deve ser maior que zero");
         }
 
         this.precoVenda = precoVenda;
@@ -56,7 +64,7 @@ public class Produto {
         }
 
         if (precoCusto.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Preco de custo nao deve ser menor que zero");
+            throw new FalhaValorNaoPodeSerNegativoException("Preco de custo nao deve ser menor que zero");
         }
 
         this.precoCusto = precoCusto;
@@ -78,5 +86,7 @@ public class Produto {
     public void inativar() {
         this.ativo = false;
     }
+
+    public void setModifiedOn() { this.modifiedOn = LocalDateTime.now(); }
 
 }

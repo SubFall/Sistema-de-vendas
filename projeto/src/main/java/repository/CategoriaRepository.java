@@ -111,7 +111,7 @@ public class CategoriaRepository {
         }
     }
 
-    public Categoria buscarPorId(Long idCategoria) {
+    public Categoria buscarPorId(Long idCategoria) throws SQLException {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -124,8 +124,6 @@ public class CategoriaRepository {
                     return mapearCategoria(rs);
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao buscar por ID", e);
         }
         return null;
     }

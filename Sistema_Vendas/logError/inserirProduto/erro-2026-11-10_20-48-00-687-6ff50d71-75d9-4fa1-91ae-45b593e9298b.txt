@@ -1,0 +1,11 @@
+Data: 2026-11-10T20:48:00.689517700
+Método: inserirProduto
+Erro: null
+
+java.sql.SQLException
+	at repository.ProdutoRepository.inserirProduto(ProdutoRepository.java:32)
+	at service.ProdutoService.inserirProduto(ProdutoService.java:25)
+	at ui.produto.ProdutoMenu.cadastrar(ProdutoMenu.java:84)
+	at ui.produto.ProdutoMenu.iniciar(ProdutoMenu.java:34)
+	at test.Principal.iniciar(Principal.java:123)
+	at test.Principal.main(Principal.java:97)

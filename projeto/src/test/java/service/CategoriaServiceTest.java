@@ -45,7 +45,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void inserirCategoria_RetornaCategoriaPadrao() {
+    void inserirCategoria_RetornaCategoriaPadrao() throws SQLException {
         var categoriaPadrao = categoriaList.getFirst();
 
         BDDMockito.when(repository.buscarPorId(categoriaPadrao.getId())).thenReturn(categoriaPadrao);
@@ -68,7 +68,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deletarInativarCategoria_AtualizarStatusCategoria_QuandoForBemSucedido_RetornaZero() {
+    void deletarInativarCategoria_AtualizarStatusCategoria_QuandoForBemSucedido_RetornaZero() throws SQLException {
         var categoria = categoriaList.getLast();
 
         BDDMockito.when(repository.buscarPorId(categoria.getId())).thenReturn(categoria);
@@ -81,7 +81,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deletarInativarCategoria_DeletarCategoria_QuandoForBemSucedido_RetornaUm() {
+    void deletarInativarCategoria_DeletarCategoria_QuandoForBemSucedido_RetornaUm() throws SQLException {
         var categoria = categoriaList.getLast();
 
         BDDMockito.when(repository.buscarPorId(categoria.getId())).thenReturn(categoria);
@@ -94,7 +94,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deletarInativarCategoria_LancaExcecao_DeletarCategoriaPadrao_RetornaMenosUm() {
+    void deletarInativarCategoria_LancaExcecao_DeletarCategoriaPadrao_RetornaMenosUm() throws SQLException {
         var categoriaPadrao = categoriaList.getFirst();
 
         BDDMockito.when(repository.buscarPorId(categoriaPadrao.getId())).thenReturn(categoriaPadrao);
@@ -105,7 +105,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deletarInativarCategoria_BuscarPorId_LancaExcecao_RetornaMenosUm() {
+    void deletarInativarCategoria_BuscarPorId_LancaExcecao_RetornaMenosUm() throws SQLException {
         var categoria = categoriaList.getLast();
 
         BDDMockito.when(repository.buscarPorId(categoria.getId()))
@@ -117,7 +117,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deletarInativarCategoria_CategoriaPossuiProdutos_LancaExcecao_RetornaMenosUm() {
+    void deletarInativarCategoria_CategoriaPossuiProdutos_LancaExcecao_RetornaMenosUm() throws SQLException {
         var categoria = categoriaList.getLast();
 
         BDDMockito.when(repository.buscarPorId(categoria.getId())).thenReturn(categoria);
@@ -130,7 +130,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deletarInativarCategoria_AtualizarStatusCategoria_LancaExcecao_RetornaMenosUm() {
+    void deletarInativarCategoria_AtualizarStatusCategoria_LancaExcecao_RetornaMenosUm() throws SQLException {
         var categoria = categoriaList.getLast();
 
         BDDMockito.when(repository.buscarPorId(categoria.getId())).thenReturn(categoria);
@@ -144,7 +144,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void deletarInativarCategoria_DeletarCategoria_LancaExcecao_RetornaMenosUm() {
+    void deletarInativarCategoria_DeletarCategoria_LancaExcecao_RetornaMenosUm() throws SQLException {
         var categoria = categoriaList.getLast();
 
         BDDMockito.when(repository.buscarPorId(categoria.getId())).thenReturn(categoria);
@@ -218,7 +218,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void buscarPorId_RetornaCategoriia_QuandoForBemSucedido() {
+    void buscarPorId_RetornaCategoriia_QuandoForBemSucedido() throws SQLException {
         var categoria = categoriaList.getFirst();
 
         BDDMockito.when(repository.buscarPorId(categoria.getId())).thenReturn(categoria);
@@ -229,7 +229,7 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void buscarPorId_ValidarCategoriaExisteLancaExcecao() {
+    void buscarPorId_ValidarCategoriaExisteLancaExcecao() throws SQLException {
         var id = 99L;
 
         BDDMockito.when(repository.buscarPorId(id))
