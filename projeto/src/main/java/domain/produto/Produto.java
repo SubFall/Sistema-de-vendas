@@ -1,8 +1,8 @@
 package domain.produto;
 
 import domain.categoria.Categoria;
-import domain.exception.FalhaValorNaoPodeSerNegativoException;
-import domain.exception.FalhaValorObrigatorioException;
+import domain.exception.produto.FalhaValorNaoPodeSerNegativoException;
+import domain.exception.produto.FalhaValorObrigatorioException;
 import lombok.*;
 
 import java.math.BigDecimal;

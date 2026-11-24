@@ -1,6 +1,8 @@
 package ui.categoria;
 
 import domain.categoria.Categoria;
+import domain.exception.categoria.*;
+import domain.exception.produto.FalhaAoBuscarCategoriaException;
 import lombok.RequiredArgsConstructor;
 import service.CategoriaService;
 import ui.grid.CategoriaGrid;
@@ -44,27 +46,25 @@ public class CategoriaMenu {
     }
 
     private void cadastrarCategoria() {
-
         try {
             System.out.print("Descricao: ");
             var categoria = Categoria.builder().descricao(scanner.nextLine()).build();
 
-            var categoriaCadastrada = categoriaService.inserirCategoria(categoria);
+            var isCategoriaCadastrada = categoriaService.inserirCategoria(categoria);
 
-            if (categoriaCadastrada != null && Categoria.ID_SEM_CATEGORIA.equals(categoriaCadastrada.getId())) {
-                System.out.println("Categoria padrao utilizada: " + categoriaCadastrada.getDescricao());
-            } else if (categoriaCadastrada != null) {
-                System.out.println("Categoria " + categoriaCadastrada.getDescricao() + " cadastrada com sucesso!");
+            if (isCategoriaCadastrada != null && Categoria.ID_SEM_CATEGORIA.equals(isCategoriaCadastrada.getId())) {
+                System.out.println("Categoria padrao utilizada: " + isCategoriaCadastrada.getDescricao());
+            } else if (isCategoriaCadastrada != null) {
+                System.out.println("Categoria " + isCategoriaCadastrada.getDescricao() + " cadastrada com sucesso!");
             } else {
                 System.out.println("Erro ao inserir categoria: " + categoria.getDescricao());
             }
-        } catch (IllegalArgumentException e) {
+        } catch (FalhaAoInserirCategoriaException | FalhaCategoriaNaoExisteException | FalhaCategoriaJaExisteException e) {
             System.out.println(e.getMessage());
         }
     }
 
     private void removerCategoria() {
-
         try {
             listar(1);
 
@@ -83,13 +83,12 @@ public class CategoriaMenu {
             } else {
                 System.out.println("Erro ao inativar/deletar");
             }
-        } catch (IllegalArgumentException e) {
+        } catch (FalhaAoDeletarOuInativarCategoriaException | FalhaCategoriaPadraoNaoPodeAlterarException e) {
             System.out.println(e.getMessage());
         }
     }
 
     private void atualizarCategoria() {
-
         try {
             listar(1);
             System.out.println("Selecione um ID para atualizar");
@@ -108,7 +107,7 @@ public class CategoriaMenu {
             } else {
                 System.out.println("Ops! Erro ao Atualizar Categoria " + categoria.getDescricao());
             }
-        } catch (IllegalArgumentException e) {
+        } catch (FalhaAoAtualizarCategoriaException | FalhaCategoriaJaExisteException | FalhaCategoriaPadraoNaoPodeAlterarException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -137,22 +136,22 @@ public class CategoriaMenu {
 
     public void listar(int idLista) {
         List<Categoria> categorias = new ArrayList<>();
-        switch (idLista) {
-            case 1 -> categorias = categoriaService.buscarTodos();
-            case 2 -> {
-                System.out.print("Digite a descrição: ");
-                categorias = categoriaService.buscarPorDescricao(scanner.nextLine());
-            }
-            case 3 -> {
-                System.out.print("Digite o ID: ");
-
-                try {
-                    categorias.add(categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID")));
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
+        try {
+            switch (idLista) {
+                case 1 -> categorias = categoriaService.buscarTodos();
+                case 2 -> {
+                    System.out.print("Digite a descrição: ");
+                    categorias = categoriaService.buscarPorDescricao(scanner.nextLine());
                 }
+                case 3 -> {
+                    System.out.print("Digite o ID: ");
+
+                    categorias.add(categoriaService.buscarPorId(ConsoleUtils.lerLong(scanner, "ID")));
+                }
+                default -> System.out.println("opção inválida!");
             }
-            default -> System.out.println("opção inválida!");
+        } catch (FalhaAoBuscarCategoriaException | FalhaCategoriaNaoExisteException e) {
+            System.out.println(e.getMessage());
         }
         CategoriaGrid.exibirGridCategoria(categorias);
     }

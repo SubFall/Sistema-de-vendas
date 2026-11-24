@@ -1,4 +1,4 @@
-package domain.exception;
+package domain.exception.categoria;
 
 public class FalhaAoBuscarCategoriaException extends RuntimeException {
     public FalhaAoBuscarCategoriaException() {

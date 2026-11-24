@@ -1,7 +1,7 @@
 package service;
 
 import domain.categoria.Categoria;
-import domain.exception.*;
+import domain.exception.produto.*;
 import domain.produto.Produto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

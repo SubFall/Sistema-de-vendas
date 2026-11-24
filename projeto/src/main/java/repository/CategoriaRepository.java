@@ -17,7 +17,7 @@ public class CategoriaRepository {
         this.connectionProvider = connectionProvider;
     }
 
-    public boolean inserirCategoria(Categoria categoria) {
+    public boolean inserirCategoria(Categoria categoria) throws SQLException {
         String sql = "INSERT INTO categoria (descricao) VALUES (?);";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -26,12 +26,10 @@ public class CategoriaRepository {
             ps.setString(1, categoria.getDescricao());
 
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao inserir Categoria!", e);
         }
     }
 
-    public boolean deletarCategoria(Long idCategoria) {
+    public boolean deletarCategoria(Long idCategoria) throws SQLException {
         String sql = "DELETE FROM categoria WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -40,12 +38,10 @@ public class CategoriaRepository {
             ps.setLong(1, idCategoria);
 
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao Deletar Categoria", e);
         }
     }
 
-    public boolean atualizarStatusCategoria(boolean ativo, Long idCategoria) {
+    public boolean atualizarStatusCategoria(boolean ativo, Long idCategoria) throws SQLException {
         String sql = "UPDATE categoria SET ativo = ? WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -55,12 +51,10 @@ public class CategoriaRepository {
             ps.setLong(2, idCategoria);
 
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao atualizar Status Categoria!", e);
         }
     }
 
-    public boolean atualizarCategoria(Categoria categoria) {
+    public boolean atualizarCategoria(Categoria categoria) throws SQLException {
         String sql = "UPDATE categoria SET descricao = ?, ativo = ? WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -71,12 +65,10 @@ public class CategoriaRepository {
             ps.setLong(3, categoria.getId());
 
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao Atualizar Categoria", e);
         }
     }
 
-    public boolean categoriaPossuiProdutos(Categoria categoria) {
+    public boolean categoriaPossuiProdutos(Categoria categoria) throws SQLException {
         String sql = "SELECT 1 FROM categoria WHERE descricao = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -89,13 +81,11 @@ public class CategoriaRepository {
                     return true;
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao verificar Categoria tem Produtos!", e);
         }
         return false;
     }
 
-    public boolean categoriaPossuiProdutos(int idCategoria) {
+    public boolean categoriaPossuiProdutos(int idCategoria) throws SQLException {
         String sql = "SELECT 1 FROM produtos WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -106,12 +96,10 @@ public class CategoriaRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    public Categoria buscarPorId(Long idCategoria) throws SQLException {
+    public Categoria buscarPorId(Long idCategoria) throws SQLException  {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria WHERE id_categoria = ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -128,7 +116,7 @@ public class CategoriaRepository {
         return null;
     }
 
-    public List<Categoria> buscarPorDescricao(String descricao) {
+    public List<Categoria> buscarPorDescricao(String descricao) throws SQLException {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria WHERE descricao LIKE ? ORDER BY descricao;";
         List<Categoria> categorias = new ArrayList<>();
 
@@ -142,13 +130,11 @@ public class CategoriaRepository {
                     categorias.add(mapearCategoria(rs));
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
         return categorias;
     }
 
-    public List<Categoria> buscarTodos() {
+    public List<Categoria> buscarTodos() throws SQLException {
         String sql = "SELECT id_categoria, descricao, ativo FROM categoria ORDER BY descricao;";
         List<Categoria> categorias = new ArrayList<>();
 
@@ -159,14 +145,11 @@ public class CategoriaRepository {
             while (rs.next()) {
                 categorias.add(mapearCategoria(rs));
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
         return categorias;
     }
 
-    public boolean existeOutraCategoriaComDescricao(String descricao, Long idCategoria) {
+    public boolean existeOutraCategoriaComDescricao(String descricao, Long idCategoria) throws SQLException {
         String sql = "SELECT 1 FROM categoria WHERE descricao = ? AND id_categoria <> ?;";
 
         try (Connection conn = connectionProvider.getConnection();
@@ -178,8 +161,6 @@ public class CategoriaRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao verificar Outra Categoria Com Descricao", e);
         }
     }
 

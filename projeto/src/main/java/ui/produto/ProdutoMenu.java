@@ -1,7 +1,7 @@
 package ui.produto;
 
 import domain.categoria.Categoria;
-import domain.exception.*;
+import domain.exception.produto.*;
 import domain.produto.Produto;
 import lombok.RequiredArgsConstructor;
 import service.CategoriaService;
@@ -95,7 +95,7 @@ public class ProdutoMenu {
                 System.out.println("Erro ao inserir Produto!");
             }
         } catch (IllegalArgumentException | FalhaAoInserirProdutoException | FalhaValorObrigatorioException |
-                FalhaValorNaoPodeSerNegativoException | FalhaValorJaRegistradoException e) {
+                 FalhaValorNaoPodeSerNegativoException | FalhaValorJaRegistradoException e) {
             System.out.println(e.getMessage());
         }
     }

@@ -1,4 +1,4 @@
-package domain.exception;
+package domain.exception.produto;
 
 public class FalhaProdutoEstaAtivoException extends RuntimeException {
     public FalhaProdutoEstaAtivoException() {

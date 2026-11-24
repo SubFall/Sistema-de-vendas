@@ -1,7 +1,6 @@
 package service;
 
-import domain.categoria.Categoria;
-import domain.exception.*;
+import domain.exception.produto.*;
 import domain.produto.Produto;
 import lombok.RequiredArgsConstructor;
 import repository.CategoriaRepository;
@@ -26,7 +25,7 @@ public class ProdutoService {
 
             return produtoRepository.inserirProduto(produto);
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","inserirProduto", e);
+            Log.registrarErro("ProdutoService", "inserirProduto", e);
             throw new FalhaAoInserirProdutoException(
                     "Nao foi possivel cadastrar o produto. Tente novamente.", e
             );
@@ -39,9 +38,9 @@ public class ProdutoService {
 
             return produtoRepository.atualizarStatusProduto(produto);
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","atualizarStatusProduto", e);
+            Log.registrarErro("ProdutoService", "atualizarStatusProduto", e);
             throw new FalhaAoAtualizarProdutoException(
-              "Nao foi possivel atualizar o produto. Tente novamente."
+                    "Nao foi possivel atualizar o produto. Tente novamente."
             );
         }
     }
@@ -53,7 +52,7 @@ public class ProdutoService {
 
             return produtoRepository.atualizarProduto(produto);
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","atualizarProduto", e);
+            Log.registrarErro("ProdutoService", "atualizarProduto", e);
             throw new FalhaAoAtualizarProdutoException(
                     "Nao foi possivel atualizar o produto. Tente novamente."
             );
@@ -64,7 +63,7 @@ public class ProdutoService {
         try {
             return produtoRepository.buscarTodos();
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","buscarTodos", e);
+            Log.registrarErro("ProdutoService", "buscarTodos", e);
             throw new FalhaAoBuscarProdutoException(
                     "Nao foi possivel buscar o produto. Tente novamente."
             );
@@ -75,7 +74,7 @@ public class ProdutoService {
         try {
             return produtoRepository.buscarTodosPorStatus(true);
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","buscarTodosAtivos", e);
+            Log.registrarErro("ProdutoService", "buscarTodosAtivos", e);
             throw new FalhaAoBuscarProdutoException(
                     "Nao foi possivel buscar o produto. Tente novamente."
             );
@@ -86,7 +85,7 @@ public class ProdutoService {
         try {
             return produtoRepository.buscarTodosPorStatus(false);
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","buscarTodosInativos", e);
+            Log.registrarErro("ProdutoService", "buscarTodosInativos", e);
             throw new FalhaAoBuscarProdutoException(
                     "Nao foi possivel buscar o produto. Tente novamente."
             );
@@ -97,7 +96,7 @@ public class ProdutoService {
         try {
             return validarProdutoExiste(produtoRepository.buscarPorId(idProduto));
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","buscarPorId", e);
+            Log.registrarErro("ProdutoService", "buscarPorId", e);
             throw new FalhaAoBuscarProdutoException(
                     "Nao foi possivel buscar o produto. Tente novamente."
             );
@@ -108,7 +107,7 @@ public class ProdutoService {
         try {
             return validarProdutoAtivo(produtoRepository.buscarPorId(idProduto));
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","buscarPorIdAtivo", e);
+            Log.registrarErro("ProdutoService", "buscarPorIdAtivo", e);
             throw new FalhaAoBuscarProdutoException(
                     "Nao foi possivel buscar o produto. Tente novamente."
             );
@@ -119,7 +118,7 @@ public class ProdutoService {
         try {
             return validarProdutoInativo(produtoRepository.buscarPorId(idProduto));
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","buscarPorIdInativo", e);
+            Log.registrarErro("ProdutoService", "buscarPorIdInativo", e);
             throw new FalhaAoBuscarProdutoException(
                     "Nao foi possivel buscar o produto. Tente novamente."
             );
@@ -133,7 +132,7 @@ public class ProdutoService {
             }
             return produtoRepository.buscarPorDescricao(descricao);
         } catch (SQLException e) {
-            Log.registrarErro("ProdutoService","buscarPorDescricao", e);
+            Log.registrarErro("ProdutoService", "buscarPorDescricao", e);
             throw new FalhaAoBuscarProdutoException(
                     "Nao foi possivel buscar o produto. Tente novamente."
             );

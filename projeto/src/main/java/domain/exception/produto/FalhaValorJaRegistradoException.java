@@ -1,4 +1,4 @@
-package domain.exception;
+package domain.exception.produto;
 
 public class FalhaValorJaRegistradoException extends RuntimeException {
     public FalhaValorJaRegistradoException() {
